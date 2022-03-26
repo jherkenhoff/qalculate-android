@@ -1,0 +1,60 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+  <group android:scaleX="1.6875"
+      android:scaleY="1.6875">
+    <path
+        android:pathData="M0,0h32v64h-32z"
+        android:strokeLineJoin="round"
+        android:strokeWidth="0.565685"
+        android:fillColor="#4d4d4d"
+        android:strokeColor="#00000000"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M32,0h32v64h-32z"
+        android:strokeLineJoin="round"
+        android:strokeWidth="0.4"
+        android:strokeColor="#00000000"
+        android:strokeLineCap="round">
+      <aapt:attr name="android:fillColor">
+        <gradient 
+            android:startY="9.155139"
+            android:startX="42.37603"
+            android:endY="55.00769"
+            android:endX="42.37603"
+            android:type="linear">
+          <item android:offset="0" android:color="#FFD4279F"/>
+          <item android:offset="1" android:color="#FFFA3DA3"/>
+        </gradient>
+      </aapt:attr>
+    </path>
+    <path
+        android:pathData="M0,32h32v32h-32z"
+        android:strokeAlpha="0.1"
+        android:strokeLineJoin="round"
+        android:strokeWidth="0.4"
+        android:fillColor="#ffffff"
+        android:strokeColor="#00000000"
+        android:fillAlpha="0.1"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M32,0h3.0746v64h-3.0746z"
+        android:strokeWidth="1.05301"
+        android:fillType="evenOdd">
+      <aapt:attr name="android:fillColor">
+        <gradient 
+            android:startY="31.708462"
+            android:startX="35.074062"
+            android:endY="31.708462"
+            android:endX="31.999453"
+            android:type="linear">
+          <item android:offset="0" android:color="#00000000"/>
+          <item android:offset="1" android:color="#27000000"/>
+        </gradient>
+      </aapt:attr>
+    </path>
+  </group>
+</vector>

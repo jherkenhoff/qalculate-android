@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   enable-background="new"
+   version="1.0"
+   id="svg87"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs29">
+    <linearGradient
+       id="linearGradient1074-7"
+       x1="152"
+       x2="137.5"
+       y1="156"
+       y2="156"
+       gradientTransform="matrix(0.21204195,0,0,0.28829436,2.8436854,-13.265456)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         stop-opacity="0"
+         offset="0"
+         id="stop8" />
+      <stop
+         stop-opacity=".15644"
+         offset="1"
+         id="stop10" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2128"
+       x1="216"
+       x2="216"
+       y1="28"
+       y2="284"
+       gradientTransform="matrix(0.16230948,0,0,0.17911153,7.3171837,4.1400164)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         stop-color="#d4279f"
+         offset="0"
+         id="stop13" />
+      <stop
+         stop-color="#fa3da3"
+         offset="1"
+         id="stop15" />
+    </linearGradient>
+  </defs>
+  <g
+     id="layer2"
+     style="display:inline;opacity:1">
+    <rect
+       style="opacity:1;fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:0.565685;stroke-linecap:round;stroke-linejoin:round;stop-color:#000000"
+       id="rect2775"
+       width="32"
+       height="64"
+       x="0"
+       y="0" />
+    <rect
+       style="opacity:1;fill:url(#linearGradient2128);fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stop-color:#000000"
+       id="rect1996"
+       width="32"
+       height="64"
+       x="32"
+       y="0" />
+    <rect
+       style="opacity:0.1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stop-color:#000000"
+       id="rect6118"
+       width="32"
+       height="32"
+       x="0"
+       y="32" />
+    <rect
+       x="32"
+       y="0"
+       width="3.0746183"
+       height="64"
+       enable-background="new"
+       fill="url(#linearGradient1074-7)"
+       fill-rule="evenodd"
+       id="rect63"
+       style="fill:url(#linearGradient1074-7);stroke-width:1.05301" />
+  </g>
+</svg>
