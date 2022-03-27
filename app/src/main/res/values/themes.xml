@@ -6,9 +6,9 @@
         <item name="colorPrimaryVariant">@color/qalculate_pink</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondary">@color/bluegrey_800</item>
+        <item name="colorSecondaryVariant">@color/bluegrey_800</item>
+        <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
@@ -22,4 +22,20 @@
     <style name="Theme.Qalculate.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Qalculate.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Widget.Button.NumberPad" parent="Widget.AppCompat.Button">
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:minWidth">84dp</item>
+        <item name="android:minHeight">84dp</item>
+        <item name="backgroundTint">?attr/colorSecondary</item>
+        <item name="android:backgroundTint">?attr/colorSecondary</item>
+        <item name="android:width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="Widget.Button.Operator" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:minHeight">67dp</item>
+        <item name="android:textSize">22sp</item>
+    </style>
 </resources>
