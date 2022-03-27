@@ -11,6 +11,13 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         init {
+            System.loadLibrary("c++_shared")
+            System.loadLibrary("lzma")
+            System.loadLibrary("gmp")
+            System.loadLibrary("mpfr")
+            System.loadLibrary("iconv")
+            System.loadLibrary("xml2")
+            System.loadLibrary("qalculate")
             System.loadLibrary("libqalculate_swig")
         }
     }
