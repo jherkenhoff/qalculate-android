@@ -12,6 +12,9 @@ android {
         targetSdk 31
         versionCode 1
         versionName "1.0"
+        ndk {
+            abiFilters "x86", "armeabi-v7a"
+        }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
