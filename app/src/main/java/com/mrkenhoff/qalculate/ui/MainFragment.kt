@@ -1,5 +1,8 @@
 package com.mrkenhoff.qalculate.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,10 +13,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import com.mrkenhoff.qalculate.databinding.FragmentMainBinding
-import com.mrkenhoff.libqalculate.Calculator
+import com.mrkenhoff.qalculate.R
 
 
 /**
@@ -81,6 +84,14 @@ class MainFragment : Fragment() {
                 viewModel.setInput(s.toString())
             }
         })
+        binding.resultTextView.setOnLongClickListener {
+            val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = ClipData.newPlainText(
+                requireContext().getString(R.string.app_name), binding.resultTextView.text)
+            clipboardManager.setPrimaryClip(clipData)
+            Snackbar.make(requireView(), R.string.copied_to_clipboard, Snackbar.LENGTH_LONG).show()
+            true
+        }
     }
 
     private fun type(text: String) {
