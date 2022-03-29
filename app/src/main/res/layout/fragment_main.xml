@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:calculatorButton="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -62,48 +63,45 @@
         android:gravity="end">
 
         <include
+            android:id="@+id/numPad"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:id="@+id/numPad"
             layout="@layout/number_pad" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
             android:orientation="vertical">
 
-            <Button
+            <com.mrkenhoff.qalculate.ui.CalculatorButton
                 android:id="@+id/deleteButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="⌫"
                 style="@style/Widget.Button.Operator" />
 
-            <Button
-                android:id="@+id/operatorDivide"
+            <com.mrkenhoff.qalculate.ui.CalculatorButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="÷"
+                calculatorButton:typedText="/"
                 style="@style/Widget.Button.Operator" />
 
-            <Button
-                android:id="@+id/operatorMultiply"
+            <com.mrkenhoff.qalculate.ui.CalculatorButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="×"
+                calculatorButton:typedText="*"
                 style="@style/Widget.Button.Operator" />
 
-            <Button
-                android:id="@+id/operatorMinus"
+            <com.mrkenhoff.qalculate.ui.CalculatorButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="-"
                 style="@style/Widget.Button.Operator" />
 
-            <Button
-                android:id="@+id/operatorPlus"
+            <com.mrkenhoff.qalculate.ui.CalculatorButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="+"
