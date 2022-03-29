@@ -12,12 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import com.mrkenhoff.qalculate.databinding.FragmentMainBinding
 import com.mrkenhoff.qalculate.R
-
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -33,48 +33,22 @@ class MainFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        viewModel.resultString.observe(viewLifecycleOwner, Observer { newResult ->
+        viewModel.resultString.observe(viewLifecycleOwner) { newResult ->
             binding.resultTextView.text = newResult.toString()
-        })
+        }
+        childFragmentManager.beginTransaction()
+            .add(R.id.button_panel, ButtonLayoutFragment.newInstance("layouts/main.xml"))
+            .commit()
 
+        EventBus.getDefault().register(this)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.numPad.num1.setOnClickListener { type("1") }
-        binding.numPad.num2.setOnClickListener { type("2") }
-        binding.numPad.num3.setOnClickListener { type("3") }
-        binding.numPad.num4.setOnClickListener { type("4") }
-        binding.numPad.num5.setOnClickListener { type("5") }
-        binding.numPad.num6.setOnClickListener { type("6") }
-        binding.numPad.num7.setOnClickListener { type("7") }
-        binding.numPad.num8.setOnClickListener { type("8") }
-        binding.numPad.num9.setOnClickListener { type("9") }
-        binding.numPad.num0.setOnClickListener { type("0") }
-        binding.numPad.dot.setOnClickListener { type(".") }
-        binding.numPad.e.setOnClickListener { type("E") }
-
-        binding.operatorDivide.setOnClickListener { type("/") }
-        binding.operatorMultiply.setOnClickListener { type("*") }
-        binding.operatorMinus.setOnClickListener { type("-") }
-        binding.operatorPlus.setOnClickListener { type("+") }
-
-        binding.deleteButton.setOnClickListener {
-            val end = binding.inputText.selectionEnd
-            if (end > 0) {
-                binding.inputText.text.replace(end - 1, end, "")
-            }
-        }
-        binding.deleteButton.setOnLongClickListener {
-            binding.inputText.setText("")
-            true
-        }
         binding.inputText.setOnKeyListener { _, keyCode, _ -> keyCode == KeyEvent.KEYCODE_ENTER }
         binding.inputText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {}
@@ -94,12 +68,21 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun type(text: String) {
-        binding.inputText.text.insert(binding.inputText.selectionStart, text)
+    @Subscribe
+    fun type(event: ButtonEvent) {
+        if (event.text == "@backspace@") {
+            val end = binding.inputText.selectionEnd
+            if (end > 0) {
+                binding.inputText.text.replace(end - 1, end, "")
+            }
+        } else {
+            binding.inputText.text.insert(binding.inputText.selectionStart, event.text)
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        EventBus.getDefault().unregister(this)
         _binding = null
     }
 }

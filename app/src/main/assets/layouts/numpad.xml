@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<vertical>
+    <horizontal>
+        <button text="7" /> <button text="8" /> <button text="9" />
+    </horizontal>
+    <horizontal>
+        <button text="4" /> <button text="5" /> <button text="6" />
+    </horizontal>
+    <horizontal>
+        <button text="1" /> <button text="2" /> <button text="3" />
+    </horizontal>
+    <horizontal>
+        <button text="0" /> <button text="." /> <button text="E" style="outlined" />
+    </horizontal>
+</vertical>

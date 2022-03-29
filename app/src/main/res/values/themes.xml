@@ -12,6 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="calculatorButtonDefault">@style/CalculatorButton.Default</item>
+        <item name="calculatorButtonOutlined">@style/CalculatorButton.Outlined</item>
     </style>
 
     <style name="Theme.Qalculate.NoActionBar">
@@ -19,23 +21,14 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.Qalculate.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="Theme.Qalculate.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="Widget.Button.NumberPad" parent="Widget.AppCompat.Button">
+    <style name="CalculatorButton.Default" parent="Widget.MaterialComponents.Button">
         <item name="android:textColor">?attr/colorOnSecondary</item>
-        <item name="android:minWidth">84dp</item>
-        <item name="android:minHeight">84dp</item>
         <item name="backgroundTint">?attr/colorSecondary</item>
         <item name="android:backgroundTint">?attr/colorSecondary</item>
-        <item name="android:width">0dp</item>
-        <item name="android:layout_weight">1</item>
         <item name="android:textSize">22sp</item>
     </style>
 
-    <style name="Widget.Button.Operator" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:minHeight">67dp</item>
+    <style name="CalculatorButton.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:textSize">22sp</item>
     </style>
 </resources>

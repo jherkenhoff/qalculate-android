@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<vertical>
+    <horizontal weight="3">
+        <include src="layouts/numpad.xml" weight="3" />
+        <vertical>
+            <button text="⌫" typedText="@backspace@" style="outlined" />
+            <button text="÷" typedText="/" style="outlined" />
+            <button text="×" typedText="*" style="outlined" />
+            <button text="-" style="outlined" />
+            <button text="+" style="outlined" />
+        </vertical>
+    </horizontal>
+    <space />
+</vertical>
