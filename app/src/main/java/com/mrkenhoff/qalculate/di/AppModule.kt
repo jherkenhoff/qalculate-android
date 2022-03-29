@@ -26,6 +26,8 @@ class AppModule {
         System.loadLibrary("xml2")
         System.loadLibrary("qalculate")
         System.loadLibrary("libqalculate_swig")
-        return Calculator()
+        var calc = Calculator()
+        calc.loadGlobalDefinitions()
+        return calc
     }
 }

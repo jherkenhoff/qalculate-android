@@ -10,7 +10,6 @@ import com.mrkenhoff.libqalculate.Calculator
 @HiltViewModel
 class MainViewModel @Inject constructor(private val calculator: Calculator) : ViewModel() {
 
-
     val inputStringPrivate = MutableLiveData<String>()
     val inputString: LiveData<String> get() = inputStringPrivate
 
@@ -24,7 +23,6 @@ class MainViewModel @Inject constructor(private val calculator: Calculator) : Vi
             doCalculation()
         }
     }
-
 
     private fun doCalculation() {
         resultStringPrivate.value = calculator.calculateAndPrint(inputStringPrivate.value, 2000)
