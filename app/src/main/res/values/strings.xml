@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Qalculate!</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
 </resources>
