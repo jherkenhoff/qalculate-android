@@ -12,25 +12,25 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/num1"
+            android:id="@+id/num7"
+            style="@style/Widget.Button.NumberPad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1"
-            style="@style/Widget.Button.NumberPad" />
+            android:text="7" />
 
         <Button
-            android:id="@+id/num2"
+            android:id="@+id/num8"
+            style="@style/Widget.Button.NumberPad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2"
-            style="@style/Widget.Button.NumberPad" />
+            android:text="8" />
 
         <Button
-            android:id="@+id/num3"
+            android:id="@+id/num9"
+            style="@style/Widget.Button.NumberPad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3"
-            style="@style/Widget.Button.NumberPad" />
+            android:text="9" />
 
     </LinearLayout>
 
@@ -68,26 +68,25 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/num7"
+            android:id="@+id/num1"
+            style="@style/Widget.Button.NumberPad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="7"
-            style="@style/Widget.Button.NumberPad" />
+            android:text="1" />
 
         <Button
-            android:id="@+id/num8"
+            android:id="@+id/num2"
+            style="@style/Widget.Button.NumberPad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="8"
-            style="@style/Widget.Button.NumberPad" />
+            android:text="2" />
 
         <Button
-            android:id="@+id/num9"
+            android:id="@+id/num3"
+            style="@style/Widget.Button.NumberPad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="9"
-            android:textSize="22sp"
-            style="@style/Widget.Button.NumberPad" />
+            android:text="3"/>
 
     </LinearLayout>
 
