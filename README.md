@@ -1,8 +1,26 @@
-# Qalculate! Android UI
+<h1 align="center">
+ Qalculate! Android UI
+</h1>
 
-<a href="https://user-images.githubusercontent.com/5811634/160284839-a76dd58b-ae7e-447e-8697-ea81ff5c2d74.png"><img src="https://user-images.githubusercontent.com/5811634/160284839-a76dd58b-ae7e-447e-8697-ea81ff5c2d74.png" width="250"></a>
+<!-- description -->
+<p align="center">
+  <strong>~ Powerful and versatile multi-purpose calculator for the Android platform ~</strong>
+  <br/>
+  :warning: <i>This project is in very early development state</i>
+    <br />
+    <a href="https://git.mpi-hd.mpg.de/elcoTRAP/elcoSim/issues">Report Bug</a>
+    ·
+    <a href="https://git.mpi-hd.mpg.de/elcoTRAP/elcoSim/issues">Request Feature</a>
+</p>
+Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation). Features include a large library of customizable functions, unit calculations and conversion, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface.
 
-Qalculate! is a multi-purpose cross-platform desktop calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation). Features include a large library of customizable functions, unit calculations and conversion, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface.
+<br/>
+<br/>
+<p align="center">
+  <a href="https://user-images.githubusercontent.com/5811634/160284839-a76dd58b-ae7e-447e-8697-ea81ff5c2d74.png">
+    <img src="https://user-images.githubusercontent.com/5811634/160284839-a76dd58b-ae7e-447e-8697-ea81ff5c2d74.png" width="250">
+  </a>
+</p>
 
 ## Compiling
 You need to have the Android `NDK` installed. For building the native binaries, you also need `swig`.
