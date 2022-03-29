@@ -1,0 +1,35 @@
+# Qalculate! Android UI
+
+<a href="https://user-images.githubusercontent.com/5811634/160284839-a76dd58b-ae7e-447e-8697-ea81ff5c2d74.png"><img src="https://user-images.githubusercontent.com/5811634/160284839-a76dd58b-ae7e-447e-8697-ea81ff5c2d74.png" width="250"></a>
+
+Qalculate! is a multi-purpose cross-platform desktop calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation). Features include a large library of customizable functions, unit calculations and conversion, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface.
+
+## Compiling
+You need to have the Android `NDK` installed. For building the native binaries, you also need `swig`.
+
+```
+git clone https://github.com/mr-kenhoff/libqalculate-android
+git clone https://github.com/mr-kenhoff/qalculate-android
+cd qalculate-android
+./gradlew assembleDebug
+```
+
+## Features
+Features specific to qalculate-android:
+
+* Platform-Native Graphical user interface
+* Simple default view
+* Optional calculate-as-you-type mode
+
+Features from libqalculate:
+
+* Calculation and parsing:
+* Result display:
+* Symbolic calculation:
+* Functions:
+* Units:
+* Variables and constants:
+* Plotting:
+* and more...
+
+_For more details about the syntax, and available functions, units, and variables, please consult the manual (https://qalculate.github.io/manual/)_
