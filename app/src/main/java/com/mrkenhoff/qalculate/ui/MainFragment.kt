@@ -1,4 +1,4 @@
-package com.mrkenhoff.qalculate
+package com.mrkenhoff.qalculate.ui
 
 import android.os.Bundle
 import android.text.Editable
@@ -8,14 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.mrkenhoff.libqalculate.Calculator
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import com.mrkenhoff.qalculate.databinding.FragmentMainBinding
+import com.mrkenhoff.libqalculate.Calculator
 
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
+@AndroidEntryPoint
 class MainFragment : Fragment() {
+
+    private val viewModel: MainViewModel by viewModels()
 
     private var _binding: FragmentMainBinding? = null
 
@@ -26,6 +33,11 @@ class MainFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
+
+        viewModel.resultString.observe(viewLifecycleOwner, Observer { newResult ->
+            binding.resultTextView.text = newResult.toString()
+        })
+
         return binding.root
     }
 
@@ -66,19 +78,13 @@ class MainFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                calculate()
+                viewModel.setInput(s.toString())
             }
         })
-
     }
 
     private fun type(text: String) {
         binding.inputText.text.insert(binding.inputText.selectionStart, text)
-    }
-
-    private fun calculate() {
-        val calc = Calculator()
-        binding.resultTextView.text = calc.calculateAndPrint(binding.inputText.text.toString(), 2000)
     }
 
     override fun onDestroyView() {
