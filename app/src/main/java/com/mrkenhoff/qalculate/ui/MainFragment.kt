@@ -6,12 +6,13 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import com.mrkenhoff.qalculate.databinding.FragmentMainBinding
@@ -25,12 +26,9 @@ import org.greenrobot.eventbus.Subscribe
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by activityViewModels()
 
     private var _binding: FragmentMainBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -69,15 +67,27 @@ class MainFragment : Fragment() {
     }
 
     @Subscribe
-    fun type(event: ButtonEvent) {
-        if (event.text == "@backspace@") {
-            val end = binding.inputText.selectionEnd
-            if (end > 0) {
-                binding.inputText.text.replace(end - 1, end, "")
-            }
+    fun type(event: BackspaceEvent) {
+        val start = binding.inputText.selectionStart
+        val end = binding.inputText.selectionEnd
+        // TODO: Why is start and end always the same? Possibly an upstream bug?
+        if (start == end && end > 0) {
+            binding.inputText.text.replace(end - 1, end, "")
         } else {
-            binding.inputText.text.insert(binding.inputText.selectionStart, event.text)
+            binding.inputText.text.replace(start, end, "")
         }
+    }
+    @Subscribe
+    fun type(event: ClearEvent) {
+        binding.inputText.setText("")
+    }
+
+    @Subscribe
+    fun type(event: TypeEvent) {
+        binding.inputText.text.insert(binding.inputText.selectionStart, event.textFront)
+        val cursorPos = binding.inputText.selectionStart
+        binding.inputText.text.insert(binding.inputText.selectionStart, event.textBack)
+        binding.inputText.setSelection(cursorPos)
     }
 
     override fun onDestroyView() {

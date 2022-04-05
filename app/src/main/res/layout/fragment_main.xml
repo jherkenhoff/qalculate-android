@@ -21,6 +21,8 @@
             android:padding="16dp"
             android:background="@null"
             android:textAlignment="textEnd"
+            android:cursorVisible="true"
+            android:textCursorDrawable="@null"
             android:ems="10"
             android:textColor="?attr/colorOnPrimary"
             android:inputType="textNoSuggestions|textMultiLine" />

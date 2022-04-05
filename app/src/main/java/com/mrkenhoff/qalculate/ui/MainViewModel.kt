@@ -10,14 +10,14 @@ import com.mrkenhoff.libqalculate.Calculator
 @HiltViewModel
 class MainViewModel @Inject constructor(private val calculator: Calculator) : ViewModel() {
 
-    val inputStringPrivate = MutableLiveData<String>()
-    val inputString: LiveData<String> get() = inputStringPrivate
+    val _inputString = MutableLiveData<String>()
+    val inputString: LiveData<String> get() = _inputString
 
-    val resultStringPrivate = MutableLiveData<String>()
-    val resultString: LiveData<String> get() = resultStringPrivate
+    val _resultString = MutableLiveData<String>()
+    val resultString: LiveData<String> get() = _resultString
 
     fun setInput(input: String) {
-        inputStringPrivate.value = input
+        _inputString.value = input
 
         if (true) { // TODO: If auto-calculation is switched on
             doCalculation()
@@ -25,6 +25,6 @@ class MainViewModel @Inject constructor(private val calculator: Calculator) : Vi
     }
 
     private fun doCalculation() {
-        resultStringPrivate.value = calculator.calculateAndPrint(inputStringPrivate.value, 2000)
+        _resultString.value = calculator.calculateAndPrint(_inputString.value, 2000)
     }
 }
