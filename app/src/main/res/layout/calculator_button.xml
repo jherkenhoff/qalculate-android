@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:rotation="0"
         android:text=""
-        android:translationZ="90dp"
+        android:translationZ="4dp"
         app:layout_constraintStart_toStartOf="@+id/centerButton"
         app:layout_constraintTop_toTopOf="@+id/centerButton" />
 
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
-        android:translationZ="90dp"
+        android:translationZ="4dp"
         app:layout_constraintEnd_toEndOf="@+id/centerButton"
         app:layout_constraintTop_toTopOf="@+id/centerButton" />
 
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
-        android:translationZ="90dp"
+        android:translationZ="4dp"
         app:layout_constraintBottom_toBottomOf="@+id/centerButton"
         app:layout_constraintEnd_toEndOf="@+id/centerButton" />
 
@@ -47,7 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
-        android:translationZ="90dp"
+        android:translationZ="4dp"
         app:layout_constraintBottom_toBottomOf="@+id/centerButton"
         app:layout_constraintStart_toStartOf="@+id/centerButton" />
 
