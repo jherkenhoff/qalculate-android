@@ -8,9 +8,9 @@
   <br/>
   :warning: <i>This project is in very early development state</i>
     <br />
-    <a href="https://git.mpi-hd.mpg.de/elcoTRAP/elcoSim/issues">Report Bug</a>
+    <a href="https://github.com/mr-kenhoff/qalculate-android/issues/new">Report Bug</a>
     ·
-    <a href="https://git.mpi-hd.mpg.de/elcoTRAP/elcoSim/issues">Request Feature</a>
+    <a href="https://github.com/mr-kenhoff/qalculate-android/issues/new">Request Feature</a>
 </p>
 Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation). Features include a large library of customizable functions, unit calculations and conversion, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface.
 
