@@ -6,13 +6,18 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import android.widget.ArrayAdapter
+import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import com.mrkenhoff.qalculate.databinding.FragmentMainBinding
@@ -42,11 +47,32 @@ class MainFragment : Fragment() {
             .commit()
 
         EventBus.getDefault().register(this)
+
+        val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item, viewModel.getAutoCompletionList())
+        binding.inputText.setAdapter(adapter)
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Toolbar
+        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+
+        // Find the activity's DrawerLayout
+        val drawerLayout = requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout);
+
+        val navController = NavHostFragment.findNavController(this);
+
+        NavigationUI.setupWithNavController(toolbar, navController)
+
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+
+
         binding.inputText.setOnKeyListener { _, keyCode, _ -> keyCode == KeyEvent.KEYCODE_ENTER }
         binding.inputText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {}
@@ -64,6 +90,7 @@ class MainFragment : Fragment() {
             Snackbar.make(requireView(), R.string.copied_to_clipboard, Snackbar.LENGTH_LONG).show()
             true
         }
+
     }
 
     @Subscribe

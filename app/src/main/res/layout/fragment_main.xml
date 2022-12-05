@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.MainFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DEG" />
+    </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,51 +28,48 @@
         android:orientation="vertical"
         android:paddingTop="64dp">
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/inputText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
             android:background="@null"
-            android:textAlignment="textEnd"
-            android:cursorVisible="true"
-            android:textCursorDrawable="@null"
             android:ems="10"
-            android:textColor="?attr/colorOnPrimary"
-            android:inputType="textNoSuggestions|textMultiLine" />
+            android:padding="16dp"
+            android:textAlignment="textEnd"
+            android:textColor="?attr/colorOnPrimary" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
         android:background="?attr/colorSecondary"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/lightgray"
-            android:textAlignment="textEnd"
             android:text="="
+            android:textAlignment="textEnd"
+            android:textColor="@color/lightgray"
             android:textSize="20sp" />
 
         <TextView
             android:id="@+id/resultTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?attr/colorOnSecondary"
-            android:textAlignment="textEnd"
             android:text="0"
+            android:textAlignment="textEnd"
+            android:textColor="?attr/colorOnSecondary"
             android:textSize="20sp" />
 
     </LinearLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/button_panel"
-        android:layout_margin="16dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_margin="16dp" />
 
 </LinearLayout>

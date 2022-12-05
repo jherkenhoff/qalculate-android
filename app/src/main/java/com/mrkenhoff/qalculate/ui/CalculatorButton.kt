@@ -2,6 +2,7 @@ package com.mrkenhoff.qalculate.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent

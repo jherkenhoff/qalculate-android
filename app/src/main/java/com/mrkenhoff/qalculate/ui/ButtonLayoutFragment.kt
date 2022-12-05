@@ -2,14 +2,14 @@ package com.mrkenhoff.qalculate.ui
 
 import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import com.mrkenhoff.qalculate.R
 import dagger.hilt.android.AndroidEntryPoint
 import org.w3c.dom.Element
@@ -23,8 +23,6 @@ import org.greenrobot.eventbus.EventBus
  */
 @AndroidEntryPoint
 class ButtonLayoutFragment : Fragment() {
-
-    private val viewModel: MainViewModel by activityViewModels()
 
     companion object {
         const val ARG_FILENAME = "filename"
@@ -75,7 +73,8 @@ class ButtonLayoutFragment : Fragment() {
                     "outlined" ->R.attr.calculatorButtonOutlined
                     else ->R.attr.calculatorButtonDefault
                 }
-                val button = CalculatorButton(requireContext(), null, style)
+
+                val button = CalculatorButton(requireContext(), null)
                 button.text = element.getAttribute("text")
 
                 button.topLeftText = element.getAttribute("topLeftText", "")
@@ -123,9 +122,6 @@ class ButtonLayoutFragment : Fragment() {
                             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT
                         )
                         layoutParams.weight = 1 / child.getAttribute("weight", "1").toFloat()
-                        if (childView is CalculatorButton && i != element.childNodes.length && horizontal) {
-                            layoutParams.marginEnd = 8.toPx.toInt()
-                        }
                         childView.layoutParams = layoutParams
                         group.addView(childView)
                     }
