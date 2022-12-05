@@ -11,7 +11,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import android.widget.ArrayAdapter
+import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import com.mrkenhoff.qalculate.databinding.FragmentMainBinding
@@ -25,12 +31,9 @@ import org.greenrobot.eventbus.Subscribe
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by activityViewModels()
 
     private var _binding: FragmentMainBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -44,11 +47,32 @@ class MainFragment : Fragment() {
             .commit()
 
         EventBus.getDefault().register(this)
+
+        val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item, viewModel.getAutoCompletionList())
+        binding.inputText.setAdapter(adapter)
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Toolbar
+        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+
+        // Find the activity's DrawerLayout
+        val drawerLayout = requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout);
+
+        val navController = NavHostFragment.findNavController(this);
+
+        NavigationUI.setupWithNavController(toolbar, navController)
+
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+
+
         binding.inputText.setOnKeyListener { _, keyCode, _ -> keyCode == KeyEvent.KEYCODE_ENTER }
         binding.inputText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {}
@@ -66,18 +90,31 @@ class MainFragment : Fragment() {
             Snackbar.make(requireView(), R.string.copied_to_clipboard, Snackbar.LENGTH_LONG).show()
             true
         }
+
     }
 
     @Subscribe
-    fun type(event: ButtonEvent) {
-        if (event.text == "@backspace@") {
-            val end = binding.inputText.selectionEnd
-            if (end > 0) {
-                binding.inputText.text.replace(end - 1, end, "")
-            }
+    fun type(event: BackspaceEvent) {
+        val start = binding.inputText.selectionStart
+        val end = binding.inputText.selectionEnd
+        // TODO: Why is start and end always the same? Possibly an upstream bug?
+        if (start == end && end > 0) {
+            binding.inputText.text.replace(end - 1, end, "")
         } else {
-            binding.inputText.text.insert(binding.inputText.selectionStart, event.text)
+            binding.inputText.text.replace(start, end, "")
         }
+    }
+    @Subscribe
+    fun type(event: ClearEvent) {
+        binding.inputText.setText("")
+    }
+
+    @Subscribe
+    fun type(event: TypeEvent) {
+        binding.inputText.text.insert(binding.inputText.selectionStart, event.textFront)
+        val cursorPos = binding.inputText.selectionStart
+        binding.inputText.text.insert(binding.inputText.selectionStart, event.textBack)
+        binding.inputText.setSelection(cursorPos)
     }
 
     override fun onDestroyView() {

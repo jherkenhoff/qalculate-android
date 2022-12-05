@@ -7,6 +7,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 import com.mrkenhoff.libqalculate.Calculator
+import com.mrkenhoff.libqalculate.PrintOptions
+import com.mrkenhoff.libqalculate.EvaluationOptions
+import com.mrkenhoff.libqalculate.IntervalDisplay
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -29,5 +32,22 @@ class AppModule {
         var calc = Calculator()
         calc.loadGlobalDefinitions()
         return calc
+    }
+
+    @Singleton
+    @Provides
+    internal fun providePrintOptions(application: Application): PrintOptions {
+        var po = PrintOptions()
+
+        var intDisp = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
+        po.setInterval_display(intDisp)
+        return po
+    }
+
+    @Singleton
+    @Provides
+    internal fun provideEvaluationOptions(application: Application): EvaluationOptions {
+        var eo = EvaluationOptions()
+        return eo
     }
 }
