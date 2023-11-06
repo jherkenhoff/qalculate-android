@@ -23,21 +23,27 @@ Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> 
 </p>
 
 ## Compiling
-You need to have the Android `NDK` installed. For building the native binaries, you also need `swig`.
+The project can only be built under Linux (maybe MacOS too) but not on Windows as it relies on bash shell scripts. On Windows, you can use a virtual machine.
 
-```
-git clone https://github.com/mr-kenhoff/libqalculate-android
-git clone https://github.com/mr-kenhoff/qalculate-android
-cd qalculate-android
-./gradlew assembleDebug
-```
+You need to have Android Studio and the Android `NDK` installed. For building the native binaries, you also need `swig`.
+
+Use the following commands: 
+-```
+-git clone https://github.com/jherkenhoff/libqalculate-android
+-git clone https://github.com/jherkenhoff/qalculate-android
+-cd qalculate-android
+-./gradlew assembleDebug
+-```
+
+If there is any issue, please see the more detailed compilation instructions in [libqalculate-android](https://github.com/jherkenhoff/qalculate-android).
 
 ## Features
 Features specific to qalculate-android:
 
 * Platform-Native Graphical user interface
 * Simple default view
-* Optional calculate-as-you-type mode
+* Optional calculate-as-you-type mode (enabled by default)
+* Fast sliding to type special characters (similarly to [Calculator++](https://github.com/Bubu/android-calculatorpp))
 
 Features from libqalculate:
 
@@ -50,4 +56,14 @@ Features from libqalculate:
 * Plotting:
 * and more...
 
+Missing feature:
+
+* Only the final result is shown, even if approximated. Hence we miss on other representations such as with rational numbers, and exact solutions, as only the approximated one will be shown. Eg, solve2(10x=4y^2; sqrt(y)=1; x; y) = 2 ∕ 5 = 0,4   -- another example: (-1)^(1/4) = ((1 + i) ⋅ √(2)) ∕ 2 ≈ 0,707 106 78 + 0,707 106 78i
+
 _For more details about the syntax, and available functions, units, and variables, please consult the manual (https://qalculate.github.io/manual/)_
+
+## License
+
+This project was created by jherkenhoff.
+
+This project is licensed under the GNU General Public License v2.0 (GPLv2).
