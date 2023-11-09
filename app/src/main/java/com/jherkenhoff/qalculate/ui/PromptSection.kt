@@ -39,18 +39,18 @@ fun PromptSection(viewModel: MainViewModel = viewModel()) {
             value = viewModel.inputString.value,
             onValueChange = viewModel::setInput,
             modifier= Modifier.fillMaxWidth().padding(top=10.dp),
-            textStyle = MaterialTheme.typography.titleLarge.copy(color=MaterialTheme.colorScheme.onSurfaceVariant)
+            textStyle = MaterialTheme.typography.titleLarge.copy(color=MaterialTheme.colorScheme.onSurface)
         )
         Divider()
         Text(
-            text="(6kilonewtons) / (2meter²) to millibar",
-            style= MaterialTheme.typography.bodySmall.copy(color=MaterialTheme.colorScheme.onSurfaceVariant),
+            text=viewModel.parsedString.value,
+            style= MaterialTheme.typography.bodySmall.copy(color=MaterialTheme.colorScheme.onSurface),
             modifier= Modifier.fillMaxWidth()
         )
         Text(
             text=viewModel.resultString.value,
             textAlign= TextAlign.Right,
-            style= MaterialTheme.typography.headlineLarge.copy(color=MaterialTheme.colorScheme.onSurfaceVariant),
+            style= MaterialTheme.typography.headlineLarge.copy(color=MaterialTheme.colorScheme.onSurface),
             modifier= Modifier.fillMaxWidth().padding(top=30.dp)
         )
     }
