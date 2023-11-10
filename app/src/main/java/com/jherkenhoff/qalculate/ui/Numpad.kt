@@ -1,9 +1,13 @@
 package com.jherkenhoff.qalculate.ui
 
 import android.text.Layout
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -18,34 +22,54 @@ import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
 
 @Composable
-fun NumButton(text: String, modifier: Modifier = Modifier) {
-    Button(onClick = { /*TODO*/ }, modifier=modifier) {
-        Text(text = text, style=MaterialTheme.typography.bodySmall)
+fun RowScope.NumButton(text: String, modifier: Modifier = Modifier) {
+    Button(onClick = { /*TODO*/ }, modifier=modifier.weight(1f).fillMaxSize()) {
+        Text(text = text, style=MaterialTheme.typography.bodyLarge)
     }
 }
 
 @Composable
 fun Numpad(modifier: Modifier = Modifier) {
-    Column(modifier=modifier.padding(horizontal=20.dp, vertical=20.dp)) {
-        Row(modifier=Modifier.fillMaxWidth()){
-            NumButton("7", modifier = Modifier.fillMaxWidth().weight(1f))
-            NumButton("8", modifier = Modifier.fillMaxWidth().weight(1f))
-            NumButton("9", modifier = Modifier.fillMaxWidth().weight(1f))
+    Column(
+        modifier=modifier.fillMaxSize().padding(horizontal=20.dp, vertical=20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Row(
+            modifier=Modifier.weight(1f).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp))
+        {
+            NumButton("7")
+            NumButton("8")
+            NumButton("9")
+            NumButton("⌫")
+            NumButton("AC")
         }
-        Row {
-            NumButton("4", modifier = Modifier.fillMaxWidth().weight(1f))
-            NumButton("5", modifier = Modifier.fillMaxWidth().weight(1f))
-            NumButton("6", modifier = Modifier.fillMaxWidth().weight(1f))
+        Row(
+            modifier=Modifier.weight(1f).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            NumButton("4")
+            NumButton("5")
+            NumButton("6")
+            NumButton("*")
+            NumButton("/")
         }
-        Row {
-            NumButton("1", modifier = Modifier.fillMaxWidth().weight(1f))
-            NumButton("2", modifier = Modifier.fillMaxWidth().weight(1f))
-            NumButton("3", modifier = Modifier.fillMaxWidth().weight(1f))
+        Row(
+            modifier=Modifier.weight(1f).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            NumButton("1")
+            NumButton("2")
+            NumButton("3")
+            NumButton("+")
+            NumButton("-")
         }
-        Row {
-            NumButton("0", modifier = Modifier.fillMaxWidth().weight(1f))
-            NumButton(".", modifier = Modifier.fillMaxWidth().weight(1f))
-            NumButton("E", modifier = Modifier.fillMaxWidth().weight(1f))
+        Row(
+            modifier=Modifier.weight(1f).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            NumButton("0")
+            NumButton(".")
+            NumButton("E")
+            NumButton("Ans")
+            NumButton("=")
         }
     }
 }
