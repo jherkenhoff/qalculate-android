@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +26,12 @@ fun PromptSection(viewModel: MainViewModel = viewModel()) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal=20.dp, vertical=20.dp)
     ) {
+        Spacer(
+            Modifier.windowInsetsBottomHeight(
+                WindowInsets.systemBars
+            )
+        )
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(3.dp)
         ){
@@ -41,7 +50,9 @@ fun PromptSection(viewModel: MainViewModel = viewModel()) {
             modifier= Modifier.fillMaxWidth().padding(top=10.dp),
             textStyle = MaterialTheme.typography.titleLarge.copy(color=MaterialTheme.colorScheme.onSurface)
         )
-        Divider()
+        Divider(
+            color = MaterialTheme.colorScheme.onSurface
+        )
         Text(
             text=viewModel.parsedString.value,
             style= MaterialTheme.typography.bodySmall.copy(color=MaterialTheme.colorScheme.onSurface),

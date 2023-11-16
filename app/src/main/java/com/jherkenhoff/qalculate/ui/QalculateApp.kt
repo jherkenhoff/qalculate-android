@@ -9,10 +9,7 @@ import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
 @Composable
 fun QalculateApp() {
     QalculateTheme {
-        AppScaffold(
-            promptSection = { PromptSection() },
-            inputSection = { paddingValues ->  Numpad(modifier= Modifier.padding(paddingValues)) }
-        )
+        CalculatorScreen()
     }
 }
 

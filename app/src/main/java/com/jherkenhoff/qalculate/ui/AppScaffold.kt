@@ -2,9 +2,10 @@ package com.jherkenhoff.qalculate.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
@@ -22,9 +23,11 @@ import com.jherkenhoff.qalculate.ui.theme.TopSheetShape
 
 @Composable
 fun AppScaffold(
-    promptSection: @Composable (() -> Unit) = {},
+    topPanel: @Composable (() -> Unit) = {},
     inputSection: @Composable ((PaddingValues) -> Unit) = {}
 ) {
+    // val topInset = WindowInsets.systemBars.getTop()
+
     Surface(
         color = MaterialTheme.colorScheme.background
     ) {
@@ -35,12 +38,12 @@ fun AppScaffold(
             val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
 
             layout(layoutWidth, layoutHeight) {
-                val promptSectionPlaceables =
-                    subcompose(AppScaffoldLayoutContent.PromptSection, promptSection).map {
+                val topPanelPlaceables =
+                    subcompose(AppScaffoldLayoutContent.TopPanel, topPanel).map {
                         it.measure(looseConstraints)
                     }
-                val promptSectionHeight =
-                    promptSectionPlaceables.maxByOrNull { it.height }?.height ?: 0
+                val topPanelHeight =
+                    topPanelPlaceables.maxByOrNull { it.height }?.height ?: 0
 
                 val dragHandlePlaceables = subcompose(AppScaffoldLayoutContent.DragHandle) {
                     DragHandle()
@@ -52,7 +55,7 @@ fun AppScaffold(
 
                 val topSheetPlaceables = subcompose(AppScaffoldLayoutContent.TopSheet) {
                     TopSheet(
-                        Modifier.height(promptSectionHeight.toDp() + dragHandleHeight.toDp())
+                        Modifier.height(topPanelHeight.toDp() + dragHandleHeight.toDp())
                     )
                 }.map {
                     it.measure(looseConstraints)
@@ -60,7 +63,7 @@ fun AppScaffold(
 
                 val inputSectionPlaceables = subcompose(AppScaffoldLayoutContent.InputSection) {
                     val inputSectionPadding = PaddingValues(
-                        top = promptSectionHeight.toDp() + dragHandleHeight.toDp()
+                        top = topPanelHeight.toDp() + dragHandleHeight.toDp()
                     )
                     inputSection(inputSectionPadding)
                 }.map {
@@ -70,11 +73,11 @@ fun AppScaffold(
                 topSheetPlaceables.forEach {
                     it.place(0, 0)
                 }
-                promptSectionPlaceables.forEach {
+                topPanelPlaceables.forEach {
                     it.place(0, 0)
                 }
                 dragHandlePlaceables.forEach {
-                    it.place(0, promptSectionHeight)
+                    it.place(0, topPanelHeight)
                 }
                 inputSectionPlaceables.forEach {
                     it.place(0, 0)
@@ -115,4 +118,4 @@ private fun DefaultPreview() {
     TopSheet(Modifier.height(100.dp))
 }
 
-private enum class AppScaffoldLayoutContent {DragHandle, PromptSection, TopSheet, InputSection}
+private enum class AppScaffoldLayoutContent {DragHandle, TopPanel, TopSheet, InputSection}
