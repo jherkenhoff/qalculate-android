@@ -1,10 +1,13 @@
 package com.jherkenhoff.qalculate.ui
 
+import android.graphics.Insets
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -26,6 +29,7 @@ fun AppScaffold(
     topPanel: @Composable (() -> Unit) = {},
     inputSection: @Composable ((PaddingValues) -> Unit) = {}
 ) {
+
     // val topInset = WindowInsets.systemBars.getTop()
 
     Surface(

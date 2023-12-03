@@ -2,6 +2,7 @@ package com.jherkenhoff.qalculate.ui
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.EvaluationOptions
@@ -13,30 +14,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val calculator: Calculator,
-    private val eo: EvaluationOptions
+    private val calculator: Calculator
 ) : ViewModel() {
-
-    val inputString : MutableState<String> = mutableStateOf("")
     val parsedString : MutableState<String> = mutableStateOf("")
     val resultString : MutableState<String> = mutableStateOf("")
 
-    fun setInput(input: String) {
-        inputString.value = input
-        // TODO: If auto-calculation is switched on
-        doCalculation()
-    }
-    private fun doCalculation() {
+    fun calculate(input: String) {
 
-        val parse_options = ParseOptions()
-        val ms = calculator.parse(inputString.value, parse_options)
+        val parseOptions = ParseOptions()
+        val ms = calculator.parse(input, parseOptions)
 
-        val parsed_po = PrintOptions()
-        parsed_po.place_units_separately = false
-        parsed_po.preserve_format = true
-        parsedString.value = calculator.print(ms, 2000, parsed_po)
+        val parsedPrintOptions = PrintOptions()
+        parsedPrintOptions.place_units_separately = false
+        parsedPrintOptions.preserve_format = true
+        parsedString.value = calculator.print(ms, 2000, parsedPrintOptions)
 
-        calculator.calculate(ms, 2000, eo)
+        val evaluationOptions = EvaluationOptions()
+        calculator.calculate(ms, 2000, evaluationOptions)
 
         val resultPo = PrintOptions()
         resultPo.interval_display = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
