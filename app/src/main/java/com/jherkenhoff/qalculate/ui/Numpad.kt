@@ -31,7 +31,13 @@ import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
 
 @Composable
-fun RowScope.NumButton(text: String, secondaryText: String? = null, modifier: Modifier = Modifier, containerColor: Color = MaterialTheme.colorScheme.secondaryContainer) {
+fun RowScope.NumButton(
+    text: String,
+    secondaryText: String? = null,
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.secondaryContainer,
+    onClick: () -> Unit = {}
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier= modifier
@@ -46,7 +52,7 @@ fun RowScope.NumButton(text: String, secondaryText: String? = null, modifier: Mo
             )
         }
         FilledTonalButton(
-            onClick = { /*TODO*/ },
+            onClick = onClick,
             contentPadding = PaddingValues(0.dp),
             modifier= modifier
                 .weight(1f)
@@ -60,7 +66,8 @@ fun RowScope.NumButton(text: String, secondaryText: String? = null, modifier: Mo
 
 @Composable
 fun Numpad(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onButtonEvent: (String) -> Unit = {}
 ) {
     val horizontalSpacing = 10.dp
     Column(
@@ -124,9 +131,9 @@ fun Numpad(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(horizontalSpacing))
         {
-            NumButton("7")
-            NumButton("8")
-            NumButton("9")
+            NumButton("7", onClick = { onButtonEvent("7") })
+            NumButton("8", onClick = { onButtonEvent("8") })
+            NumButton("9", onClick = { onButtonEvent("9") })
             NumButton("⌫", modifier=Modifier.weight(2f), containerColor = MaterialTheme.colorScheme.errorContainer)
         }
         Row(
@@ -134,31 +141,31 @@ fun Numpad(
                 .weight(1f)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(horizontalSpacing)) {
-            NumButton("4")
-            NumButton("5")
-            NumButton("6")
-            NumButton("*", containerColor = MaterialTheme.colorScheme.tertiaryContainer)
-            NumButton("/", containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+            NumButton("4", onClick = { onButtonEvent("4") })
+            NumButton("5", onClick = { onButtonEvent("5") })
+            NumButton("6", onClick = { onButtonEvent("6") })
+            NumButton("*", onClick = { onButtonEvent("*") }, containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+            NumButton("/", onClick = { onButtonEvent("/") }, containerColor = MaterialTheme.colorScheme.tertiaryContainer)
         }
         Row(
             modifier= Modifier
                 .weight(1f)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(horizontalSpacing)) {
-            NumButton("1")
-            NumButton("2")
-            NumButton("3")
-            NumButton("+", containerColor = MaterialTheme.colorScheme.tertiaryContainer)
-            NumButton("-", containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+            NumButton("1", onClick = { onButtonEvent("1") })
+            NumButton("2", onClick = { onButtonEvent("2") })
+            NumButton("3", onClick = { onButtonEvent("3") })
+            NumButton("+", onClick = { onButtonEvent("+") }, containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+            NumButton("-", onClick = { onButtonEvent("-") }, containerColor = MaterialTheme.colorScheme.tertiaryContainer)
         }
         Row(
             modifier= Modifier
                 .weight(1f)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(horizontalSpacing)) {
-            NumButton("0")
-            NumButton(".")
-            NumButton("E")
+            NumButton("0", onClick = { onButtonEvent("0") })
+            NumButton(".", onClick = { onButtonEvent(".") })
+            NumButton("E", onClick = { onButtonEvent("E") })
             NumButton("Ans", containerColor = MaterialTheme.colorScheme.tertiaryContainer)
             NumButton("⏎", containerColor = MaterialTheme.colorScheme.tertiaryContainer)
         }

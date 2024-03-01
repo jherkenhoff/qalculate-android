@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
@@ -43,9 +44,10 @@ fun PromptSection(
             ModeLabelButton("EXACT")
         }
 
-        BasicTextField(
+        TextField(
             value = inputTextFieldValue,
             onValueChange = onInputChanged,
+            placeholder = { Text(text = "Enter expression") },
             modifier= Modifier.fillMaxWidth().padding(top=10.dp),
             textStyle = MaterialTheme.typography.titleLarge.copy(color=MaterialTheme.colorScheme.onSurface)
         )
