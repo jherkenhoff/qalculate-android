@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,6 +16,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,7 +51,8 @@ fun PromptSection(
             onValueChange = onInputChanged,
             placeholder = { Text(text = "Enter expression") },
             modifier= Modifier.fillMaxWidth().padding(top=10.dp),
-            textStyle = MaterialTheme.typography.titleLarge.copy(color=MaterialTheme.colorScheme.onSurface)
+            textStyle = MaterialTheme.typography.titleLarge.copy(color=MaterialTheme.colorScheme.onSurface),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, autoCorrect = false)
         )
         Divider(
             color = MaterialTheme.colorScheme.onSurface

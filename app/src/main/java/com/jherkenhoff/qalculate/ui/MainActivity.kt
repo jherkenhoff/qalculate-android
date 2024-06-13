@@ -1,4 +1,4 @@
-package com.jherkenhoff.qalculate
+package com.jherkenhoff.qalculate.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

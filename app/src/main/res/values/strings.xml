@@ -2,4 +2,5 @@
     <string name="app_name">Qalculate!</string>
     <string name="top_sheet_arrow_down">Down arrow</string>
     <string name="top_sheet_menu">Menu button</string>
+    <string name="textfield_hint">Enter expression</string>
 </resources>
