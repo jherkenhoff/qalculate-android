@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
@@ -36,9 +37,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getTextAfterSelection
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -60,9 +67,7 @@ fun CalculatorScreenContent(
     initialInputString: String = ""
 ) {
     var inputTextFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(
-            TextFieldValue(initialInputString)
-        )
+        mutableStateOf(TextFieldValue(initialInputString))
     }
 
     val onInputChanged: (TextFieldValue) -> Unit = {
@@ -87,22 +92,46 @@ fun CalculatorScreenContent(
     Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background).imePadding().fillMaxSize()) {
 
         Column(modifier = Modifier.weight(1f).padding(16.dp)) {
-            CalculationList(modifier = Modifier.weight(1.0f))
+            CalculationList(
+                parsedString,
+                resultString,
+                modifier = Modifier.weight(1.0f)
+            )
             InputBar(
                 inputTextFieldValue,
                 onInputFieldValueChanged = onInputChanged
             )
         }
 
-        QuickKeys()
+        QuickKeys(onKey = {
+            inputTextFieldValue = inputTextFieldValue.addText(it)
+            onInputChanged(inputTextFieldValue)
+        })
     }
+}
+
+
+
+
+private fun TextFieldValue.addText(newString: String): TextFieldValue {
+    val newText = this.text.replaceRange(
+        this.selection.start,
+        this.selection.end,
+        newString
+    )
+    val newSelection = TextRange(
+        start = newText.length,
+        end = newText.length
+    )
+
+    return this.copy(text = newText, selection = newSelection)
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
     CalculatorScreenContent(
-        "cos(0)",
+        "<i>asd",
         "1",
         initialInputString = "7 T"
     )

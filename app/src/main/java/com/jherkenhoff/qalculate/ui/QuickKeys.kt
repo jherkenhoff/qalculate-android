@@ -15,7 +15,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun QuickKeys() {
+fun QuickKeys(
+    onKey: (String) -> Unit
+) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {
@@ -26,7 +28,7 @@ fun QuickKeys() {
             ) {
                 for (i in arrayOf("_", "=", "√", "^", "(", ")", "÷", "×", "-", "+")) {
                     TextButton(
-                        onClick = { /*TODO*/ },
+                        onClick = {onKey(i)},
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
@@ -43,7 +45,7 @@ fun QuickKeys() {
 
                 for (i in intArrayOf(1,2,3,4,5,6,7,8,9,0)) {
                     TextButton(
-                        onClick = { /*TODO*/ },
+                        onClick = {onKey(i.toString())},
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
@@ -62,5 +64,5 @@ fun QuickKeys() {
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
-    QuickKeys()
+    QuickKeys(onKey = {})
 }
