@@ -89,24 +89,26 @@ fun CalculatorScreenContent(
         inputTextFieldValue = TextFieldValue(text, selection)
     }
 
-    Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background).imePadding().fillMaxSize()) {
+    Surface(modifier = Modifier
+        .imePadding()
+        .fillMaxSize()
+    ) {
+        Column() {
 
-        Column(modifier = Modifier.weight(1f).padding(16.dp)) {
             CalculationList(
+                inputTextFieldValue,
                 parsedString,
                 resultString,
-                modifier = Modifier.weight(1.0f)
+                onInputChanged = onInputChanged,
+                modifier = Modifier.weight(1.0f).padding(horizontal = 16.dp)
             )
-            InputBar(
-                inputTextFieldValue,
-                onInputFieldValueChanged = onInputChanged
-            )
-        }
+            Spacer(modifier = Modifier.height(16.dp))
 
-        QuickKeys(onKey = {
-            inputTextFieldValue = inputTextFieldValue.addText(it)
-            onInputChanged(inputTextFieldValue)
-        })
+            QuickKeys(onKey = {
+                inputTextFieldValue = inputTextFieldValue.addText(it)
+                onInputChanged(inputTextFieldValue)
+            })
+        }
     }
 }
 
