@@ -12,34 +12,49 @@ import com.jherkenhoff.libqalculate.ParseOptions
 import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_HTML
 import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_TERMINAL
+import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
+import com.jherkenhoff.qalculate.domain.CalculateUseCase
+import com.jherkenhoff.qalculate.domain.ParseUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val calculator: Calculator
+    private val calculator: Calculator,
+    private val parseUseCase: ParseUseCase,
+    private val calculateUseCase: CalculateUseCase
 ) : ViewModel() {
+
+
+    val testCalculationHistory = listOf(
+        CalculationHistoryItem(
+            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        )
+    )
+
     val parsedString : MutableState<String> = mutableStateOf("")
     val resultString : MutableState<String> = mutableStateOf("")
+    val calculationHistory :MutableState<List<CalculationHistoryItem>> = mutableStateOf(testCalculationHistory)
 
     fun calculate(input: String) {
 
-        val parseOptions = ParseOptions()
-        parseOptions.preserve_format = true
-        val ms = calculator.parse(input, parseOptions)
+        val parsedMathStructure = parseUseCase(input)
+
+        val calculatedMathStructure = calculateUseCase(parsedMathStructure)
 
         val parsedPrintOptions = PrintOptions()
         parsedPrintOptions.place_units_separately = false
         parsedPrintOptions.preserve_format = true
         parsedPrintOptions.use_unicode_signs = true
-        parsedString.value = calculator.print(ms, 2000, parsedPrintOptions, true, 1, TAG_TYPE_HTML)
-
-        val evaluationOptions = EvaluationOptions()
-        calculator.calculate(ms, 2000, evaluationOptions)
+        parsedString.value = calculator.print(parsedMathStructure, 2000, parsedPrintOptions, true, 1, TAG_TYPE_HTML)
 
         val resultPo = PrintOptions()
         resultPo.interval_display = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
         resultPo.use_unicode_signs = true
-        resultString.value = calculator.print(ms, 2000, resultPo, true, 1, TAG_TYPE_HTML)
+        resultString.value = calculator.print(calculatedMathStructure, 2000, resultPo, true, 1, TAG_TYPE_HTML)
     }
 }

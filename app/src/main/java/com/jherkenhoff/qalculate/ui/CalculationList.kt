@@ -67,40 +67,47 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.R
+import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
+import java.time.LocalDateTime
 
 @Composable
 fun CalculationList(
-    inputTextFieldValue: TextFieldValue,
+    calculationHistory: List<CalculationHistoryItem>,
     currentParsed: String,
     currentResult: String,
-    onInputChanged: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Spacer(modifier = Modifier.weight(1f))
-//        Calculation(
-//            input = TextFieldValue("m_e"),
-//            parsed = "m_e",
-//            result = "ge",
-//            editMode = false
-//        )
+        for (calculation in calculationHistory) {
+            Spacer(modifier = Modifier.weight(1f))
+            Calculation(
+                calculation.parsed,
+                calculation.result
+            )
+        }
+        CalculationDivider(text = "Now")
         Calculation(
-            inputTextFieldValue,
             currentParsed,
-            currentResult,
-            onInputChanged = onInputChanged,
-            editMode=true,
-            divider = "Now")
+            currentResult
+        )
     }
 }
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
+
+    val testCalculationHistory = listOf(
+        CalculationHistoryItem(
+            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        )
+    )
+
     CalculationList(
-        TextFieldValue("Moin"),
-        "7 T",
-        "7 T",
-        onInputChanged = {},
-        modifier = Modifier.padding(horizontal = 16.dp)
+        testCalculationHistory,
+        "1+1",
+        "2"
     )
 }

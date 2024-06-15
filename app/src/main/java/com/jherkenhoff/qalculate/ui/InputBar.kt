@@ -1,6 +1,10 @@
 package com.jherkenhoff.qalculate.ui
 
 import android.widget.Space
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +30,7 @@ import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -48,114 +53,93 @@ import com.jherkenhoff.qalculate.R
 
 @Composable
 fun InputBar(
-    inputFieldValue: TextFieldValue,
-    onInputFieldValueChanged: (TextFieldValue) -> Unit,
-) {
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(42.dp),
-        horizontalArrangement = Arrangement.End
-    ) {
-
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .background(
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(100),
-                ),
-            verticalAlignment=Alignment.CenterVertically
-        ){
-
-            IconButton(
-                onClick = { /* doSomething() */ },
-            ) {
-                Icon(Icons.AutoMirrored.Outlined.List, contentDescription = "Localized description", tint = MaterialTheme.colorScheme.onPrimaryContainer)
-            }
-
-            ExpressionInputTextField(
-                inputFieldValue,
-                onValueChange = onInputFieldValueChanged,
-                onFocused = {},
-                focusState = false,
-                onSubmit = {},
-                modifier = Modifier.weight(1f),
-            )
-        }
-
-        Spacer(modifier = Modifier.width(10.dp))
-
-        FilledIconButton(
-            onClick = { /*TODO*/ },
-            colors = IconButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-            ),
-            modifier = Modifier
-                .fillMaxHeight()
-                .aspectRatio(1f)
-        ) {
-            Icon(Icons.Outlined.Send, contentDescription = "Submit calculation")
-        }
-    }
-}
-
-@Composable
-private fun ExpressionInputTextField(
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     onFocused: (Boolean) -> Unit,
     focusState: Boolean,
     onSubmit: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-
     var lastFocusState by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier){
-        BasicTextField(
-            value = textFieldValue,
-            onValueChange = { onValueChange(it) },
-            modifier = modifier
-                .align(Alignment.CenterStart)
-                .fillMaxWidth()
-                .onFocusChanged { state ->
-                    if (lastFocusState != state.isFocused) {
-                        onFocused(state.isFocused)
-                    }
-                    lastFocusState = state.isFocused
-                },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Uri,
-                imeAction = ImeAction.Go,
-                autoCorrect = false
-            ),
-            keyboardActions = KeyboardActions {
-                if (textFieldValue.text.isNotBlank()) onSubmit(textFieldValue.text)
-            },
-            maxLines = 1,
-            cursorBrush = SolidColor(LocalContentColor.current),
-            textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current)
-        )
+    Surface(
+        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSurface),
+        shape = RoundedCornerShape(100),
+        modifier = modifier.fillMaxWidth().height(40.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
-        val disableContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        if (textFieldValue.text.isEmpty() && !focusState) {
-            Text(
-                modifier = Modifier.align(Alignment.CenterStart),
-                text = stringResource(R.string.textfield_hint),
-                style = MaterialTheme.typography.bodyLarge.copy(color = disableContentColor)
-            )
+            IconButton(
+                onClick = { /* doSomething() */ },
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Outlined.List,
+                    contentDescription = "Localized description",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Box(
+                contentAlignment = Alignment.CenterStart,
+                modifier = Modifier.weight(1f)
+            ) {
+                BasicTextField(
+                    value = textFieldValue,
+                    onValueChange = onValueChange,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { state ->
+                            if (lastFocusState != state.isFocused) {
+                                onFocused(state.isFocused)
+                            }
+                            lastFocusState = state.isFocused
+                        },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Uri,
+                        imeAction = ImeAction.Go,
+                        autoCorrect = false
+                    ),
+                    keyboardActions = KeyboardActions {
+                        if (textFieldValue.text.isNotBlank()) onSubmit(textFieldValue.text)
+                    },
+                    maxLines = 1,
+                    cursorBrush = SolidColor(LocalContentColor.current),
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                )
+
+                if (textFieldValue.text.isEmpty() && !focusState) {
+                    Text(
+                        text = stringResource(R.string.textfield_hint),
+                        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimaryContainer),
+                    )
+                }
+            }
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun DefaultPreview() {
-    InputBar(TextFieldValue(""), {})
+private fun EmptyPreview() {
+    InputBar(
+        TextFieldValue(""),
+        {},
+        {},
+        false,
+        {})
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WithInputPreview() {
+    InputBar(
+        TextFieldValue("1km + 1m"),
+        {},
+        {},
+        false,
+        {})
 }

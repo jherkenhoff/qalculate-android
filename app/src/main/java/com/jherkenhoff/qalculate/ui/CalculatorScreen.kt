@@ -19,18 +19,25 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.twotone.List
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,18 +56,23 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import com.jherkenhoff.qalculate.ui.theme.TopSheetShape
+import java.time.LocalDateTime
 
 @Composable
 fun CalculatorScreen(viewModel: MainViewModel = viewModel()) {
     CalculatorScreenContent(
+        viewModel.calculationHistory.value,
         viewModel.parsedString.value,
         viewModel.resultString.value,
         viewModel::calculate
     )
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorScreenContent(
+    calculationHistory: List<CalculationHistoryItem>,
     parsedString: String,
     resultString: String,
     calculate: (String) -> Unit = {},
@@ -89,18 +101,58 @@ fun CalculatorScreenContent(
         inputTextFieldValue = TextFieldValue(text, selection)
     }
 
-    Surface(modifier = Modifier
-        .imePadding()
-        .fillMaxSize()
-    ) {
-        Column() {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = {
+                },
+                navigationIcon = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
 
+                    }
+
+                },
+                actions = {
+                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("DEG") })
+                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exact") })
+                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exp.") })
+                }
+
+            )
+        },
+        modifier = Modifier.imePadding(),
+    ) {
+        innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .padding(innerPadding),
+        ) {
             CalculationList(
-                inputTextFieldValue,
+                calculationHistory,
                 parsedString,
                 resultString,
-                onInputChanged = onInputChanged,
-                modifier = Modifier.weight(1.0f).padding(horizontal = 16.dp)
+                modifier = Modifier
+                    .weight(1.0f)
+                    .padding(horizontal = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            InputBar(
+                textFieldValue = inputTextFieldValue,
+                onValueChange = onInputChanged,
+                onFocused = {},
+                focusState = false,
+                onSubmit = {},
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -132,9 +184,20 @@ private fun TextFieldValue.addText(newString: String): TextFieldValue {
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
+
+    val testCalculationHistory = listOf(
+        CalculationHistoryItem(
+            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        )
+    )
+
     CalculatorScreenContent(
-        "<i>asd",
-        "1",
-        initialInputString = "7 T"
+        testCalculationHistory,
+        "1+1",
+        "2",
+        initialInputString = "1+1"
     )
 }

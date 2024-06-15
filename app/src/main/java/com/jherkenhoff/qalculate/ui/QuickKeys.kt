@@ -33,7 +33,7 @@ fun QuickKeys(
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        Text(text = i.toString(), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = i, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
