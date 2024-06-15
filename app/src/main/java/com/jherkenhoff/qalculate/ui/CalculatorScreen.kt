@@ -127,8 +127,8 @@ fun CalculatorScreenContent(
                 parsedString,
                 resultString,
                 modifier = Modifier
-                    .weight(1.0f)
                     .padding(horizontal = 16.dp)
+                    .weight(1f)
             )
             Spacer(modifier = Modifier.height(16.dp))
             InputBar(
@@ -147,13 +147,35 @@ fun CalculatorScreenContent(
     }
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
 
     val testCalculationHistory = listOf(
+        CalculationHistoryItem(
+            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        ),
+        CalculationHistoryItem(
+            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        ),
+        CalculationHistoryItem(
+            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        ),
+        CalculationHistoryItem(
+            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        ),
         CalculationHistoryItem(
             LocalDateTime.parse("2023-01-02T23:40:57.120"),
             "1m + 1m",

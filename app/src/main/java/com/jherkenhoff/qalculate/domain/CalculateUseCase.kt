@@ -9,7 +9,7 @@ class CalculateUseCase @Inject constructor(
     private val evaluationOptionsRepository: EvaluationOptionsRepository,
     private val calc: Calculator
 ) {
-    operator fun invoke(expression: MathStructure): MathStructure {
+    operator fun invoke(expression: String): MathStructure {
         val evaluationOptions = evaluationOptionsRepository.getEvaluationOptions()
 
         val result = calc.calculate(expression, evaluationOptions)

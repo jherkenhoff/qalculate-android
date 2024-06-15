@@ -69,7 +69,7 @@ class MainViewModel @Inject constructor(
 
         val parsedMathStructure = parseUseCase(inputTextFieldValue.value.text)
 
-        val calculatedMathStructure = calculateUseCase(parsedMathStructure)
+        val calculatedMathStructure = calculateUseCase(inputTextFieldValue.value.text)
 
         val parsedPrintOptions = PrintOptions()
         parsedPrintOptions.place_units_separately = false
