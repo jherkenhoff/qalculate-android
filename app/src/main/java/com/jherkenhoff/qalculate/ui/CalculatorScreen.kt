@@ -39,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -62,44 +63,29 @@ import java.time.LocalDateTime
 
 @Composable
 fun CalculatorScreen(viewModel: MainViewModel = viewModel()) {
+    val calculationHistory = viewModel.calculationHistory.collectAsState()
+
     CalculatorScreenContent(
-        viewModel.calculationHistory.value,
-        viewModel.parsedString.value,
-        viewModel.resultString.value,
-        viewModel::calculate
+        input = viewModel.inputTextFieldValue.value,
+        onInputChanged = viewModel::updateInput,
+        onQuickKeyPressed = viewModel::onQuickKeyPressed,
+        calculationHistory = calculationHistory.value,
+        parsedString = viewModel.parsedString.value,
+        resultString = viewModel.resultString.value,
+        onCalculationSubmit = viewModel::submitCalculation
     )
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorScreenContent(
+    input: TextFieldValue,
+    onInputChanged: (TextFieldValue) -> Unit,
+    onQuickKeyPressed: (CharSequence) -> Unit,
     calculationHistory: List<CalculationHistoryItem>,
     parsedString: String,
     resultString: String,
-    calculate: (String) -> Unit = {},
-    initialInputString: String = ""
+    onCalculationSubmit: () -> Unit
 ) {
-    var inputTextFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(initialInputString))
-    }
-
-    val onInputChanged: (TextFieldValue) -> Unit = {
-        inputTextFieldValue = it
-        calculate(it.text)
-    }
-
-    val onNumpadButtonEvent: (String) -> Unit = {
-        val start = inputTextFieldValue.selection.start
-        val end = inputTextFieldValue.selection.end
-
-        val text = inputTextFieldValue.text.slice(
-            IntRange(
-                0,
-                start - 1
-            )
-        ) + it + inputTextFieldValue.text.slice(IntRange(end, inputTextFieldValue.text.length - 1))
-        val selection = TextRange(start + it.length)
-        inputTextFieldValue = TextFieldValue(text, selection)
-    }
 
     Scaffold(
         topBar = {
@@ -146,40 +132,22 @@ fun CalculatorScreenContent(
             )
             Spacer(modifier = Modifier.height(16.dp))
             InputBar(
-                textFieldValue = inputTextFieldValue,
+                textFieldValue = input,
                 onValueChange = onInputChanged,
                 onFocused = {},
                 focusState = false,
-                onSubmit = {},
+                onSubmit = { onCalculationSubmit() },
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            QuickKeys(onKey = {
-                inputTextFieldValue = inputTextFieldValue.addText(it)
-                onInputChanged(inputTextFieldValue)
-            })
+            QuickKeys(onKey = onQuickKeyPressed)
         }
     }
 }
 
 
-
-
-private fun TextFieldValue.addText(newString: String): TextFieldValue {
-    val newText = this.text.replaceRange(
-        this.selection.start,
-        this.selection.end,
-        newString
-    )
-    val newSelection = TextRange(
-        start = newText.length,
-        end = newText.length
-    )
-
-    return this.copy(text = newText, selection = newSelection)
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -195,9 +163,12 @@ private fun DefaultPreview() {
     )
 
     CalculatorScreenContent(
-        testCalculationHistory,
-        "1+1",
-        "2",
-        initialInputString = "1+1"
+        input = TextFieldValue("1+1"),
+        onInputChanged = {},
+        onQuickKeyPressed = {},
+        calculationHistory = testCalculationHistory,
+        parsedString = "1+1",
+        resultString = "2",
+        onCalculationSubmit = {}
     )
 }
