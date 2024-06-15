@@ -17,8 +17,8 @@ Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> 
 <br/>
 <br/>
 <p align="center">
-  <a href="https://user-images.githubusercontent.com/5811634/160284839-a76dd58b-ae7e-447e-8697-ea81ff5c2d74.png">
-    <img src="https://user-images.githubusercontent.com/5811634/160284839-a76dd58b-ae7e-447e-8697-ea81ff5c2d74.png" width="250">
+  <a href="readme/screenshot.png">
+    <img src="readme/screenshot.png" width="250">
   </a>
 </p>
 
