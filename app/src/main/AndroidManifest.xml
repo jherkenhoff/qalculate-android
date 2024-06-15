@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mrkenhoff.qalculate">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name=".QalculateApp"
+        android:name=".QalculateApplication"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Qalculate">
+        android:theme="@style/Theme.Qalculate"
+        tools:targetApi="31">
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Qalculate.NoActionBar">
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Qalculate">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
