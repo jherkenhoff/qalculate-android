@@ -90,7 +90,7 @@ fun InputBar(
                 BasicTextField(
                     value = textFieldValue,
                     onValueChange = onValueChange,
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged { state ->
                             if (lastFocusState != state.isFocused) {
