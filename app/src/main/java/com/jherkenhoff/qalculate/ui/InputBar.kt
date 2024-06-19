@@ -22,6 +22,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.List
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Dialpad
+import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -64,8 +69,9 @@ fun InputBar(
 
     Surface(
         //border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline),
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        modifier = modifier.fillMaxWidth().height(56.dp)
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        shape = RoundedCornerShape(100),
+        modifier = modifier.fillMaxWidth().height(48.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
@@ -76,9 +82,9 @@ fun InputBar(
                 onClick = { /* doSomething() */ },
             ) {
                 Icon(
-                    Icons.AutoMirrored.Outlined.List,
+                    Icons.Filled.Calculate,
                     contentDescription = "Localized description",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
@@ -108,13 +114,13 @@ fun InputBar(
                     },
                     maxLines = 1,
                     cursorBrush = SolidColor(LocalContentColor.current),
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
                 )
 
                 if (textFieldValue.text.isEmpty() && !focusState) {
                     Text(
                         text = stringResource(R.string.textfield_hint),
-                        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
                     )
                 }
             }
