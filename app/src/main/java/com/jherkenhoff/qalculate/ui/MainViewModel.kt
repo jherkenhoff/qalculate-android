@@ -4,6 +4,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.getTextAfterSelection
+import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jherkenhoff.libqalculate.Calculator
@@ -61,8 +63,18 @@ class MainViewModel @Inject constructor(
         recalculate()
     }
 
-    fun onQuickKeyPressed(value: CharSequence) {
+    fun onQuickKeyPressed(quickKeyText: String) {
+        val maxChars = inputTextFieldValue.value.text.length
+        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
+        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
+        val newText = "$textBeforeSelection$quickKeyText$textAfterSelection"
+        val newCursorPosition = textBeforeSelection.length + quickKeyText.length
 
+
+        updateInput(TextFieldValue(
+            text = newText,
+            selection = TextRange(newCursorPosition)
+        ))
     }
 
     private fun recalculate() {
@@ -91,8 +103,8 @@ private fun TextFieldValue.addText(newString: String): TextFieldValue {
         newString
     )
     val newSelection = TextRange(
-        start = newText.length,
-        end = newText.length
+        start = this.selection.end+newText.length,
+        end = this.selection.end+newText.length
     )
 
     return this.copy(text = newText, selection = newSelection)

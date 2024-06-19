@@ -80,7 +80,7 @@ fun CalculatorScreen(viewModel: MainViewModel = viewModel()) {
 fun CalculatorScreenContent(
     input: TextFieldValue,
     onInputChanged: (TextFieldValue) -> Unit,
-    onQuickKeyPressed: (CharSequence) -> Unit,
+    onQuickKeyPressed: (String) -> Unit,
     calculationHistory: List<CalculationHistoryItem>,
     parsedString: String,
     resultString: String,
