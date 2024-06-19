@@ -88,6 +88,7 @@ fun CalculatorScreenContent(
 ) {
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
                 colors = topAppBarColors(

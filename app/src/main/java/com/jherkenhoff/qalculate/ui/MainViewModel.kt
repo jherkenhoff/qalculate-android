@@ -42,8 +42,8 @@ class MainViewModel @Inject constructor(
             emptyList()
         )
 
-    val parsedString : MutableState<String> = mutableStateOf("")
-    val resultString : MutableState<String> = mutableStateOf("")
+    val parsedString : MutableState<String> = mutableStateOf("0")
+    val resultString : MutableState<String> = mutableStateOf("0")
 
     val inputTextFieldValue : MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
 

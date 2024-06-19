@@ -63,9 +63,9 @@ fun InputBar(
     var lastFocusState by remember { mutableStateOf(false) }
 
     Surface(
-        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSurface),
-        shape = RoundedCornerShape(100),
-        modifier = modifier.fillMaxWidth().height(40.dp)
+        //border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        modifier = modifier.fillMaxWidth().height(56.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
@@ -108,13 +108,13 @@ fun InputBar(
                     },
                     maxLines = 1,
                     cursorBrush = SolidColor(LocalContentColor.current),
-                    textStyle = MaterialTheme.typography.bodyMedium,
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                 )
 
                 if (textFieldValue.text.isEmpty() && !focusState) {
                     Text(
                         text = stringResource(R.string.textfield_hint),
-                        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimaryContainer),
+                        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                     )
                 }
             }
