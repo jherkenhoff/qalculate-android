@@ -82,7 +82,12 @@ import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.R
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import kotlinx.coroutines.launch
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 
 fun LazyListState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
@@ -116,17 +121,34 @@ fun CalculationList(
             state = scrollState,
             modifier = Modifier.fillMaxSize()
         ) {
-            calculationList.forEachIndexed { index, item ->
-                stickyHeader{
-                    CalculationDivider(text = "Now")
+            calculationHistory.groupBy { it.time.toLocalDate() }
+                .map { (id, list) ->
+                    stickyHeader{
+                        val dayString = when (id) {
+                            LocalDate.now() -> "Today"
+                            LocalDate.now().minusDays(1) -> "Yesterday"
+                            else -> id.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+                        }
+                        CalculationDivider(text = dayString)
+                    }
+                    list.forEachIndexed { index, it ->
+                        it.time.toLocalDate()
+                        item() {
+                            Calculation(
+                                it.parsed,
+                                it.result,
+                                modifier = Modifier.animateItemPlacement()
+                            )
+                        }
+                    }
                 }
-                item(key = index) {
-                    Calculation(
-                        item.parsed,
-                        item.result,
-                        modifier = Modifier.animateItemPlacement()
-                    )
-                }
+            item {
+                CalculationDivider(text = "Now")
+            }
+            item {Calculation(
+                currentParsed,
+                currentResult
+            )
             }
         }
 
@@ -172,7 +194,25 @@ private fun DefaultPreview() {
 
     val testCalculationHistory = listOf(
         CalculationHistoryItem(
-            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            LocalDateTime.now().minusDays(10),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        ),
+        CalculationHistoryItem(
+            LocalDateTime.now().minusDays(1),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        ),
+        CalculationHistoryItem(
+            LocalDateTime.now().minusDays(1).minusHours(2),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        ),
+        CalculationHistoryItem(
+            LocalDateTime.now().minusMinutes(20),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"

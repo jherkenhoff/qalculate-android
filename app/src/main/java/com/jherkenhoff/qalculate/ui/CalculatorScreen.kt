@@ -154,31 +154,25 @@ private fun DefaultPreview() {
 
     val testCalculationHistory = listOf(
         CalculationHistoryItem(
-            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            LocalDateTime.now().minusDays(10),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"
         ),
         CalculationHistoryItem(
-            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            LocalDateTime.now().minusDays(1),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"
         ),
         CalculationHistoryItem(
-            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            LocalDateTime.now().minusDays(1).minusHours(2),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"
         ),
         CalculationHistoryItem(
-            LocalDateTime.parse("2023-01-02T23:40:57.120"),
-            "1m + 1m",
-            "1 m + 1 m",
-            "2 m"
-        ),
-        CalculationHistoryItem(
-            LocalDateTime.parse("2023-01-02T23:40:57.120"),
+            LocalDateTime.now().minusMinutes(20),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"

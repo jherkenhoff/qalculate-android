@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.TextRange
@@ -23,6 +24,7 @@ import com.jherkenhoff.qalculate.domain.ParseUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -79,20 +81,23 @@ class MainViewModel @Inject constructor(
 
     private fun recalculate() {
 
-        val parsedMathStructure = parseUseCase(inputTextFieldValue.value.text)
+        viewModelScope.launch {
 
-        val calculatedMathStructure = calculateUseCase(inputTextFieldValue.value.text)
+            val parsedMathStructure = parseUseCase(inputTextFieldValue.value.text)
 
-        val parsedPrintOptions = PrintOptions()
-        parsedPrintOptions.place_units_separately = false
-        parsedPrintOptions.preserve_format = true
-        parsedPrintOptions.use_unicode_signs = true
-        parsedString.value = calculator.print(parsedMathStructure, 2000, parsedPrintOptions, true, 1, TAG_TYPE_HTML)
+            val calculatedMathStructure = calculateUseCase(inputTextFieldValue.value.text)
 
-        val resultPo = PrintOptions()
-        resultPo.interval_display = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
-        resultPo.use_unicode_signs = true
-        resultString.value = calculator.print(calculatedMathStructure, 2000, resultPo, true, 1, TAG_TYPE_HTML)
+            val parsedPrintOptions = PrintOptions()
+            parsedPrintOptions.place_units_separately = false
+            parsedPrintOptions.preserve_format = true
+            parsedPrintOptions.use_unicode_signs = true
+            parsedString.value = calculator.print(parsedMathStructure, 2000, parsedPrintOptions, true, 1, TAG_TYPE_HTML)
+
+            val resultPo = PrintOptions()
+            resultPo.interval_display = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
+            resultPo.use_unicode_signs = true
+            resultString.value = calculator.print(calculatedMathStructure, 2000, resultPo, true, 1, TAG_TYPE_HTML)
+        }
     }
 }
 
