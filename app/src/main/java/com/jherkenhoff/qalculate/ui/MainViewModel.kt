@@ -58,6 +58,8 @@ class MainViewModel @Inject constructor(
                 resultString.value
             )
         )
+
+        updateInput(TextFieldValue(""))
     }
 
     fun updateInput(input: TextFieldValue) {
