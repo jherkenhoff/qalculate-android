@@ -52,3 +52,13 @@ Features from libqalculate:
 
 _For more details about the syntax, and available functions, units, and variables, please consult the manual (https://qalculate.github.io/manual/)_
 
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
