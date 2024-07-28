@@ -152,8 +152,15 @@ fun CalculationList(
             }
         }
 
+
+        val isScrolledToTheEnd by remember {
+            derivedStateOf {
+                scrollState.isScrolledToTheEnd()
+            }
+        }
+
         AnimatedVisibility(
-            visible = !scrollState.isScrolledToTheEnd(),
+            visible = !isScrolledToTheEnd,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it/2 }),
             exit = fadeOut(),
             modifier = Modifier.align(Alignment.BottomCenter)
