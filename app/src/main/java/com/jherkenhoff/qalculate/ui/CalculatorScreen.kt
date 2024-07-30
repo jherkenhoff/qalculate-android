@@ -42,10 +42,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
@@ -86,6 +88,8 @@ fun CalculatorScreenContent(
     resultString: String,
     onCalculationSubmit: () -> Unit
 ) {
+
+    var isAltKeyboardOpen by remember{ mutableStateOf(false) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -138,47 +142,52 @@ fun CalculatorScreenContent(
                 onFocused = {},
                 focusState = false,
                 onSubmit = { onCalculationSubmit() },
+                altKeyboardEnabled = isAltKeyboardOpen,
+                onKeyboardToggleClick = { isAltKeyboardOpen = !isAltKeyboardOpen },
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            QuickKeys(onKey = onQuickKeyPressed)
+            if (isAltKeyboardOpen) {
+                AltKeyboard(onKey = onQuickKeyPressed)
+            } else {
+                QuickKeys(onKey = onQuickKeyPressed)
+            }
         }
     }
 }
 
+private val testCalculationHistory = listOf(
+    CalculationHistoryItem(
+        LocalDateTime.now().minusDays(10),
+        "1m + 1m",
+        "1 m + 1 m",
+        "2 m"
+    ),
+    CalculationHistoryItem(
+        LocalDateTime.now().minusDays(1),
+        "1m + 1m",
+        "1 m + 1 m",
+        "2 m"
+    ),
+    CalculationHistoryItem(
+        LocalDateTime.now().minusDays(1).minusHours(2),
+        "1m + 1m",
+        "1 m + 1 m",
+        "2 m"
+    ),
+    CalculationHistoryItem(
+        LocalDateTime.now().minusMinutes(20),
+        "1m + 1m",
+        "1 m + 1 m",
+        "2 m"
+    )
+)
+
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
-
-    val testCalculationHistory = listOf(
-        CalculationHistoryItem(
-            LocalDateTime.now().minusDays(10),
-            "1m + 1m",
-            "1 m + 1 m",
-            "2 m"
-        ),
-        CalculationHistoryItem(
-            LocalDateTime.now().minusDays(1),
-            "1m + 1m",
-            "1 m + 1 m",
-            "2 m"
-        ),
-        CalculationHistoryItem(
-            LocalDateTime.now().minusDays(1).minusHours(2),
-            "1m + 1m",
-            "1 m + 1 m",
-            "2 m"
-        ),
-        CalculationHistoryItem(
-            LocalDateTime.now().minusMinutes(20),
-            "1m + 1m",
-            "1 m + 1 m",
-            "2 m"
-        )
-    )
-
     CalculatorScreenContent(
         input = TextFieldValue("1+1"),
         onInputChanged = {},

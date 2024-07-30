@@ -137,7 +137,7 @@ fun CalculationList(
                             Calculation(
                                 it.parsed,
                                 it.result,
-                                modifier = Modifier.animateItemPlacement()
+                                //modifier = Modifier.animateItemPlacement()
                             )
                         }
                     }

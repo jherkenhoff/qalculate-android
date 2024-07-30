@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -47,6 +48,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -63,9 +66,12 @@ fun InputBar(
     onFocused: (Boolean) -> Unit,
     focusState: Boolean,
     onSubmit: (String) -> Unit,
+    altKeyboardEnabled: Boolean,
     modifier: Modifier = Modifier,
+    onKeyboardToggleClick: () -> Unit = {},
 ) {
     var lastFocusState by remember { mutableStateOf(false) }
+
 
     Surface(
         //border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline),
@@ -79,10 +85,10 @@ fun InputBar(
         ) {
 
             IconButton(
-                onClick = { /* doSomething() */ },
+                onClick = onKeyboardToggleClick,
             ) {
                 Icon(
-                    Icons.Filled.Calculate,
+                    if (altKeyboardEnabled) Icons.Filled.Keyboard else Icons.Filled.Calculate,
                     contentDescription = "Localized description",
                     tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -93,29 +99,33 @@ fun InputBar(
                 contentAlignment = Alignment.CenterStart,
                 modifier = Modifier.weight(1f)
             ) {
-                BasicTextField(
-                    value = textFieldValue,
-                    onValueChange = onValueChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { state ->
-                            if (lastFocusState != state.isFocused) {
-                                onFocused(state.isFocused)
-                            }
-                            lastFocusState = state.isFocused
+                CompositionLocalProvider(
+                    LocalTextInputService provides if (altKeyboardEnabled) null else LocalTextInputService.current
+                ) {
+                    BasicTextField(
+                        value = textFieldValue,
+                        onValueChange = onValueChange,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { state ->
+                                if (lastFocusState != state.isFocused) {
+                                    onFocused(state.isFocused)
+                                }
+                                lastFocusState = state.isFocused
+                            },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Uri,
+                            imeAction = ImeAction.Go,
+                            autoCorrect = false
+                        ),
+                        keyboardActions = KeyboardActions {
+                            if (textFieldValue.text.isNotBlank()) onSubmit(textFieldValue.text)
                         },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Uri,
-                        imeAction = ImeAction.Go,
-                        autoCorrect = false
-                    ),
-                    keyboardActions = KeyboardActions {
-                        if (textFieldValue.text.isNotBlank()) onSubmit(textFieldValue.text)
-                    },
-                    maxLines = 1,
-                    cursorBrush = SolidColor(LocalContentColor.current),
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
-                )
+                        maxLines = 1,
+                        cursorBrush = SolidColor(LocalContentColor.current),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
+                    )
+                }
 
                 if (textFieldValue.text.isEmpty() && !focusState) {
                     Text(
@@ -130,13 +140,14 @@ fun InputBar(
 
 @Preview(showBackground = true)
 @Composable
-private fun EmptyPreview() {
+private fun PlaceholderPreview() {
     InputBar(
         TextFieldValue(""),
         {},
         {},
         false,
-        {})
+        {},
+        false)
 }
 
 @Preview(showBackground = true)
@@ -147,5 +158,18 @@ private fun WithInputPreview() {
         {},
         {},
         false,
-        {})
+        {},
+        false)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WithInputAltKeyboardPreview() {
+    InputBar(
+        TextFieldValue("1km + 1m"),
+        {},
+        {},
+        false,
+        {},
+        true)
 }
