@@ -87,7 +87,7 @@ fun ColumnScope.Calculation(
         modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 80.dp)
     ) {
         Text(
-            messageFormatter("= " + result),
+            messageFormatter(result),
             style = MaterialTheme.typography.displayMedium,
             textAlign = TextAlign.Center,
         )

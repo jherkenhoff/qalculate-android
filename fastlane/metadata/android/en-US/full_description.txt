@@ -1,0 +1,3 @@
+Qalculate! - the ultimate multi-purpose calculator - is now finally available on Android!
+
+It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation). Features include a large library of customizable functions, unit calculations and conversion, physical constants, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation or interval arithmetic.
