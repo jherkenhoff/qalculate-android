@@ -5,6 +5,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
@@ -78,6 +79,36 @@ class MainViewModel @Inject constructor(
         updateInput(TextFieldValue(
             text = newText,
             selection = TextRange(newCursorPosition)
+        ))
+    }
+
+    fun onDelKeyPressed() {
+        val maxChars = inputTextFieldValue.value.text.length
+        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
+        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
+
+
+        var newText: String
+        var newCursorPosition: Int
+
+        if (inputTextFieldValue.value.getSelectedText().isEmpty()) {
+            newText = "$textBeforeSelection$textAfterSelection"
+            newCursorPosition = textBeforeSelection.length
+        } else {
+            newText = "$textBeforeSelection$textAfterSelection"
+            newCursorPosition = textBeforeSelection.length
+        }
+
+        updateInput(TextFieldValue(
+            text = newText,
+            selection = TextRange(newCursorPosition)
+        ))
+    }
+
+    fun onACKeyPressed() {
+        updateInput(TextFieldValue(
+            text = "",
+            selection = TextRange(0)
         ))
     }
 

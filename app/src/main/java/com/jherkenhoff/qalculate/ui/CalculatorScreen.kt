@@ -25,12 +25,18 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
@@ -38,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -71,6 +78,8 @@ fun CalculatorScreen(viewModel: MainViewModel = viewModel()) {
         input = viewModel.inputTextFieldValue.value,
         onInputChanged = viewModel::updateInput,
         onQuickKeyPressed = viewModel::onQuickKeyPressed,
+        onDelKeyPressed = viewModel::onDelKeyPressed,
+        onACKeyPressed = viewModel::onACKeyPressed,
         calculationHistory = calculationHistory.value,
         parsedString = viewModel.parsedString.value,
         resultString = viewModel.resultString.value,
@@ -83,6 +92,8 @@ fun CalculatorScreenContent(
     input: TextFieldValue,
     onInputChanged: (TextFieldValue) -> Unit,
     onQuickKeyPressed: (String) -> Unit,
+    onDelKeyPressed: () -> Unit,
+    onACKeyPressed: () -> Unit,
     calculationHistory: List<CalculationHistoryItem>,
     parsedString: String,
     resultString: String,
@@ -90,69 +101,90 @@ fun CalculatorScreenContent(
 ) {
 
     var isAltKeyboardOpen by remember{ mutableStateOf(false) }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface,
-        topBar = {
-            TopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
-                        )
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Text("Drawer title", modifier = Modifier.padding(16.dp))
+                HorizontalDivider()
+                NavigationDrawerItem(
+                    label = { Text(text = "Drawer Item") },
+                    selected = true,
+                    onClick = { /*TODO*/ }
+                )
 
+            }
+        },
+    ) {
+
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.surface,
+            topBar = {
+                TopAppBar(
+                    colors = topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    title = {
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { /*TODO*/ }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "Localized description"
+                            )
+
+                        }
+
+                    },
+                    actions = {
+                        SuggestionChip(onClick = { /*TODO*/ }, label = { Text("DEG") })
+                        SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exact") })
+                        SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exp.") })
                     }
 
-                },
-                actions = {
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("DEG") })
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exact") })
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exp.") })
+                )
+            },
+            modifier = Modifier.imePadding(),
+        ) { innerPadding ->
+
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding),
+            ) {
+                CalculationList(
+                    calculationHistory,
+                    parsedString,
+                    resultString,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .weight(1f)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                InputBar(
+                    textFieldValue = input,
+                    onValueChange = onInputChanged,
+                    onFocused = {},
+                    focusState = false,
+                    onSubmit = { onCalculationSubmit() },
+                    altKeyboardEnabled = isAltKeyboardOpen,
+                    onKeyboardToggleClick = { isAltKeyboardOpen = !isAltKeyboardOpen },
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (isAltKeyboardOpen) {
+                    AltKeyboard(
+                        onKey = onQuickKeyPressed,
+                        onDel = onDelKeyPressed,
+                        onAC = onACKeyPressed
+                    )
+                } else {
+                    QuickKeys(onKey = onQuickKeyPressed)
                 }
-
-            )
-        },
-        modifier = Modifier.imePadding(),
-    ) {
-        innerPadding ->
-
-        Column(
-            modifier = Modifier
-                .padding(innerPadding),
-        ) {
-            CalculationList(
-                calculationHistory,
-                parsedString,
-                resultString,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .weight(1f)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            InputBar(
-                textFieldValue = input,
-                onValueChange = onInputChanged,
-                onFocused = {},
-                focusState = false,
-                onSubmit = { onCalculationSubmit() },
-                altKeyboardEnabled = isAltKeyboardOpen,
-                onKeyboardToggleClick = { isAltKeyboardOpen = !isAltKeyboardOpen },
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (isAltKeyboardOpen) {
-                AltKeyboard(onKey = onQuickKeyPressed)
-            } else {
-                QuickKeys(onKey = onQuickKeyPressed)
             }
         }
     }
@@ -192,6 +224,8 @@ private fun DefaultPreview() {
         input = TextFieldValue("1+1"),
         onInputChanged = {},
         onQuickKeyPressed = {},
+        onDelKeyPressed = {},
+        onACKeyPressed = {},
         calculationHistory = testCalculationHistory,
         parsedString = "1+1",
         resultString = "2",
