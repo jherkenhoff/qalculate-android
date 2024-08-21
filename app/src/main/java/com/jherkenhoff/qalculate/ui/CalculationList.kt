@@ -134,7 +134,7 @@ fun CalculationList(
                     list.forEachIndexed { index, it ->
                         it.time.toLocalDate()
                         item() {
-                            Calculation(
+                            CalculationListItem(
                                 it.parsed,
                                 it.result,
                                 //modifier = Modifier.animateItemPlacement()
@@ -145,7 +145,7 @@ fun CalculationList(
             item {
                 CalculationDivider(text = "Now")
             }
-            item {Calculation(
+            item {CalculationListItem(
                 currentParsed,
                 currentResult
             )

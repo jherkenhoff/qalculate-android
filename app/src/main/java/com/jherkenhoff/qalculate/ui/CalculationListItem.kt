@@ -16,9 +16,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ColumnScope.CalculationItem(
+fun ColumnScope.CalculationListItem(
     parsed: String,
-    result: String
+    result: String,
+    compact: Boolean = true
 ) {
     Text(
         messageFormatter(parsed),
@@ -36,15 +37,16 @@ fun ColumnScope.CalculationItem(
     }
 }
 @Composable
-fun CalculationItem(
+fun CalculationListItem(
     parsed: String,
     result: String,
     modifier: Modifier = Modifier,
+    compact: Boolean = true,
 ) {
     Column(
         modifier = modifier
     ) {
-        CalculationItem(
+        CalculationListItem(
             parsed,
             result
         )
@@ -54,7 +56,7 @@ fun CalculationItem(
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
-    CalculationItem(
+    CalculationListItem(
         "1 kilometer + 5 meter",
         "1.005 m",
         modifier = Modifier.padding(16.dp)
