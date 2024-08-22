@@ -57,6 +57,13 @@ _For more details about the syntax, and available functions, units, and variable
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/jherkenhoff"><img src="https://avatars.githubusercontent.com/u/22686781?v=4?s=100" width="100px;" alt="jherkenhoff"/><br /><sub><b>jherkenhoff</b></sub></a><br /><a href="#code-jherkenhoff" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
