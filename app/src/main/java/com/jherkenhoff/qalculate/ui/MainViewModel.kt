@@ -86,14 +86,18 @@ class MainViewModel @Inject constructor(
         val maxChars = inputTextFieldValue.value.text.length
         val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
         val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
-
+        val selectedText = inputTextFieldValue.value.getSelectedText()
 
         var newText: String
         var newCursorPosition: Int
-
-        if (inputTextFieldValue.value.getSelectedText().isEmpty()) {
-            newText = "$textBeforeSelection$textAfterSelection"
-            newCursorPosition = textBeforeSelection.length
+        
+        if (selectedText.isEmpty()) {
+            if (textBeforeSelection.isEmpty()) {
+                return
+            } else {
+                newText = "${textBeforeSelection.dropLast(1)}$textAfterSelection"
+                newCursorPosition = textBeforeSelection.length - 1
+            }
         } else {
             newText = "$textBeforeSelection$textAfterSelection"
             newCursorPosition = textBeforeSelection.length
