@@ -57,6 +57,13 @@ _For more details about the syntax, and available functions, units, and variable
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/keinezeit8"><img src="https://avatars.githubusercontent.com/u/59264615?v=4?s=100" width="100px;" alt="keinezeit8"/><br /><sub><b>keinezeit8</b></sub></a><br /><a href="#doc-keinezeit8" title="Documentation">📖</a></td>
+    </tr>
+  </tbody>
+</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
