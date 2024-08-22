@@ -1,4 +1,21 @@
 {
   "projectName": "qalculate-android",
-  "projectOwner": "jherkenhoff"
+  "projectOwner": "jherkenhoff",
+  "files": [
+    "README.md"
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "keinezeit8",
+      "name": "keinezeit8",
+      "avatar_url": "https://avatars.githubusercontent.com/u/59264615?v=4",
+      "profile": "https://github.com/keinezeit8",
+      "contributions": [
+        "doc"
+      ]
+    }
+  ]
 }
