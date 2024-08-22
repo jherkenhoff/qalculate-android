@@ -60,6 +60,7 @@ _For more details about the syntax, and available functions, units, and variable
 <table>
   <tbody>
     <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/jherkenhoff"><img src="https://avatars.githubusercontent.com/u/22686781?v=4?s=100" width="100px;" alt="jherkenhoff"/><br /><sub><b>jherkenhoff</b></sub></a><br /><a href="#code-jherkenhoff" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.bytehamster.com"><img src="https://avatars.githubusercontent.com/u/5811634?v=4?s=100" width="100px;" alt="ByteHamster"/><br /><sub><b>ByteHamster</b></sub></a><br /><a href="#code-ByteHamster" title="Code">💻</a></td>
     </tr>
   </tbody>
