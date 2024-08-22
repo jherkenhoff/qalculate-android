@@ -1,4 +1,21 @@
 {
   "projectName": "qalculate-android",
-  "projectOwner": "jherkenhoff"
+  "projectOwner": "jherkenhoff",
+  "files": [
+    "README.md"
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "ByteHamster",
+      "name": "ByteHamster",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5811634?v=4",
+      "profile": "https://www.bytehamster.com",
+      "contributions": [
+        "code"
+      ]
+    }
+  ]
 }
