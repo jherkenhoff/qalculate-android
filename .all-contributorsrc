@@ -34,6 +34,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "inidamleader",
+      "name": "Inidam Leader",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24585476?v=4",
+      "profile": "https://play.google.com/store/apps/details?id=com.inidamleader.ovtracker",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }
