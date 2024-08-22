@@ -41,11 +41,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -70,6 +73,8 @@ fun InputBar(
     modifier: Modifier = Modifier,
     onKeyboardToggleClick: () -> Unit = {},
 ) {
+
+    val focusRequester = remember { FocusRequester() }
     var lastFocusState by remember { mutableStateOf(false) }
 
 
@@ -107,6 +112,7 @@ fun InputBar(
                         onValueChange = onValueChange,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .focusRequester(focusRequester)
                             .onFocusChanged { state ->
                                 if (lastFocusState != state.isFocused) {
                                     onFocused(state.isFocused)
@@ -135,6 +141,11 @@ fun InputBar(
                 }
             }
         }
+    }
+
+    // Focus the input text field on app startup
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 }
 

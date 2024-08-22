@@ -90,7 +90,7 @@ class MainViewModel @Inject constructor(
 
         var newText: String
         var newCursorPosition: Int
-        
+
         if (selectedText.isEmpty()) {
             if (textBeforeSelection.isEmpty()) {
                 return
