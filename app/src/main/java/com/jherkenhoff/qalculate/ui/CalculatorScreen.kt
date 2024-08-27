@@ -73,7 +73,10 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 @Composable
-fun CalculatorScreen(viewModel: MainViewModel = viewModel()) {
+fun CalculatorScreen(
+    viewModel: MainViewModel = viewModel(),
+    openDrawer: () -> Unit = {}
+) {
     val calculationHistory = viewModel.calculationHistory.collectAsState()
 
     CalculatorScreenContent(
@@ -85,7 +88,8 @@ fun CalculatorScreen(viewModel: MainViewModel = viewModel()) {
         calculationHistory = calculationHistory.value,
         parsedString = viewModel.parsedString.value,
         resultString = viewModel.resultString.value,
-        onCalculationSubmit = viewModel::submitCalculation
+        onCalculationSubmit = viewModel::submitCalculation,
+        openDrawer = openDrawer
     )
 }
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,92 +103,77 @@ fun CalculatorScreenContent(
     calculationHistory: List<CalculationHistoryItem>,
     parsedString: String,
     resultString: String,
-    onCalculationSubmit: () -> Unit
+    onCalculationSubmit: () -> Unit,
+    openDrawer: () -> Unit = {  }
 ) {
 
     var isAltKeyboardOpen by remember{ mutableStateOf(false) }
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            Drawer()
-        },
-    ) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
+        topBar = {
+            TopAppBar(
+                colors = topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = {
+                },
+                navigationIcon = {
+                    IconButton(onClick = openDrawer) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
 
-        Scaffold(
-            containerColor = MaterialTheme.colorScheme.surface,
-            topBar = {
-                TopAppBar(
-                    colors = topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                    title = {
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                drawerState.apply {
-                                    if (isClosed) open() else close()
-                                }
-                            }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = "Localized description"
-                            )
-
-                        }
-
-                    },
-                    actions = {
-                        SuggestionChip(onClick = { /*TODO*/ }, label = { Text("DEG") })
-                        SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exact") })
-                        SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exp.") })
                     }
 
-                )
-            },
-            modifier = Modifier.imePadding(),
-        ) { innerPadding ->
-
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding),
-            ) {
-                CalculationList(
-                    calculationHistory,
-                    parsedString,
-                    resultString,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .weight(1f)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                InputBar(
-                    textFieldValue = input,
-                    onValueChange = onInputChanged,
-                    onFocused = {},
-                    focusState = false,
-                    onSubmit = { onCalculationSubmit() },
-                    altKeyboardEnabled = isAltKeyboardOpen,
-                    onKeyboardToggleClick = { isAltKeyboardOpen = !isAltKeyboardOpen },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (isAltKeyboardOpen) {
-                    AltKeyboard(
-                        onKey = onQuickKeyPressed,
-                        onDel = onDelKeyPressed,
-                        onAC = onACKeyPressed
-                    )
-                } else {
-                    QuickKeys(onKey = onQuickKeyPressed)
+                },
+                actions = {
+                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("DEG") })
+                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exact") })
+                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exp.") })
                 }
+
+            )
+        },
+        modifier = Modifier.imePadding(),
+    ) { innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .padding(innerPadding),
+        ) {
+            CalculationList(
+                calculationHistory,
+                parsedString,
+                resultString,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .weight(1f)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            InputBar(
+                textFieldValue = input,
+                onValueChange = onInputChanged,
+                onFocused = {},
+                focusState = false,
+                onSubmit = { onCalculationSubmit() },
+                altKeyboardEnabled = isAltKeyboardOpen,
+                onKeyboardToggleClick = { isAltKeyboardOpen = !isAltKeyboardOpen },
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (isAltKeyboardOpen) {
+                AltKeyboard(
+                    onKey = onQuickKeyPressed,
+                    onDel = onDelKeyPressed,
+                    onAC = onACKeyPressed
+                )
+            } else {
+                QuickKeys(onKey = onQuickKeyPressed)
             }
         }
     }

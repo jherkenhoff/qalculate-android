@@ -3,4 +3,5 @@
     <string name="top_sheet_arrow_down">Down arrow</string>
     <string name="top_sheet_menu">Menu button</string>
     <string name="textfield_hint">Enter expression</string>
+    <string name="about_qalculate_text">Powerful and versatile multi-purpose calculator based on the almighty Qalculate! desktop calculator.</string>
 </resources>

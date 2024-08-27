@@ -1,12 +1,8 @@
 package com.jherkenhoff.qalculate.ui
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Functions
@@ -20,25 +16,23 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jherkenhoff.qalculate.R
 
 
 @Composable
 fun Drawer(
-
+    modifier: Modifier = Modifier,
+    onCalculatorClick: () -> Unit = {},
+    onAboutClick: () -> Unit = {}
 ) {
-    ModalDrawerSheet {
+    ModalDrawerSheet(modifier = modifier) {
         Spacer(modifier = Modifier.height(30.dp))
         NavigationDrawerItem(
             label = { Text(text = "Calculator") },
             selected = true,
-            onClick = { /*TODO*/ },
+            onClick = onCalculatorClick,
             icon = { Icon(Icons.Filled.Calculate, contentDescription = "Calculator icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
@@ -63,7 +57,7 @@ fun Drawer(
         NavigationDrawerItem(
             label = { Text(text = "About") },
             selected = false,
-            onClick = { /*TODO*/ },
+            onClick = onAboutClick,
             icon = { Icon(Icons.Filled.Info, contentDescription = "Settings icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
