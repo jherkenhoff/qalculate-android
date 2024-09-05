@@ -5,15 +5,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -24,8 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -35,7 +34,8 @@ fun AltKeyboard(
     modifier: Modifier = Modifier,
     onKey: (String) -> Unit = {},
     onDel: () -> Unit = {},
-    onAC: () -> Unit = {}
+    onAC: () -> Unit = {},
+    onSubmit: () -> Unit = {}
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -54,6 +54,7 @@ fun AltKeyboard(
                 onKey = onKey,
                 onDel = onDel,
                 onAC = onAC,
+                onSubmit = onSubmit,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
@@ -72,7 +73,8 @@ fun BasicAltKeyboard(
     modifier: Modifier = Modifier,
     onKey: (String) -> Unit = {},
     onDel: () -> Unit = {},
-    onAC: () -> Unit = {}
+    onAC: () -> Unit = {},
+    onSubmit: () -> Unit = {}
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -104,7 +106,7 @@ fun BasicAltKeyboard(
             AltKeyboardButton(text=".", onClick={onKey(".")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="e", onClick={onKey("e")}, color = MaterialTheme.colorScheme.primary)
             AltKeyboardButton(text="Ans", onClick={}, color = MaterialTheme.colorScheme.primary)
-            AltKeyboardButton(text="=", onClick={}, color = MaterialTheme.colorScheme.primary)
+            AltKeyboardButton(icon=Icons.AutoMirrored.Filled.KeyboardReturn, description="Return button", onClick={onSubmit()}, color = MaterialTheme.colorScheme.primary)
         }
     }
 }
@@ -147,6 +149,26 @@ fun RowScope.AltKeyboardButton(
         colors = ButtonDefaults.buttonColors(containerColor = color)
     ) {
         Text(text = text)
+    }
+}
+
+@Composable
+fun RowScope.AltKeyboardButton(
+    icon: ImageVector,
+    description: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.secondary
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.weight(1f).height(50.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = color)
+    ) {
+        Icon(
+            icon,
+            contentDescription = description
+        )
     }
 }
 
