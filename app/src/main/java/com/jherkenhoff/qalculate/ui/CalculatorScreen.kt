@@ -18,16 +18,17 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
 @Composable
@@ -50,6 +51,7 @@ fun CalculatorScreen(
         openDrawer = openDrawer
     )
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorScreenContent(
@@ -65,7 +67,8 @@ fun CalculatorScreenContent(
     openDrawer: () -> Unit = {  }
 ) {
 
-    var isAltKeyboardOpen by remember{ mutableStateOf(false) }
+    val screenSettingsRepository = ScreenSettingsRepository(LocalContext.current)
+    var isAltKeyboardOpen = screenSettingsRepository.isAltKeyboardOpen.collectAsState(true).value
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -118,7 +121,12 @@ fun CalculatorScreenContent(
                 focusState = false,
                 onSubmit = { onCalculationSubmit() },
                 altKeyboardEnabled = isAltKeyboardOpen,
-                onKeyboardToggleClick = { isAltKeyboardOpen = !isAltKeyboardOpen },
+                onKeyboardToggleClick = {
+                    isAltKeyboardOpen = !isAltKeyboardOpen
+                    runBlocking {
+                        screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
+                    }
+                },
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
             )
