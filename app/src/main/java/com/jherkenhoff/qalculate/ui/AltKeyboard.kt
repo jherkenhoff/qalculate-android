@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material3.Button
@@ -78,30 +79,30 @@ fun BasicAltKeyboard(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AltKeyboardButton(text="7", onClick={onKey("7")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="8", onClick={onKey("8")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="9", onClick={onKey("9")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="⌫", onClick=onDel, color = MaterialTheme.colorScheme.error)
             AltKeyboardButton(text="AC", onClick=onAC, color = MaterialTheme.colorScheme.error)
         }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AltKeyboardButton(text="4", onClick={onKey("4")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="5", onClick={onKey("5")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="6", onClick={onKey("6")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="×", onClick={onKey("×")}, color = MaterialTheme.colorScheme.primary)
             AltKeyboardButton(text="÷", onClick={onKey("÷")}, color = MaterialTheme.colorScheme.primary)
         }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AltKeyboardButton(text="1", onClick={onKey("1")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="2", onClick={onKey("2")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="3", onClick={onKey("3")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="+", onClick={onKey("+")}, color = MaterialTheme.colorScheme.primary)
             AltKeyboardButton(text="-", onClick={onKey("-")}, color = MaterialTheme.colorScheme.primary)
         }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AltKeyboardButton(text="0", onClick={onKey("0")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text=".", onClick={onKey(".")}, color = MaterialTheme.colorScheme.secondary)
             AltKeyboardButton(text="e", onClick={onKey("e")}, color = MaterialTheme.colorScheme.primary)
@@ -145,8 +146,9 @@ fun RowScope.AltKeyboardButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.weight(1f).height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = color)
+        modifier = modifier.weight(1f).height(64.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        contentPadding = PaddingValues(4.dp)
     ) {
         Text(text = text)
     }
@@ -162,8 +164,9 @@ fun RowScope.AltKeyboardButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.weight(1f).height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = color)
+        modifier = modifier.weight(1f).height(64.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        contentPadding = PaddingValues(4.dp)
     ) {
         Icon(
             icon,
