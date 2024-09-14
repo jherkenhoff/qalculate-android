@@ -67,7 +67,7 @@ dependencies {
     implementation 'androidx.compose.material3:material3:1.2.1'
     implementation 'androidx.compose.material:material-icons-extended:1.7.0-rc01'
     implementation 'com.google.dagger:hilt-android:2.52'
-    implementation 'com.jherkenhoff:libqalculate:4.8.1-2'
+    implementation 'com.jherkenhoff:libqalculate:5.2.0-1'
     implementation 'androidx.compose.material3:material3-android:1.2.1'
     kapt 'com.google.dagger:hilt-compiler:2.52'
     testImplementation 'junit:junit:4.13.2'
