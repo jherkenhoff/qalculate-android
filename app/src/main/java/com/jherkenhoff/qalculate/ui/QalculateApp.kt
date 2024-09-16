@@ -44,8 +44,8 @@ fun QalculateApp() {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
-                Drawer(
-                    onAboutClick = { aboutCardVisible = true; coroutineScope.launch { drawerState.close() } },
+                NavigationDrawer(
+                    onNavigation = { navController.navigate(it); coroutineScope.launch { drawerState.close() } },
                     modifier = Modifier.zIndex(1000f)
                 )}
         ) {

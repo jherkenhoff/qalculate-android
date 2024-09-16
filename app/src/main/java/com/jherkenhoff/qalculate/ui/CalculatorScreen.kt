@@ -18,7 +18,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
@@ -27,13 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
 @Composable
 fun CalculatorScreen(
-    viewModel: MainViewModel = viewModel(),
+    viewModel: CalculatorViewModel = viewModel(),
     openDrawer: () -> Unit = {}
 ) {
     val calculationHistory = viewModel.calculationHistory.collectAsState()
@@ -86,7 +84,6 @@ fun CalculatorScreenContent(
                             imageVector = Icons.Filled.Menu,
                             contentDescription = "Localized description"
                         )
-
                     }
 
                 },

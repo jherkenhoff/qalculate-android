@@ -24,9 +24,17 @@ fun QalculateNavGraph(
 
         composable(route = QalculateDestinations.CALCULATOR) {
             CalculatorScreen(
-                viewModel = hiltViewModel<MainViewModel>(),
+                viewModel = hiltViewModel<CalculatorViewModel>(),
                 openDrawer = openDrawer,
             )
         }
+
+        composable(route = QalculateDestinations.UNITS) {
+            UnitsScreen(
+                viewModel = hiltViewModel<UnitsViewModel>(),
+                openDrawer = openDrawer,
+            )
+        }
+
     }
 }

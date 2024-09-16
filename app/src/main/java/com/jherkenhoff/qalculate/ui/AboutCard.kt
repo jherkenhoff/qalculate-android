@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
@@ -58,7 +58,7 @@ fun AboutCard(
                         contentDescription = "Qalculate logo",
                         modifier = Modifier
                             .size(50.dp)
-                            .clip(CircleShape)
+                            .shadow(6.dp, shape = CircleShape)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
