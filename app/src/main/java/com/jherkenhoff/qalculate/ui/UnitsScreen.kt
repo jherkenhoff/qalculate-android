@@ -1,21 +1,18 @@
 package com.jherkenhoff.qalculate.ui
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.automirrored.outlined.ArrowLeft
 import androidx.compose.material.icons.filled.Add
@@ -49,6 +46,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
+data class UnitDefinition(
+    val title: String,
+    val name: String,
+    val abbreviation: String
+)
+
 @Composable
 fun UnitsScreen(
     viewModel: UnitsViewModel = viewModel(),
@@ -56,164 +59,154 @@ fun UnitsScreen(
 ) {
 
     UnitsScreenContent(
-        openDrawer = openDrawer
+        openDrawer = openDrawer,
+        unitList = viewModel.unitList.value,
+        onSearchInputUpdate = { viewModel.setSearchString(it) },
+        searchString = viewModel.searchString.value
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UnitsScreenContent(
-    openDrawer: () -> Unit = {  }
+    openDrawer: () -> Unit = {  },
+    unitList: List<UnitDefinition> = emptyList(),
+    onSearchInputUpdate: (String) -> Unit = {},
+    searchString: String = ""
 ) {
 
     val scrollState = rememberScrollState()
 
-    var searchOpen by remember{ mutableStateOf(false) }
 
-    AnimatedContent(
-        targetState = searchOpen,
-        transitionSpec = {
-            fadeIn(animationSpec = tween(150, 150)) togetherWith
-                    fadeOut(animationSpec = tween(150))
-        }, label = "size transform"
-    ) { targetExpanded ->
-        if (targetExpanded) {
-            SearchBar(
-                query = "search units",
-                active = true,
-                leadingIcon = {
-                    IconButton(onClick = { searchOpen = false }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back icon")
-                    }
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(text = "Units")
                 },
+                navigationIcon = {
+                    IconButton(onClick = openDrawer) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
+                    }
+
+                },
+                actions = {
+                    IconButton(onClick = {   }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Sort,
+                            contentDescription = "Sort icon"
+                        )
+                    }
+                }
+
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { /* do something */ },
+                containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+            ) {
+                Icon(Icons.Filled.Add, "Add unit icon")
+            }
+        },
+        modifier = Modifier.imePadding(),
+    ) { innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+        ) {
+
+            SearchBar(
+                query = searchString,
+                placeholder = { Text("search units") },
+                active = false,
                 trailingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search icon") },
-                onActiveChange = { searchOpen = it },
-                onQueryChange = {},
-                onSearch = {}
+                onActiveChange = {  },
+                onQueryChange = onSearchInputUpdate,
+                onSearch = {},
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
 
             }
-        } else {
-            Scaffold(
-                containerColor = MaterialTheme.colorScheme.surface,
-                topBar = {
-                    CenterAlignedTopAppBar(
-                        title = {
-                            Text(text = "Units")
-                        },
-                        navigationIcon = {
-                            IconButton(onClick = openDrawer) {
-                                Icon(
-                                    imageVector = Icons.Filled.Menu,
-                                    contentDescription = "Localized description"
-                                )
-                            }
 
-                        },
-                        actions = {
-                            IconButton(onClick = { searchOpen = true }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Search,
-                                    contentDescription = "Search icon"
-                                )
-                            }
-                            IconButton(onClick = { searchOpen = true }) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.Sort,
-                                    contentDescription = "Sort icon"
-                                )
-                            }
-                        }
+            Spacer(modifier = Modifier.size(8.dp))
 
-                    )
-                },
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = { /* do something */ },
-                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
-                    ) {
-                        Icon(Icons.Filled.Add, "Add unit icon")
-                    }
-                },
-                modifier = Modifier.imePadding(),
-            ) { innerPadding ->
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(scrollState)
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
 
-                Column(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                ) {
+            ) {
+                Box(modifier = Modifier.wrapContentSize(Alignment.BottomStart)) {
 
-                    Row(
-                        modifier = Modifier
-                            .horizontalScroll(scrollState)
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    var expanded by remember { mutableStateOf(false) }
 
-                    ) {
-                        Box(modifier = Modifier.wrapContentSize(Alignment.BottomStart)) {
-
-                            var expanded by remember { mutableStateOf(false) }
-
-                            FilterChip(
-                                selected = true,
-                                onClick = { expanded = true },
-                                label = { Text("Light") },
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.ArrowDropDown,
-                                        contentDescription = "Unit system icon"
-                                    )
-                                }
+                    FilterChip(
+                        selected = true,
+                        onClick = { expanded = true },
+                        label = { Text("Light") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowDropDown,
+                                contentDescription = "Unit system icon"
                             )
-                            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                                DropdownMenuItem(
-                                    text = { Text("Up") },
-                                    onClick = { /* Handle edit! */ },
-                                    leadingIcon = { Icon(Icons.AutoMirrored.Outlined.ArrowLeft, contentDescription = null) }
-                                )
-                                HorizontalDivider()
-                                DropdownMenuItem(
-                                    text = { Text("Settings") },
-                                    onClick = { /* Handle settings! */ },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Radiance") },
-                                    onClick = { /* Handle send feedback! */ },
-                                )
-                            }
                         }
-                        FilterChip(
-                            selected = false,
-                            onClick = { /*TODO*/ },
-                            label = { Text("System") },
-                            trailingIcon = {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowDropDown,
-                                    contentDescription = "Unit system icon"
-                                )
-                            }
+                    )
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        DropdownMenuItem(
+                            text = { Text("Up") },
+                            onClick = { /* Handle edit! */ },
+                            leadingIcon = { Icon(Icons.AutoMirrored.Outlined.ArrowLeft, contentDescription = null) }
                         )
-                        FilterChip(
-                            selected = false,
-                            onClick = { /*TODO*/ },
-                            label = { Text("Favorite") }
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            text = { Text("Settings") },
+                            onClick = { /* Handle settings! */ },
                         )
-                        FilterChip(
-                            selected = false,
-                            onClick = { /*TODO*/ },
-                            label = { Text("Custom") }
+                        DropdownMenuItem(
+                            text = { Text("Radiance") },
+                            onClick = { /* Handle send feedback! */ },
                         )
                     }
+                }
+                FilterChip(
+                    selected = false,
+                    onClick = { /*TODO*/ },
+                    label = { Text("System") },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = "Unit system icon"
+                        )
+                    }
+                )
+                FilterChip(
+                    selected = false,
+                    onClick = { /*TODO*/ },
+                    label = { Text("Favorite") }
+                )
+                FilterChip(
+                    selected = false,
+                    onClick = { /*TODO*/ },
+                    label = { Text("Custom") }
+                )
+            }
 
-                    ListItem(
-                        headlineContent = { Text(text = "Ampere") },
-                        supportingContent = { Text(text = "A, ampere, amperes, amp") },
-                    )
-                    ListItem(
-                        headlineContent = { Text(text = "Ampere per Meter") },
-                        supportingContent = { Text(text = "= 1 A ∕ m") },
-                    )
+            LazyColumn {
+                for (unitDefinition in unitList) {
+                    item {
+                        ListItem(
+                            headlineContent = { Text(unitDefinition.title) },
+                            supportingContent = { Text(unitDefinition.abbreviation) },
+                        )
+                    }
                 }
             }
         }

@@ -1,6 +1,5 @@
 package com.jherkenhoff.qalculate.ui
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.jherkenhoff.libqalculate.Calculator
@@ -12,7 +11,30 @@ class UnitsViewModel @Inject constructor(
     private val calc: Calculator,
 ) : ViewModel() {
 
-    val parsedString : MutableState<String> = mutableStateOf("0")
+    private val _searchString = mutableStateOf("")
+    val searchString = _searchString
 
-    val unitNames : List<String> = calc.units.map { it.name() }
+    private val _unitList = mutableStateOf<List<UnitDefinition>>(emptyList())
+    val unitList = _unitList
+
+    init {
+        updateUnitList()
+    }
+
+    fun setSearchString(newSearchString: String) {
+        _searchString.value = newSearchString
+        updateUnitList()
+    }
+
+    private fun updateUnitList() {
+        val sorted = calc.units.sortedWith(compareBy { it.title() })
+
+        var filtered = sorted
+
+        if (_searchString.value.isNotEmpty()) {
+            filtered = filtered.filter { it.title().lowercase().startsWith(_searchString.value.lowercase()) }
+        }
+
+        _unitList.value = filtered.map { UnitDefinition(it.title(), it.name(), it.abbreviation()) }
+    }
 }
