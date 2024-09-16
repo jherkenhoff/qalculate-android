@@ -10,6 +10,7 @@ import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jherkenhoff.libqalculate.Calculator
+import com.jherkenhoff.libqalculate.ExpressionItem
 import com.jherkenhoff.libqalculate.IntervalDisplay
 import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_HTML
@@ -44,6 +45,8 @@ class CalculatorViewModel @Inject constructor(
     val resultString : MutableState<String> = mutableStateOf("0")
 
     val inputTextFieldValue : MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
+
+    val autocompleteList : MutableList<ExpressionItem> = mutableListOf()
 
     fun submitCalculation() {
         calculationHistoryRepository.appendCalculation(

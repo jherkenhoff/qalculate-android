@@ -1,15 +1,13 @@
 package com.jherkenhoff.qalculate.di
 
 import android.app.Application
+import android.util.Log
+import com.jherkenhoff.libqalculate.Calculator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import com.jherkenhoff.libqalculate.Calculator
-import com.jherkenhoff.libqalculate.PrintOptions
-import com.jherkenhoff.libqalculate.EvaluationOptions
-import com.jherkenhoff.libqalculate.IntervalDisplay
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -21,6 +19,11 @@ class AppModule {
 
         val calc = Calculator()
         calc.loadGlobalDefinitions()
+
+        for (unit in calc.units) {
+            Log.d("", unit.title())
+        }
+
         return calc
     }
 }

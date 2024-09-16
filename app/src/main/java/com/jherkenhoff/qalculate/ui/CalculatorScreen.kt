@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -18,12 +19,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jherkenhoff.libqalculate.ExpressionItem
 import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import kotlinx.coroutines.runBlocking
@@ -62,6 +65,7 @@ fun CalculatorScreenContent(
     parsedString: String,
     resultString: String,
     onCalculationSubmit: () -> Unit,
+    autocompleteList: List<ExpressionItem> = emptyList(),
     openDrawer: () -> Unit = {  }
 ) {
 
@@ -102,14 +106,22 @@ fun CalculatorScreenContent(
             modifier = Modifier
                 .padding(innerPadding),
         ) {
-            CalculationList(
-                calculationHistory,
-                parsedString,
-                resultString,
+            Box(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .weight(1f)
-            )
+            ) {
+                CalculationList(
+                    calculationHistory,
+                    parsedString,
+                    resultString,
+                )
+
+                AutocompleteList(
+                    entries = autocompleteList,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
             InputBar(
                 textFieldValue = input,

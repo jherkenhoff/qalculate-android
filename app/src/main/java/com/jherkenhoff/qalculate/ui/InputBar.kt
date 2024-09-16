@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -43,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.R
 import kotlinx.coroutines.awaitCancellation
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun InputBar(
     textFieldValue: TextFieldValue,
@@ -60,11 +61,14 @@ fun InputBar(
     var lastFocusState by remember { mutableStateOf(false) }
 
 
+
     Surface(
         //border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline),
         color = MaterialTheme.colorScheme.secondaryContainer,
         shape = RoundedCornerShape(100),
-        modifier = modifier.fillMaxWidth().height(48.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
