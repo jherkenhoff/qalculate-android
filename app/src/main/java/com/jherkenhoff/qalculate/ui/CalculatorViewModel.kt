@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class CalculatorViewModel @Inject constructor(
     private val calculator: Calculator,
     private val parseUseCase: ParseUseCase,
     private val calculateUseCase: CalculateUseCase,
