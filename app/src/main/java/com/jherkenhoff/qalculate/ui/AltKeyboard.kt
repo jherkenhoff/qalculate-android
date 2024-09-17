@@ -2,13 +2,13 @@ package com.jherkenhoff.qalculate.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material3.Button
@@ -82,32 +82,32 @@ fun BasicAltKeyboard(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AltKeyboardButton(text="7", onClick={onKey("7")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text="8", onClick={onKey("8")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text="9", onClick={onKey("9")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text="⌫", onClick=onDel, color = MaterialTheme.colorScheme.error)
-            AltKeyboardButton(text="AC", onClick=onAC, color = MaterialTheme.colorScheme.error)
+            AltKeyboardButton(text="7", onClick={onKey("7")}, color = MaterialTheme.colorScheme.primaryContainer)
+            AltKeyboardButton(text="8", onClick={onKey("8")}, color = MaterialTheme.colorScheme.secondaryContainer)
+            AltKeyboardButton(text="9", onClick={onKey("9")}, color = MaterialTheme.colorScheme.secondaryContainer)
+            AltKeyboardButton(text="⌫", onClick=onDel, color = MaterialTheme.colorScheme.tertiaryContainer)
+            AltKeyboardButton(text="AC", onClick=onAC, color = MaterialTheme.colorScheme.tertiaryContainer)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AltKeyboardButton(text="4", onClick={onKey("4")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text="5", onClick={onKey("5")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text="6", onClick={onKey("6")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text="×", onClick={onKey("×")}, color = MaterialTheme.colorScheme.primary)
-            AltKeyboardButton(text="÷", onClick={onKey("÷")}, color = MaterialTheme.colorScheme.primary)
+            AltKeyboardButton(text="4", onClick={onKey("4")}, color = MaterialTheme.colorScheme.secondaryContainer)
+            AltKeyboardButton(text="5", onClick={onKey("5")}, color = MaterialTheme.colorScheme.secondaryContainer)
+            AltKeyboardButton(text="6", onClick={onKey("6")}, color = MaterialTheme.colorScheme.secondaryContainer)
+            AltKeyboardButton(text="×", onClick={onKey("×")}, color = MaterialTheme.colorScheme.primaryContainer)
+            AltKeyboardButton(text="÷", onClick={onKey("÷")}, color = MaterialTheme.colorScheme.primaryContainer)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AltKeyboardButton(text="1", onClick={onKey("1")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text="2", onClick={onKey("2")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text="3", onClick={onKey("3")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text="+", onClick={onKey("+")}, color = MaterialTheme.colorScheme.primary)
-            AltKeyboardButton(text="-", onClick={onKey("-")}, color = MaterialTheme.colorScheme.primary)
+            AltKeyboardButton(text="1", onClick={onKey("1")}, color = MaterialTheme.colorScheme.secondaryContainer)
+            AltKeyboardButton(text="2", onClick={onKey("2")}, color = MaterialTheme.colorScheme.secondaryContainer)
+            AltKeyboardButton(text="3", onClick={onKey("3")}, color = MaterialTheme.colorScheme.secondaryContainer)
+            AltKeyboardButton(text="+", onClick={onKey("+")}, color = MaterialTheme.colorScheme.primaryContainer)
+            AltKeyboardButton(text="-", onClick={onKey("-")}, color = MaterialTheme.colorScheme.primaryContainer)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AltKeyboardButton(text="0", onClick={onKey("0")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text=".", onClick={onKey(".")}, color = MaterialTheme.colorScheme.secondary)
-            AltKeyboardButton(text="e", onClick={onKey("e")}, color = MaterialTheme.colorScheme.primary)
-            AltKeyboardButton(text="Ans", onClick={}, color = MaterialTheme.colorScheme.primary)
-            AltKeyboardButton(icon=Icons.AutoMirrored.Filled.KeyboardReturn, description="Return button", onClick={onSubmit()}, color = MaterialTheme.colorScheme.primary)
+            AltKeyboardButton(text="0", onClick={onKey("0")}, color = MaterialTheme.colorScheme.secondaryContainer)
+            AltKeyboardButton(text=".", onClick={onKey(".")}, color = MaterialTheme.colorScheme.secondaryContainer)
+            AltKeyboardButton(text="e", onClick={onKey("e")}, color = MaterialTheme.colorScheme.primaryContainer)
+            AltKeyboardButton(text="Ans", onClick={}, color = MaterialTheme.colorScheme.primaryContainer)
+            AltKeyboardButton(icon=Icons.AutoMirrored.Filled.KeyboardReturn, description="Return button", onClick={onSubmit()}, color = MaterialTheme.colorScheme.primaryContainer)
         }
     }
 }
@@ -150,7 +150,7 @@ fun RowScope.AltKeyboardButton(
         colors = ButtonDefaults.buttonColors(containerColor = color),
         contentPadding = PaddingValues(4.dp)
     ) {
-        Text(text = text)
+        Text(text, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -170,7 +170,8 @@ fun RowScope.AltKeyboardButton(
     ) {
         Icon(
             icon,
-            contentDescription = description
+            contentDescription = description,
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }
