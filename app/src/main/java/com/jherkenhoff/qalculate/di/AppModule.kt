@@ -1,7 +1,6 @@
 package com.jherkenhoff.qalculate.di
 
 import android.app.Application
-import android.util.Log
 import com.jherkenhoff.libqalculate.Calculator
 import dagger.Module
 import dagger.Provides
@@ -16,14 +15,8 @@ class AppModule {
     @Singleton
     @Provides
     internal fun provideCalculator(application: Application): Calculator {
-
         val calc = Calculator()
         calc.loadGlobalDefinitions()
-
-        for (unit in calc.units) {
-            Log.d("", unit.title())
-        }
-
         return calc
     }
 }

@@ -2,8 +2,6 @@ package com.jherkenhoff.qalculate.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -26,9 +24,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.jherkenhoff.libqalculate.ExpressionItem
 import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
+import com.jherkenhoff.qalculate.domain.AutocompleteItem
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
@@ -40,32 +38,35 @@ fun CalculatorScreen(
     val calculationHistory = viewModel.calculationHistory.collectAsState()
 
     CalculatorScreenContent(
-        input = viewModel.inputTextFieldValue.value,
+        input = { viewModel.inputTextFieldValue.value },
         onInputChanged = viewModel::updateInput,
         onQuickKeyPressed = viewModel::onQuickKeyPressed,
         onDelKeyPressed = viewModel::onDelKeyPressed,
         onACKeyPressed = viewModel::onACKeyPressed,
         calculationHistory = calculationHistory.value,
-        parsedString = viewModel.parsedString.value,
-        resultString = viewModel.resultString.value,
+        parsedString = { viewModel.parsedString.value },
+        resultString = { viewModel.resultString.value },
         onCalculationSubmit = viewModel::submitCalculation,
-        openDrawer = openDrawer
+        onAutocompleteClick = viewModel::acceptAutocomplete,
+        openDrawer = openDrawer,
+        autocompleteList = { viewModel.autocompleteList.value }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorScreenContent(
-    input: TextFieldValue,
+    input: () -> TextFieldValue,
     onInputChanged: (TextFieldValue) -> Unit,
     onQuickKeyPressed: (String) -> Unit,
     onDelKeyPressed: () -> Unit,
     onACKeyPressed: () -> Unit,
     calculationHistory: List<CalculationHistoryItem>,
-    parsedString: String,
-    resultString: String,
-    onCalculationSubmit: () -> Unit,
-    autocompleteList: List<ExpressionItem> = emptyList(),
+    parsedString: () -> String,
+    resultString: () -> String,
+    onCalculationSubmit: () -> Unit = {},
+    autocompleteList: () -> List<AutocompleteItem> = { emptyList() },
+    onAutocompleteClick: (String) -> Unit = {},
     openDrawer: () -> Unit = {  }
 ) {
 
@@ -115,31 +116,26 @@ fun CalculatorScreenContent(
                     calculationHistory,
                     parsedString,
                     resultString,
+                    bottomSpacing = 64.dp
                 )
-
-                AutocompleteList(
-                    entries = autocompleteList,
-                    modifier = Modifier.align(Alignment.BottomCenter)
+                InputBar(
+                    textFieldValue = input,
+                    onValueChange = onInputChanged,
+                    onFocused = {},
+                    focusState = false,
+                    onSubmit = { onCalculationSubmit() },
+                    altKeyboardEnabled = isAltKeyboardOpen,
+                    onKeyboardToggleClick = {
+                        isAltKeyboardOpen = !isAltKeyboardOpen
+                        runBlocking {
+                            screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp)
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            InputBar(
-                textFieldValue = input,
-                onValueChange = onInputChanged,
-                onFocused = {},
-                focusState = false,
-                onSubmit = { onCalculationSubmit() },
-                altKeyboardEnabled = isAltKeyboardOpen,
-                onKeyboardToggleClick = {
-                    isAltKeyboardOpen = !isAltKeyboardOpen
-                    runBlocking {
-                        screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
-                    }
-                },
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
 
             if (isAltKeyboardOpen) {
                 AltKeyboard(
@@ -149,7 +145,11 @@ fun CalculatorScreenContent(
                     onSubmit = onCalculationSubmit
                 )
             } else {
-                QuickKeys(onKey = onQuickKeyPressed)
+                SupplementaryBar(
+                    onKey = onQuickKeyPressed,
+                    autocompleteItems = autocompleteList,
+                    onAutocompleteClick = onAutocompleteClick
+                )
             }
         }
     }
@@ -186,14 +186,14 @@ private val testCalculationHistory = listOf(
 @Composable
 private fun DefaultPreview() {
     CalculatorScreenContent(
-        input = TextFieldValue("1+1"),
+        input = { TextFieldValue("1+1") },
         onInputChanged = {},
         onQuickKeyPressed = {},
         onDelKeyPressed = {},
         onACKeyPressed = {},
         calculationHistory = testCalculationHistory,
-        parsedString = "1+1",
-        resultString = "2",
+        parsedString = { "1+1" },
+        resultString = { "2" },
         onCalculationSubmit = {}
     )
 }

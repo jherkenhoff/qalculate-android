@@ -10,15 +10,19 @@ import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jherkenhoff.libqalculate.Calculator
-import com.jherkenhoff.libqalculate.ExpressionItem
 import com.jherkenhoff.libqalculate.IntervalDisplay
 import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_HTML
 import com.jherkenhoff.qalculate.data.CalculationHistoryRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
+import com.jherkenhoff.qalculate.domain.AutocompleteItem
+import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -30,6 +34,7 @@ class CalculatorViewModel @Inject constructor(
     private val calculator: Calculator,
     private val parseUseCase: ParseUseCase,
     private val calculateUseCase: CalculateUseCase,
+    private val autocompleteUseCase: AutocompleteUseCase,
     private val calculationHistoryRepository: CalculationHistoryRepository
 ) : ViewModel() {
 
@@ -46,7 +51,8 @@ class CalculatorViewModel @Inject constructor(
 
     val inputTextFieldValue : MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
 
-    val autocompleteList : MutableList<ExpressionItem> = mutableListOf()
+    private val _autocompleteList = mutableStateOf<List<AutocompleteItem>>(emptyList())
+    val autocompleteList = _autocompleteList
 
     fun submitCalculation() {
         calculationHistoryRepository.appendCalculation(
@@ -63,7 +69,56 @@ class CalculatorViewModel @Inject constructor(
 
     fun updateInput(input: TextFieldValue) {
         inputTextFieldValue.value = input
+        updateAutocompleteList()
         recalculate()
+    }
+
+    private fun updateAutocompleteList() {
+
+        // https://gist.github.com/Terenfear/a84863be501d3399889455f391eeefe5
+        fun <T> throttleLatest(
+            intervalMs: Long = 300L,
+            coroutineScope: CoroutineScope,
+            destinationFunction: (T) -> Unit
+        ): (T) -> Unit {
+            var throttleJob: Job? = null
+            var latestParam: T
+            return { param: T ->
+                latestParam = param
+                if (throttleJob?.isCompleted != false) {
+                    throttleJob = coroutineScope.launch {
+                        delay(intervalMs)
+                        destinationFunction(latestParam)
+                    }
+                }
+            }
+        }
+
+        //val throttledUpdate = throttleLatest<TextFieldValue>(200L, viewModelScope) { _autocompleteList.value  = autocompleteUseCase(it) }
+
+        //throttledUpdate(inputTextFieldValue.value)
+        viewModelScope.launch {
+            _autocompleteList.value = autocompleteUseCase(inputTextFieldValue.value)
+        }
+    }
+
+    fun acceptAutocomplete(autocompleteString: String) {
+
+        var textBefore = inputTextFieldValue.value.getTextBeforeSelection(inputTextFieldValue.value.text.length).toString()
+        var textAfter = inputTextFieldValue.value.getTextAfterSelection(inputTextFieldValue.value.text.length).toString()
+
+
+        val pattern = Regex("([a-zA-Z_]+$)")
+
+        val match = pattern.split(textBefore).first()
+
+        val newCursorPosition = match.length + autocompleteString.length
+        val newText = "$match$autocompleteString$textAfter"
+
+        updateInput(TextFieldValue(
+            text = newText,
+            selection = TextRange(newCursorPosition)
+        ))
     }
 
     fun onQuickKeyPressed(quickKeyText: String) {

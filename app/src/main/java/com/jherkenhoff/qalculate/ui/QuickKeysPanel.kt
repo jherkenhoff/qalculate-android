@@ -1,30 +1,33 @@
 package com.jherkenhoff.qalculate.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Calculate
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun QuickKeysPanel(
-    //keys: Array<Array<CalculatorKeyAction>>?,
     onKeyAction: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val haptic = LocalHapticFeedback.current
+
+    fun onClick(text: String) {
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        onKeyAction(text)
+    }
+
     Column(
-        modifier = modifier
+        modifier = modifier,
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Row(
             modifier = Modifier
@@ -32,9 +35,8 @@ fun QuickKeysPanel(
         ) {
             for (i in arrayOf("_", "=", "√", "^", "(", ")", "÷", "×", "-", "+")) {
                 TextButton(
-                    onClick = {onKeyAction(i)},
+                    onClick = {onClick(i)},
                     modifier = Modifier
-                        .fillMaxWidth()
                         .weight(1f)
                 ) {
                     Text(text = i, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -49,9 +51,8 @@ fun QuickKeysPanel(
 
             for (i in intArrayOf(1,2,3,4,5,6,7,8,9,0)) {
                 TextButton(
-                    onClick = {onKeyAction(i.toString())},
+                    onClick = {onClick(i.toString())},
                     modifier = Modifier
-                        .fillMaxWidth()
                         .weight(1f)
                 ) {
                     Text(text = i.toString(), color = MaterialTheme.colorScheme.onSurfaceVariant)
