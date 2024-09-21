@@ -40,9 +40,9 @@ fun CalculatorScreen(
     CalculatorScreenContent(
         input = { viewModel.inputTextFieldValue.value },
         onInputChanged = viewModel::updateInput,
-        onQuickKeyPressed = viewModel::onQuickKeyPressed,
-        onDelKeyPressed = viewModel::onDelKeyPressed,
-        onACKeyPressed = viewModel::onACKeyPressed,
+        onQuickKeyPressed = viewModel::insertText,
+        onDelKeyPressed = viewModel::removeLastChar,
+        onACKeyPressed = viewModel::clearAll,
         calculationHistory = calculationHistory.value,
         parsedString = { viewModel.parsedString.value },
         resultString = { viewModel.resultString.value },

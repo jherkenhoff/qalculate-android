@@ -121,7 +121,7 @@ class CalculatorViewModel @Inject constructor(
         ))
     }
 
-    fun onQuickKeyPressed(quickKeyText: String) {
+    fun insertText(quickKeyText: String) {
         val maxChars = inputTextFieldValue.value.text.length
         val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
         val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
@@ -135,7 +135,7 @@ class CalculatorViewModel @Inject constructor(
         ))
     }
 
-    fun onDelKeyPressed() {
+    fun removeLastChar() {
         val maxChars = inputTextFieldValue.value.text.length
         val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
         val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
@@ -162,7 +162,7 @@ class CalculatorViewModel @Inject constructor(
         ))
     }
 
-    fun onACKeyPressed() {
+    fun clearAll() {
         updateInput(TextFieldValue(
             text = "",
             selection = TextRange(0)
