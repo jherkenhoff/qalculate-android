@@ -10,17 +10,20 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
 
-@Serializable data object Calculator
+@Serializable
+sealed class NavDestinations{
+    @Serializable data object Calculator
+    @Serializable data object Units
+    @Serializable data object About
+}
 
-@Serializable data object Units
-@Serializable data object About
 
 @Composable
 fun QalculateNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     openDrawer: () -> Unit = {},
-    startDestination: Calculator = Calculator,
+    startDestination: NavDestinations.Calculator = NavDestinations.Calculator,
 ) {
     NavHost(
         navController = navController,
@@ -28,21 +31,21 @@ fun QalculateNavGraph(
         modifier = modifier
     ) {
 
-        composable<Calculator> {
+        composable<NavDestinations.Calculator> {
             CalculatorScreen(
                 viewModel = hiltViewModel<CalculatorViewModel>(),
                 openDrawer = openDrawer,
             )
         }
 
-        composable<Units> {
+        composable<NavDestinations.Units> {
             UnitsScreen(
                 viewModel = hiltViewModel<UnitsViewModel>(),
                 openDrawer = openDrawer,
             )
         }
 
-        dialog<About> {
+        dialog<NavDestinations.About> {
             AboutCard()
         }
 
