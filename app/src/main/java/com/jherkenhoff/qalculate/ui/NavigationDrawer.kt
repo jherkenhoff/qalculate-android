@@ -32,8 +32,16 @@ import com.jherkenhoff.qalculate.R
 
 @Composable
 fun NavigationDrawer(
+    currentPage: String,
     modifier: Modifier = Modifier,
     onNavigation: (String) -> Unit = {},
+    onCalculatorClick: () -> Unit = {},
+    onFunctionsClick: () -> Unit = {},
+    onVariablesClick: () -> Unit = {},
+    onUnitsClick: () -> Unit = {},
+    onDatasetsClick: () -> Unit = {},
+    onAboutClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
 ) {
     ModalDrawerSheet(modifier = modifier) {
         Box(
@@ -52,8 +60,8 @@ fun NavigationDrawer(
         }
         NavigationDrawerItem(
             label = { Text(text = "Calculator") },
-            selected = true,
-            onClick = { onNavigation(QalculateDestinations.CALCULATOR) },
+            selected = currentPage == QalculateDestinations.CALCULATOR,
+            onClick = onCalculatorClick,
             icon = { Icon(Icons.Filled.Calculate, contentDescription = "Calculator icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
@@ -62,29 +70,29 @@ fun NavigationDrawer(
                 .padding(horizontal = 25.dp, vertical = 15.dp))
         NavigationDrawerItem(
             label = { Text(text = "Functions") },
-            selected = false,
-            onClick = { /*TODO*/ },
+            selected = currentPage == QalculateDestinations.FUNCTIONS,
+            onClick = onFunctionsClick,
             icon = { Icon(Icons.Outlined.Functions, contentDescription = "Functions icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
             label = { Text(text = "Variables") },
-            selected = false,
-            onClick = { /*TODO*/ },
+            selected = currentPage == QalculateDestinations.VARIABLES,
+            onClick = onVariablesClick,
             icon = { Icon(Icons.Outlined.Pin, contentDescription = "Variables icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
             label = { Text(text = "Units") },
-            selected = false,
-            onClick = { onNavigation(QalculateDestinations.UNITS) },
+            selected = currentPage == QalculateDestinations.UNITS,
+            onClick = onUnitsClick,
             icon = { Icon(Icons.Outlined.Straighten, contentDescription = "Units icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
             label = { Text(text = "Datasets") },
             selected = false,
-            onClick = { /*TODO*/ },
+            onClick = onDatasetsClick,
             icon = { Icon(Icons.Outlined.Dataset, contentDescription = "Datasets icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
@@ -97,14 +105,14 @@ fun NavigationDrawer(
         NavigationDrawerItem(
             label = { Text(text = "About") },
             selected = false,
-            onClick = { onNavigation(QalculateDestinations.ABOUT) },
+            onClick = onAboutClick,
             icon = { Icon(Icons.Filled.Info, contentDescription = "About icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
             label = { Text(text = "Settings") },
             selected = false,
-            onClick = { /*TODO*/ },
+            onClick = onSettingsClick,
             icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
@@ -114,6 +122,8 @@ fun NavigationDrawer(
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
-    NavigationDrawer()
+    NavigationDrawer(
+        QalculateDestinations.UNITS
+    )
 }
 

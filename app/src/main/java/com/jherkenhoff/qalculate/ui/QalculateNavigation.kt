@@ -5,8 +5,10 @@ import androidx.navigation.NavHostController
 
 object QalculateDestinations {
     const val CALCULATOR = "calculator"
-    const val UNITS = "units"
-    const val ABOUT = "about"
+    const val FUNCTIONS  = "functions"
+    const val VARIABLES  = "variables"
+    const val UNITS      = "units"
+    const val ABOUT      = "about"
 }
 
 class QalculateNavigationActions(navController: NavHostController) {

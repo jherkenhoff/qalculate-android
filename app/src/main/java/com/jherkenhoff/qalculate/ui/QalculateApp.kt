@@ -4,15 +4,11 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.navigation.compose.rememberNavController
 import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
@@ -39,13 +35,14 @@ fun QalculateApp() {
             }
         )
 
-        var aboutCardVisible by remember { mutableStateOf(false) }
-
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
                 NavigationDrawer(
-                    onNavigation = { navController.navigate(it); coroutineScope.launch { drawerState.close() } },
+                    "unints",
+                    onCalculatorClick = { navController.navigate(Calculator); coroutineScope.launch { drawerState.close() } },
+                    onUnitsClick = { navController.navigate(Units); coroutineScope.launch { drawerState.close() } },
+                    onAboutClick = { navController.navigate(About); coroutineScope.launch { drawerState.close() } },
                     modifier = Modifier.zIndex(1000f)
                 )}
         ) {
@@ -53,11 +50,6 @@ fun QalculateApp() {
                 navController = navController,
                 openDrawer = { coroutineScope.launch { drawerState.open() } },
             )
-            if (aboutCardVisible) {
-            Dialog(onDismissRequest = { aboutCardVisible = false }) {
-                AboutCard()
-            }
-                }
         }
     }
 }
