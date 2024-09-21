@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -22,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,33 +41,39 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.R
 import kotlinx.coroutines.awaitCancellation
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun InputBar(
-    textFieldValue: TextFieldValue,
+    textFieldValue: () -> TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     onFocused: (Boolean) -> Unit,
     focusState: Boolean,
     onSubmit: (String) -> Unit,
     altKeyboardEnabled: Boolean,
     modifier: Modifier = Modifier,
+    shadowElevation: Dp = 3.dp,
     onKeyboardToggleClick: () -> Unit = {},
 ) {
 
     val focusRequester = remember { FocusRequester() }
     var lastFocusState by remember { mutableStateOf(false) }
 
-
     Surface(
         //border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline),
         color = MaterialTheme.colorScheme.secondaryContainer,
         shape = RoundedCornerShape(100),
-        modifier = modifier.fillMaxWidth().height(48.dp)
+        shadowElevation = shadowElevation,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp)
     ) {
+        val placeholdeVisible by remember { derivedStateOf { textFieldValue().text.isEmpty() } }
+
         Row(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
@@ -96,7 +104,7 @@ fun InputBar(
                     },
                 ) {
                     BasicTextField(
-                        value = textFieldValue,
+                        value = textFieldValue(),
                         onValueChange = onValueChange,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -113,7 +121,7 @@ fun InputBar(
                             autoCorrect = false
                         ),
                         keyboardActions = KeyboardActions {
-                            if (textFieldValue.text.isNotBlank()) onSubmit(textFieldValue.text)
+                            if (textFieldValue().text.isNotBlank()) onSubmit(textFieldValue().text)
                         },
                         maxLines = 1,
                         cursorBrush = SolidColor(LocalContentColor.current),
@@ -121,7 +129,7 @@ fun InputBar(
                     )
                 }
 
-                if (textFieldValue.text.isEmpty() && !focusState) {
+                if (placeholdeVisible && !focusState) {
                     Text(
                         text = stringResource(R.string.textfield_hint),
                         style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
@@ -141,7 +149,7 @@ fun InputBar(
 @Composable
 private fun PlaceholderPreview() {
     InputBar(
-        TextFieldValue(""),
+        {TextFieldValue("")},
         {},
         {},
         false,
@@ -153,7 +161,7 @@ private fun PlaceholderPreview() {
 @Composable
 private fun WithInputPreview() {
     InputBar(
-        TextFieldValue("1km + 1m"),
+        {TextFieldValue("1km + 1m")},
         {},
         {},
         false,
@@ -165,7 +173,7 @@ private fun WithInputPreview() {
 @Composable
 private fun WithInputAltKeyboardPreview() {
     InputBar(
-        TextFieldValue("1km + 1m"),
+        {TextFieldValue("1km + 1m")},
         {},
         {},
         false,
