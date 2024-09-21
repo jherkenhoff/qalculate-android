@@ -121,8 +121,6 @@ fun CalculatorScreenContent(
                 InputBar(
                     textFieldValue = input,
                     onValueChange = onInputChanged,
-                    onFocused = {},
-                    focusState = false,
                     onSubmit = { onCalculationSubmit() },
                     altKeyboardEnabled = isAltKeyboardOpen,
                     onKeyboardToggleClick = {

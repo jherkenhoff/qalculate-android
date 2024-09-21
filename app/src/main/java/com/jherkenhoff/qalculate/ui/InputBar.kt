@@ -51,8 +51,6 @@ import kotlinx.coroutines.awaitCancellation
 fun InputBar(
     textFieldValue: () -> TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    onFocused: (Boolean) -> Unit,
-    focusState: Boolean,
     onSubmit: (String) -> Unit,
     altKeyboardEnabled: Boolean,
     modifier: Modifier = Modifier,
@@ -109,12 +107,7 @@ fun InputBar(
                         modifier = Modifier
                             .fillMaxWidth()
                             .focusRequester(focusRequester)
-                            .onFocusChanged { state ->
-                                if (lastFocusState != state.isFocused) {
-                                    onFocused(state.isFocused)
-                                }
-                                lastFocusState = state.isFocused
-                            },
+                            .onFocusChanged { state -> lastFocusState = state.isFocused },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Uri,
                             imeAction = ImeAction.Go,
@@ -129,7 +122,7 @@ fun InputBar(
                     )
                 }
 
-                if (placeholdeVisible && !focusState) {
+                if (placeholdeVisible && !lastFocusState) {
                     Text(
                         text = stringResource(R.string.textfield_hint),
                         style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
@@ -152,9 +145,7 @@ private fun PlaceholderPreview() {
         {TextFieldValue("")},
         {},
         {},
-        false,
-        {},
-        false)
+        false,)
 }
 
 @Preview(showBackground = true)
@@ -164,9 +155,7 @@ private fun WithInputPreview() {
         {TextFieldValue("1km + 1m")},
         {},
         {},
-        false,
-        {},
-        false)
+        false,)
 }
 
 @Preview(showBackground = true)
@@ -176,7 +165,5 @@ private fun WithInputAltKeyboardPreview() {
         {TextFieldValue("1km + 1m")},
         {},
         {},
-        false,
-        {},
-        true)
+        false,)
 }
