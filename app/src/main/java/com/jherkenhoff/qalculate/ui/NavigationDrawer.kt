@@ -30,11 +30,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.R
 
+// TODO: Passing so many repetitive parameters seems not very elegant.
 @Composable
 fun NavigationDrawer(
-    currentPage: String,
+    calculatorActive: Boolean,
+    functionsActive: Boolean,
+    variablesActive: Boolean,
+    unitsActive: Boolean,
+    datasetsActive: Boolean,
     modifier: Modifier = Modifier,
-    onNavigation: (String) -> Unit = {},
     onCalculatorClick: () -> Unit = {},
     onFunctionsClick: () -> Unit = {},
     onVariablesClick: () -> Unit = {},
@@ -60,7 +64,7 @@ fun NavigationDrawer(
         }
         NavigationDrawerItem(
             label = { Text(text = "Calculator") },
-            selected = currentPage == QalculateDestinations.CALCULATOR,
+            selected = calculatorActive,
             onClick = onCalculatorClick,
             icon = { Icon(Icons.Filled.Calculate, contentDescription = "Calculator icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -70,28 +74,28 @@ fun NavigationDrawer(
                 .padding(horizontal = 25.dp, vertical = 15.dp))
         NavigationDrawerItem(
             label = { Text(text = "Functions") },
-            selected = currentPage == QalculateDestinations.FUNCTIONS,
+            selected = functionsActive,
             onClick = onFunctionsClick,
             icon = { Icon(Icons.Outlined.Functions, contentDescription = "Functions icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
             label = { Text(text = "Variables") },
-            selected = currentPage == QalculateDestinations.VARIABLES,
+            selected = variablesActive,
             onClick = onVariablesClick,
             icon = { Icon(Icons.Outlined.Pin, contentDescription = "Variables icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
             label = { Text(text = "Units") },
-            selected = currentPage == QalculateDestinations.UNITS,
+            selected = unitsActive,
             onClick = onUnitsClick,
             icon = { Icon(Icons.Outlined.Straighten, contentDescription = "Units icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
             label = { Text(text = "Datasets") },
-            selected = false,
+            selected = datasetsActive,
             onClick = onDatasetsClick,
             icon = { Icon(Icons.Outlined.Dataset, contentDescription = "Datasets icon") },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -123,7 +127,11 @@ fun NavigationDrawer(
 @Composable
 private fun DefaultPreview() {
     NavigationDrawer(
-        QalculateDestinations.UNITS
+        true,
+        false,
+        false,
+        false,
+        false
     )
 }
 
