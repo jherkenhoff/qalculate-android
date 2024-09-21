@@ -43,14 +43,14 @@ fun QalculateApp() {
             drawerState = drawerState,
             drawerContent = {
                 NavigationDrawer(
-                    currentBackStackEntry?.destination?.hierarchy?.any{it.hasRoute(Calculator::class)} == true,
+                    currentBackStackEntry?.destination?.hierarchy?.any{it.hasRoute(NavDestinations.Calculator::class)} == true,
                     false,
                     false,
-                    currentBackStackEntry?.destination?.hierarchy?.any{it.hasRoute(Units::class)} == true,
+                    currentBackStackEntry?.destination?.hierarchy?.any{it.hasRoute(NavDestinations.Units::class)} == true,
                     false,
-                    onCalculatorClick = { navController.navigate(Calculator); coroutineScope.launch { drawerState.close() } },
-                    onUnitsClick = { navController.navigate(Units); coroutineScope.launch { drawerState.close() } },
-                    onAboutClick = { navController.navigate(About); coroutineScope.launch { drawerState.close() } },
+                    onCalculatorClick = { navController.navigate(NavDestinations.Calculator); coroutineScope.launch { drawerState.close() } },
+                    onUnitsClick = { navController.navigate(NavDestinations.Units); coroutineScope.launch { drawerState.close() } },
+                    onAboutClick = { navController.navigate(NavDestinations.About); coroutineScope.launch { drawerState.close() } },
                 )}
         ) {
             QalculateNavGraph(
