@@ -32,6 +32,7 @@ import com.jherkenhoff.qalculate.domain.AutocompleteItem
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
+
 @Composable
 fun CalculatorScreen(
     viewModel: CalculatorViewModel = viewModel(),
@@ -40,19 +41,19 @@ fun CalculatorScreen(
     val calculationHistory = viewModel.calculationHistory.collectAsState()
 
     CalculatorScreenContent(
-        input = { viewModel.inputTextFieldValue.value },
+        input = { viewModel.inputTextFieldValue },
         onInputChanged = viewModel::updateInput,
         onQuickKeyPressed = viewModel::insertText,
         onDelKeyPressed = viewModel::removeLastChar,
         onACKeyPressed = viewModel::clearAll,
         calculationHistory = calculationHistory.value,
-        parsedString = { viewModel.parsedString.value },
-        resultString = { viewModel.resultString.value },
+        parsedString = { viewModel.parsedString },
+        resultString = { viewModel.resultString },
         onCalculationSubmit = viewModel::submitCalculation,
         onAutocompleteClick = viewModel::acceptAutocomplete,
         openDrawer = openDrawer,
-        autocompleteList = { viewModel.autocompleteList.value },
-        autocompleteText = { viewModel.autocompleteText.value }
+        autocompleteList = { viewModel.autocompleteList },
+        autocompleteText = { viewModel.autocompleteText }
     )
 }
 

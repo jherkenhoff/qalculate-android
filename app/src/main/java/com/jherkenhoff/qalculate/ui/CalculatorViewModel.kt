@@ -1,7 +1,8 @@
 package com.jherkenhoff.qalculate.ui
 
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -16,7 +17,6 @@ import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_HTML
 import com.jherkenhoff.qalculate.data.CalculationHistoryRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import com.jherkenhoff.qalculate.domain.AutocompleteItem
-import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +33,6 @@ class CalculatorViewModel @Inject constructor(
     private val calculator: Calculator,
     private val parseUseCase: ParseUseCase,
     private val calculateUseCase: CalculateUseCase,
-    private val autocompleteUseCase: AutocompleteUseCase,
     private val calculationHistoryRepository: CalculationHistoryRepository
 ) : ViewModel() {
 
@@ -45,23 +44,28 @@ class CalculatorViewModel @Inject constructor(
             emptyList()
         )
 
-    val parsedString : MutableState<String> = mutableStateOf("0")
-    val resultString : MutableState<String> = mutableStateOf("0")
+    var parsedString by mutableStateOf("0")
+        private set
 
-    val autocompleteText : MutableState<String> = mutableStateOf("")
+    var resultString by mutableStateOf("0")
+        private set
 
-    val inputTextFieldValue : MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
+    var autocompleteText by mutableStateOf("")
+        private set
 
-    private val _autocompleteList = mutableStateOf<List<AutocompleteItem>>(emptyList())
-    val autocompleteList = _autocompleteList
+    var inputTextFieldValue by mutableStateOf(TextFieldValue(""))
+        private set
+
+    var autocompleteList by mutableStateOf<List<AutocompleteItem>>(emptyList())
+        private set
 
     fun submitCalculation() {
         calculationHistoryRepository.appendCalculation(
             CalculationHistoryItem(
                 LocalDateTime.now(),
-                inputTextFieldValue.value.text,
-                parsedString.value,
-                resultString.value
+                inputTextFieldValue.text,
+                parsedString,
+                resultString
             )
         )
 
@@ -69,20 +73,20 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun updateInput(input: TextFieldValue) {
-        inputTextFieldValue.value = input
+        inputTextFieldValue = input
         handleAutocomplete()
         recalculate()
     }
 
     private fun handleAutocomplete() {
 
-        if (inputTextFieldValue.value.selection.length > 0) {
-            _autocompleteList.value = listOf()
-            autocompleteText.value = ""
+        if (inputTextFieldValue.selection.length > 0) {
+            autocompleteList = listOf()
+            autocompleteText = ""
             return
         }
 
-        var currentString = inputTextFieldValue.value.getTextBeforeSelection(inputTextFieldValue.value.text.length).toString()
+        var currentString = inputTextFieldValue.getTextBeforeSelection(inputTextFieldValue.text.length).toString()
 
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
@@ -91,13 +95,13 @@ class CalculatorViewModel @Inject constructor(
                 val match = pattern.find(currentString)
 
                 if (match == null) {
-                    _autocompleteList.value = listOf()
-                    autocompleteText.value = ""
+                    autocompleteList = listOf()
+                    autocompleteText = ""
                     return@withContext
                 }
 
                 currentString = match.value
-                autocompleteText.value = currentString
+                autocompleteText = currentString
 
                 val unitList = calculator.units.filter {
                     it.title().lowercase().startsWith(currentString.lowercase())
@@ -106,7 +110,7 @@ class CalculatorViewModel @Inject constructor(
                     AutocompleteItem(it.title(), it.name(), it.abbreviation())
                 }
 
-                _autocompleteList.value = unitList
+                autocompleteList = unitList
 
                 return@withContext
             }
@@ -115,8 +119,8 @@ class CalculatorViewModel @Inject constructor(
 
     fun acceptAutocomplete(autocompleteString: String) {
 
-        var textBefore = inputTextFieldValue.value.getTextBeforeSelection(inputTextFieldValue.value.text.length).toString()
-        var textAfter = inputTextFieldValue.value.getTextAfterSelection(inputTextFieldValue.value.text.length).toString()
+        var textBefore = inputTextFieldValue.getTextBeforeSelection(inputTextFieldValue.text.length).toString()
+        var textAfter = inputTextFieldValue.getTextAfterSelection(inputTextFieldValue.text.length).toString()
 
 
         val pattern = Regex("([a-zA-Z_]+$)")
@@ -133,9 +137,9 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun insertText(quickKeyText: String) {
-        val maxChars = inputTextFieldValue.value.text.length
-        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
-        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
+        val maxChars = inputTextFieldValue.text.length
+        val textBeforeSelection = inputTextFieldValue.getTextBeforeSelection(maxChars)
+        val textAfterSelection = inputTextFieldValue.getTextAfterSelection(maxChars)
         val newText = "$textBeforeSelection$quickKeyText$textAfterSelection"
         val newCursorPosition = textBeforeSelection.length + quickKeyText.length
 
@@ -147,10 +151,10 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun removeLastChar() {
-        val maxChars = inputTextFieldValue.value.text.length
-        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
-        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
-        val selectedText = inputTextFieldValue.value.getSelectedText()
+        val maxChars = inputTextFieldValue.text.length
+        val textBeforeSelection = inputTextFieldValue.getTextBeforeSelection(maxChars)
+        val textAfterSelection = inputTextFieldValue.getTextAfterSelection(maxChars)
+        val selectedText = inputTextFieldValue.getSelectedText()
 
         var newText: String
         var newCursorPosition: Int
@@ -184,34 +188,20 @@ class CalculatorViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            val parsedMathStructure = parseUseCase(inputTextFieldValue.value.text)
+            val parsedMathStructure = parseUseCase(inputTextFieldValue.text)
 
-            val calculatedMathStructure = calculateUseCase(inputTextFieldValue.value.text)
+            val calculatedMathStructure = calculateUseCase(inputTextFieldValue.text)
 
             val parsedPrintOptions = PrintOptions()
             parsedPrintOptions.place_units_separately = false
             parsedPrintOptions.preserve_format = true
             parsedPrintOptions.use_unicode_signs = 1
-            parsedString.value = calculator.print(parsedMathStructure, 2000, parsedPrintOptions, true, 1, TAG_TYPE_HTML)
+            parsedString = calculator.print(parsedMathStructure, 2000, parsedPrintOptions, true, 1, TAG_TYPE_HTML)
 
             val resultPo = PrintOptions()
             resultPo.interval_display = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
             resultPo.use_unicode_signs = 1
-            resultString.value = calculator.print(calculatedMathStructure, 2000, resultPo, true, 1, TAG_TYPE_HTML)
+            resultString = calculator.print(calculatedMathStructure, 2000, resultPo, true, 1, TAG_TYPE_HTML)
         }
     }
-}
-
-private fun TextFieldValue.addText(newString: String): TextFieldValue {
-    val newText = this.text.replaceRange(
-        this.selection.start,
-        this.selection.end,
-        newString
-    )
-    val newSelection = TextRange(
-        start = this.selection.end+newText.length,
-        end = this.selection.end+newText.length
-    )
-
-    return this.copy(text = newText, selection = newSelection)
 }
