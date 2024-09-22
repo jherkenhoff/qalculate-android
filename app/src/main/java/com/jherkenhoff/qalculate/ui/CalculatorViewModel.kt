@@ -20,12 +20,11 @@ import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -49,6 +48,8 @@ class CalculatorViewModel @Inject constructor(
     val parsedString : MutableState<String> = mutableStateOf("0")
     val resultString : MutableState<String> = mutableStateOf("0")
 
+    val autocompleteText : MutableState<String> = mutableStateOf("")
+
     val inputTextFieldValue : MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(""))
 
     private val _autocompleteList = mutableStateOf<List<AutocompleteItem>>(emptyList())
@@ -69,36 +70,46 @@ class CalculatorViewModel @Inject constructor(
 
     fun updateInput(input: TextFieldValue) {
         inputTextFieldValue.value = input
-        updateAutocompleteList()
+        handleAutocomplete()
         recalculate()
     }
 
-    private fun updateAutocompleteList() {
+    private fun handleAutocomplete() {
 
-        // https://gist.github.com/Terenfear/a84863be501d3399889455f391eeefe5
-        fun <T> throttleLatest(
-            intervalMs: Long = 300L,
-            coroutineScope: CoroutineScope,
-            destinationFunction: (T) -> Unit
-        ): (T) -> Unit {
-            var throttleJob: Job? = null
-            var latestParam: T
-            return { param: T ->
-                latestParam = param
-                if (throttleJob?.isCompleted != false) {
-                    throttleJob = coroutineScope.launch {
-                        delay(intervalMs)
-                        destinationFunction(latestParam)
-                    }
-                }
-            }
+        if (inputTextFieldValue.value.selection.length > 0) {
+            _autocompleteList.value = listOf()
+            autocompleteText.value = ""
+            return
         }
 
-        //val throttledUpdate = throttleLatest<TextFieldValue>(200L, viewModelScope) { _autocompleteList.value  = autocompleteUseCase(it) }
+        var currentString = inputTextFieldValue.value.getTextBeforeSelection(inputTextFieldValue.value.text.length).toString()
 
-        //throttledUpdate(inputTextFieldValue.value)
         viewModelScope.launch {
-            _autocompleteList.value = autocompleteUseCase(inputTextFieldValue.value)
+            withContext(Dispatchers.Default) {
+
+                val pattern = Regex("([a-zA-Z_]+$)")
+                val match = pattern.find(currentString)
+
+                if (match == null) {
+                    _autocompleteList.value = listOf()
+                    autocompleteText.value = ""
+                    return@withContext
+                }
+
+                currentString = match.value
+                autocompleteText.value = currentString
+
+                val unitList = calculator.units.filter {
+                    it.title().lowercase().startsWith(currentString.lowercase())
+                            || it.name().lowercase().startsWith(currentString.lowercase())
+                }.map {
+                    AutocompleteItem(it.title(), it.name(), it.abbreviation())
+                }
+
+                _autocompleteList.value = unitList
+
+                return@withContext
+            }
         }
     }
 

@@ -1,7 +1,9 @@
 package com.jherkenhoff.qalculate.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -49,7 +51,8 @@ fun CalculatorScreen(
         onCalculationSubmit = viewModel::submitCalculation,
         onAutocompleteClick = viewModel::acceptAutocomplete,
         openDrawer = openDrawer,
-        autocompleteList = { viewModel.autocompleteList.value }
+        autocompleteList = { viewModel.autocompleteList.value },
+        autocompleteText = { viewModel.autocompleteText.value }
     )
 }
 
@@ -65,6 +68,7 @@ fun CalculatorScreenContent(
     parsedString: () -> String,
     resultString: () -> String,
     onCalculationSubmit: () -> Unit = {},
+    autocompleteText: () -> String = {""},
     autocompleteList: () -> List<AutocompleteItem> = { emptyList() },
     onAutocompleteClick: (String) -> Unit = {},
     openDrawer: () -> Unit = {  }
@@ -118,21 +122,34 @@ fun CalculatorScreenContent(
                     resultString,
                     bottomSpacing = 64.dp
                 )
-                InputBar(
-                    textFieldValue = input,
-                    onValueChange = onInputChanged,
-                    onSubmit = { onCalculationSubmit() },
-                    altKeyboardEnabled = isAltKeyboardOpen,
-                    onKeyboardToggleClick = {
-                        isAltKeyboardOpen = !isAltKeyboardOpen
-                        runBlocking {
-                            screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
-                        }
-                    },
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 16.dp)
-                )
+                Column(modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp)
+                ) {
+
+                    AnimatedVisibility(autocompleteList().isNotEmpty()) {
+                            AutocompleteList(
+                                autocompleteText,
+                                entries = autocompleteList,
+                                onEntryClick = onAutocompleteClick,
+                                modifier = Modifier
+                                    .padding(vertical = 16.dp)
+                                    .heightIn(max = 300.dp)
+                            )
+                    }
+                    InputBar(
+                        textFieldValue = input,
+                        onValueChange = onInputChanged,
+                        onSubmit = { onCalculationSubmit() },
+                        altKeyboardEnabled = isAltKeyboardOpen,
+                        onKeyboardToggleClick = {
+                            isAltKeyboardOpen = !isAltKeyboardOpen
+                            runBlocking {
+                                screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
+                            }
+                        },
+                    )
+                }
             }
 
             if (isAltKeyboardOpen) {
@@ -145,7 +162,7 @@ fun CalculatorScreenContent(
             } else {
                 SupplementaryBar(
                     onKey = onQuickKeyPressed,
-                    autocompleteItems = autocompleteList,
+                    autocompleteItems = { emptyList() }, // autocompleteList
                     onAutocompleteClick = onAutocompleteClick
                 )
             }
@@ -180,7 +197,7 @@ private val testCalculationHistory = listOf(
     )
 )
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun DefaultPreview() {
     CalculatorScreenContent(
@@ -193,5 +210,32 @@ private fun DefaultPreview() {
         parsedString = { "1+1" },
         resultString = { "2" },
         onCalculationSubmit = {}
+    )
+}
+
+
+@Preview
+@Composable
+private fun AutocompletePreview() {
+
+    val list = listOf(
+        AutocompleteItem("Tesla", "M", "T"),
+        AutocompleteItem("Thomson cross section", "M", "T"),
+        AutocompleteItem("Terabyte", "M", "T"),
+        AutocompleteItem("Planck temperature", "M", "T"),
+    )
+
+    CalculatorScreenContent(
+        input = { TextFieldValue("1*t") },
+        onInputChanged = {},
+        onQuickKeyPressed = {},
+        onDelKeyPressed = {},
+        onACKeyPressed = {},
+        calculationHistory = testCalculationHistory,
+        parsedString = { "" },
+        resultString = { "" },
+        onCalculationSubmit = {},
+        autocompleteText = { "t" },
+        autocompleteList = { list }
     )
 }
