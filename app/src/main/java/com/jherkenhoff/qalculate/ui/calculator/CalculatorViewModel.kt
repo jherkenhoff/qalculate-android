@@ -1,4 +1,4 @@
-package com.jherkenhoff.qalculate.ui
+package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

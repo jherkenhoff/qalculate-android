@@ -1,4 +1,4 @@
-package com.inidamleader.ovtracker.util.compose.geometry
+package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset

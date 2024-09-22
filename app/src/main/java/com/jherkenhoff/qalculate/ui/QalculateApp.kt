@@ -13,6 +13,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.jherkenhoff.qalculate.ui.calculator.NavigationDrawer
 import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
 import kotlinx.coroutines.launch
 
@@ -51,7 +52,8 @@ fun QalculateApp() {
                     onCalculatorClick = { navController.navigate(NavDestinations.Calculator); coroutineScope.launch { drawerState.close() } },
                     onUnitsClick = { navController.navigate(NavDestinations.Units); coroutineScope.launch { drawerState.close() } },
                     onAboutClick = { navController.navigate(NavDestinations.About); coroutineScope.launch { drawerState.close() } },
-                )}
+                )
+            }
         ) {
             QalculateNavGraph(
                 navController = navController,

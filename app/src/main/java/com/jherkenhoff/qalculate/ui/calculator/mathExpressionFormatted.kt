@@ -1,4 +1,4 @@
-package com.jherkenhoff.qalculate.ui
+package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -9,7 +9,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.BaselineShift
 
 @Composable
-fun messageFormatter(
+fun mathExpressionFormatted(
     text: String
 ): AnnotatedString {
     val tokens = Regex("""<.*?>|([^<]+)?|(&nbsp;)""").findAll(text)

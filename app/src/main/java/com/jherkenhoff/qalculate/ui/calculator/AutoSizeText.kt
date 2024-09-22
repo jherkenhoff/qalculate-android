@@ -1,5 +1,5 @@
 // V6.3 - 01 Aug 2024
-package com.inidamleader.ovtracker.util.compose
+package com.jherkenhoff.qalculate.ui.calculator
 
 import android.util.Log
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -43,11 +43,7 @@ import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastFilter
-import com.inidamleader.ovtracker.util.compose.SuggestedFontSizesStatus.Companion.validSuggestedFontSizes
-import com.inidamleader.ovtracker.util.compose.geometry.dpSizeRoundToIntSize
-import com.inidamleader.ovtracker.util.compose.geometry.intPxToSp
-import com.inidamleader.ovtracker.util.compose.geometry.spRoundToPx
-import com.inidamleader.ovtracker.util.compose.geometry.spToIntPx
+import com.jherkenhoff.qalculate.ui.calculator.SuggestedFontSizesStatus.Companion.validSuggestedFontSizes
 import kotlin.math.min
 
 private const val TAG = "AutoSizeText"

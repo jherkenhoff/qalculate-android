@@ -1,4 +1,4 @@
-package com.jherkenhoff.qalculate.ui
+package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth

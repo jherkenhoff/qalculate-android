@@ -1,4 +1,4 @@
-package com.jherkenhoff.qalculate.ui
+package com.jherkenhoff.qalculate.ui.units
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement

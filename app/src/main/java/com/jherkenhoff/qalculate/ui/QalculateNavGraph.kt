@@ -8,6 +8,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import com.jherkenhoff.qalculate.ui.calculator.CalculatorScreen
+import com.jherkenhoff.qalculate.ui.calculator.CalculatorViewModel
+import com.jherkenhoff.qalculate.ui.units.UnitsScreen
+import com.jherkenhoff.qalculate.ui.units.UnitsViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
