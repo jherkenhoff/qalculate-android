@@ -52,8 +52,8 @@ fun CalculatorScreen(
         onCalculationSubmit = viewModel::submitCalculation,
         onAutocompleteClick = viewModel::acceptAutocomplete,
         openDrawer = openDrawer,
-        autocompleteList = { viewModel.autocompleteList },
-        autocompleteText = { viewModel.autocompleteText }
+        autocompleteList = { viewModel.autocompleteResult.items },
+        autocompleteText = { viewModel.autocompleteResult.relevantText }
     )
 }
 

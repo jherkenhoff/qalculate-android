@@ -16,15 +16,14 @@ import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_HTML
 import com.jherkenhoff.qalculate.data.CalculationHistoryRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
-import com.jherkenhoff.qalculate.domain.AutocompleteItem
+import com.jherkenhoff.qalculate.domain.AutocompleteResult
+import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -33,6 +32,7 @@ class CalculatorViewModel @Inject constructor(
     private val calculator: Calculator,
     private val parseUseCase: ParseUseCase,
     private val calculateUseCase: CalculateUseCase,
+    private val autocompleteUseCase: AutocompleteUseCase,
     private val calculationHistoryRepository: CalculationHistoryRepository
 ) : ViewModel() {
 
@@ -50,13 +50,10 @@ class CalculatorViewModel @Inject constructor(
     var resultString by mutableStateOf("0")
         private set
 
-    var autocompleteText by mutableStateOf("")
+    var autocompleteResult by mutableStateOf(AutocompleteResult(success = false))
         private set
 
     var inputTextFieldValue by mutableStateOf(TextFieldValue(""))
-        private set
-
-    var autocompleteList by mutableStateOf<List<AutocompleteItem>>(emptyList())
         private set
 
     fun submitCalculation() {
@@ -79,60 +76,16 @@ class CalculatorViewModel @Inject constructor(
     }
 
     private fun handleAutocomplete() {
-
-        if (inputTextFieldValue.selection.length > 0) {
-            autocompleteList = listOf()
-            autocompleteText = ""
-            return
-        }
-
-        var currentString = inputTextFieldValue.getTextBeforeSelection(inputTextFieldValue.text.length).toString()
-
         viewModelScope.launch {
-            withContext(Dispatchers.Default) {
-
-                val pattern = Regex("([a-zA-Z_]+$)")
-                val match = pattern.find(currentString)
-
-                if (match == null) {
-                    autocompleteList = listOf()
-                    autocompleteText = ""
-                    return@withContext
-                }
-
-                currentString = match.value
-                autocompleteText = currentString
-
-                val unitList = calculator.units.filter {
-                    it.title().lowercase().startsWith(currentString.lowercase())
-                            || it.name().lowercase().startsWith(currentString.lowercase())
-                }.map {
-                    AutocompleteItem(it.title(), it.name(), it.abbreviation())
-                }
-
-                autocompleteList = unitList
-
-                return@withContext
-            }
+            autocompleteResult = autocompleteUseCase(inputTextFieldValue)
         }
     }
 
     fun acceptAutocomplete(autocompleteString: String) {
 
-        var textBefore = inputTextFieldValue.getTextBeforeSelection(inputTextFieldValue.text.length).toString()
-        var textAfter = inputTextFieldValue.getTextAfterSelection(inputTextFieldValue.text.length).toString()
-
-
-        val pattern = Regex("([a-zA-Z_]+$)")
-
-        val match = pattern.split(textBefore).first()
-
-        val newCursorPosition = match.length + autocompleteString.length
-        val newText = "$match$autocompleteString$textAfter"
-
         updateInput(TextFieldValue(
-            text = newText,
-            selection = TextRange(newCursorPosition)
+            text = autocompleteResult.textBefore + autocompleteString + autocompleteResult.textAfter,
+            selection = TextRange(autocompleteResult.textBefore.length + autocompleteString.length)
         ))
     }
 
