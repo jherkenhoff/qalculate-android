@@ -24,7 +24,7 @@ fun ColumnScope.CalculationListItem(
 ) {
 
     Text(
-        mathExpressionFormatted(parsed),
+        mathExpressionFormatter(parsed),
         style = MaterialTheme.typography.bodyMedium
     )
     Box(
@@ -34,7 +34,7 @@ fun ColumnScope.CalculationListItem(
             .defaultMinSize(minHeight = 80.dp)
     ) {
         AutoSizeText(
-            text = mathExpressionFormatted(result),
+            text = mathExpressionFormatter(result),
             modifier = Modifier.fillMaxWidth(),
             alignment = Alignment.CenterEnd,
             style = MaterialTheme.typography.displayMedium,
