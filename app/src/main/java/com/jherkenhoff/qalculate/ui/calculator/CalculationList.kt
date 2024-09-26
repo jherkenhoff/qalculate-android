@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -51,6 +53,10 @@ fun CalculationList(
 
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(calculationHistory.size) {
+        scrollState.animateScrollToItem(calculationHistory.size)
+    }
     
     Box(
         modifier = modifier
@@ -109,7 +115,7 @@ fun CalculationList(
             JumpToBottomButton(
                 onClick = {
                     scope.launch {
-                        scrollState.animateScrollToItem(calculationHistory.size-1)
+                        scrollState.animateScrollToItem(calculationHistory.size)
                     }
                 },
                 modifier = Modifier
@@ -127,7 +133,7 @@ private fun JumpToBottomButton(
     modifier: Modifier = Modifier
 ) {
     FloatingActionButton(
-        onClick = {},
+        onClick = onClick,
         modifier = modifier
     ) {
         Icon(
