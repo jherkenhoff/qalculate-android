@@ -22,7 +22,6 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -39,7 +38,6 @@ fun AltKeyboard(
     onSubmit: () -> Unit = {}
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
         modifier = modifier
     ) {
         Column(
@@ -47,9 +45,9 @@ fun AltKeyboard(
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
         ) {
-            AltKeyboardSelector(
-                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-            )
+            //AltKeyboardSelector(
+            //    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+            //)
             Spacer(modifier = Modifier.height(16.dp))
             BasicAltKeyboard(
                 onKey = onKey,
@@ -82,7 +80,7 @@ fun BasicAltKeyboard(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AltKeyboardButton(text="7", onClick={onKey("7")}, color = MaterialTheme.colorScheme.primaryContainer)
+            AltKeyboardButton(text="7", onClick={onKey("7")}, color = MaterialTheme.colorScheme.secondaryContainer)
             AltKeyboardButton(text="8", onClick={onKey("8")}, color = MaterialTheme.colorScheme.secondaryContainer)
             AltKeyboardButton(text="9", onClick={onKey("9")}, color = MaterialTheme.colorScheme.secondaryContainer)
             AltKeyboardButton(text="⌫", onClick=onDel, color = MaterialTheme.colorScheme.tertiaryContainer)
