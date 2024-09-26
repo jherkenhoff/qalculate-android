@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -69,6 +70,7 @@ fun InputBar(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp)
+            .heightIn(48.dp, 48.dp)
     ) {
         val placeholdeVisible by remember { derivedStateOf { textFieldValue().text.isEmpty() } }
 

@@ -4,6 +4,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import com.jherkenhoff.libqalculate.Calculator
+import com.jherkenhoff.libqalculate.Unit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -30,6 +31,11 @@ data class AutocompleteResult(
 class AutocompleteUseCase @Inject constructor(
     private val calc: Calculator
 ) {
+
+    private suspend fun formatUnit(unit: Unit): String {
+
+        return unit.title()
+    }
     suspend operator fun invoke(input: TextFieldValue): AutocompleteResult {
 
         if (input.selection.length > 0) {
@@ -52,7 +58,7 @@ class AutocompleteUseCase @Inject constructor(
                 it.title().lowercase().startsWith(relevantText.lowercase())
                         || it.name().lowercase().startsWith(relevantText.lowercase())
                 }.map {
-                    AutocompleteItem(it.title(), it.name(), it.abbreviation())
+                    AutocompleteItem(formatUnit(it), it.name(), it.abbreviation())
                 }
 
             return@withContext AutocompleteResult(

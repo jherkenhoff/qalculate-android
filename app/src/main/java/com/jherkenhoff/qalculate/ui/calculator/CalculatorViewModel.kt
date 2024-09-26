@@ -96,7 +96,6 @@ class CalculatorViewModel @Inject constructor(
         val newText = "$textBeforeSelection$quickKeyText$textAfterSelection"
         val newCursorPosition = textBeforeSelection.length + quickKeyText.length
 
-
         updateInput(TextFieldValue(
             text = newText,
             selection = TextRange(newCursorPosition)
@@ -149,6 +148,8 @@ class CalculatorViewModel @Inject constructor(
             parsedPrintOptions.place_units_separately = false
             parsedPrintOptions.preserve_format = true
             parsedPrintOptions.use_unicode_signs = 1
+            parsedPrintOptions.abbreviate_names = false
+            parsedPrintOptions.short_multiplication = false
             parsedString = calculator.print(parsedMathStructure, 2000, parsedPrintOptions, true, 1, TAG_TYPE_HTML)
 
             val resultPo = PrintOptions()

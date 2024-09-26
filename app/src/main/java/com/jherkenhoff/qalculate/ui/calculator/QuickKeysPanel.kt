@@ -39,7 +39,11 @@ fun QuickKeysPanel(
                     modifier = Modifier
                         .weight(1f)
                 ) {
-                    Text(text = i, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = i,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         }
@@ -55,7 +59,11 @@ fun QuickKeysPanel(
                     modifier = Modifier
                         .weight(1f)
                 ) {
-                    Text(text = i.toString(), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = i.toString(),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         }

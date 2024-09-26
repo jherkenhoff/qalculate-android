@@ -67,7 +67,9 @@ fun AutocompleteList(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp).fillMaxWidth()
             )
             HorizontalDivider()
-            LazyColumn {
+            LazyColumn(
+                reverseLayout = true
+            ) {
                 for (entry in entries()) {
                     item {
                         ListItem(

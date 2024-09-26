@@ -148,7 +148,7 @@ fun CalculatorScreenContent(
                             runBlocking {
                                 screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
                             }
-                        },
+                        }
                     )
                 }
             }
