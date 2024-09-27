@@ -83,9 +83,12 @@ class CalculatorViewModel @Inject constructor(
 
     fun acceptAutocomplete(autocompleteString: String) {
 
+        // HACK: Add a space behind the accepted autocomplete text in order for the autocomplete list to dissapear
+        val fullautocompleteString = "$autocompleteString "
+
         updateInput(TextFieldValue(
-            text = autocompleteResult.textBefore + autocompleteString + autocompleteResult.textAfter,
-            selection = TextRange(autocompleteResult.textBefore.length + autocompleteString.length)
+            text = autocompleteResult.textBefore + fullautocompleteString + autocompleteResult.textAfter,
+            selection = TextRange(autocompleteResult.textBefore.length + fullautocompleteString.length)
         ))
     }
 

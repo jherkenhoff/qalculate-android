@@ -19,6 +19,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -78,6 +82,12 @@ fun CalculatorScreenContent(
     val screenSettingsRepository = ScreenSettingsRepository(LocalContext.current)
     var isAltKeyboardOpen = screenSettingsRepository.isAltKeyboardOpen.collectAsState(true).value
 
+    var autocompleteDismissed by remember { mutableStateOf(false) }
+
+    if (autocompleteList().isEmpty()) {
+        autocompleteDismissed = false
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
@@ -128,11 +138,12 @@ fun CalculatorScreenContent(
                     .padding(bottom = 16.dp)
                 ) {
 
-                    AnimatedVisibility(autocompleteList().isNotEmpty()) {
+                    AnimatedVisibility(!autocompleteDismissed && autocompleteList().isNotEmpty()) {
                             AutocompleteList(
                                 autocompleteText,
                                 entries = autocompleteList,
                                 onEntryClick = onAutocompleteClick,
+                                onDismiss = { autocompleteDismissed = true },
                                 modifier = Modifier
                                     .padding(vertical = 16.dp)
                                     .heightIn(max = 300.dp)

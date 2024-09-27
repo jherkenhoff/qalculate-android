@@ -39,9 +39,11 @@ fun AutocompleteList(
 
     when (dismissState.currentValue) {
         SwipeToDismissBoxValue.EndToStart -> {
-
+            onDismiss()
         }
-
+        SwipeToDismissBoxValue.StartToEnd -> {
+            onDismiss()
+        }
         else -> {  }
     }
 
