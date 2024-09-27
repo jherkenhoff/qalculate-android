@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun QalculateApp() {
-    QalculateTheme(dynamicColor = false) {
+    QalculateTheme(dynamicColor = true) {
         val navController = rememberNavController()
         val navigationActions = remember(navController) {
             QalculateNavigationActions(navController)
