@@ -57,7 +57,12 @@ android {
             // Assigns a different version code for each output APK
             // other than the universal APK.
             variant.outputs.forEach { output ->
-                val name = output.filters.find { it.filterType == ABI }?.identifier
+                val name =
+                    if (splitApks) {
+                        output.filters.find { it.filterType == ABI }?.identifier
+                    } else {
+                        abiFilterList.firstOrNull()
+                    }
 
                 // Stores the value of abiCodes that is associated with the ABI for this variant.
                 val baseAbiCode = abiCodes[name]
