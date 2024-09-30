@@ -10,7 +10,11 @@ plugins {
     alias(libs.plugins.compose)
 }
 
+val splitApks = !project.hasProperty("noSplits")
+
 val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 3, "x86_64" to 4)
+
+val abiFilterList = (properties["ABI_FILTERS"] as String).split(';')
 
 android {
     namespace = "com.jherkenhoff.qalculate"
@@ -25,21 +29,25 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {useSupportLibrary = true }
+
+        if (splitApks) {
+            splits {
+                abi {
+                    isEnable = true
+                    reset()
+                    include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+                    isUniversalApk = true
+                }
+            }
+        } else {
+            ndk { abiFilters.addAll(abiFilterList) }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
-
-    splits {
-        abi {
-            isEnable = true
-            isUniversalApk = true
-            reset()
-            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
     }
 
