@@ -5,10 +5,9 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Keyboard
 import androidx.compose.material.icons.outlined.TextFields
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,6 +15,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -41,7 +41,7 @@ fun SettingsScreenContent(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 colors = topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
@@ -50,7 +50,7 @@ fun SettingsScreenContent(
                 navigationIcon = {
                     IconButton(onClick = openDrawer) {
                         Icon(
-                            imageVector = Icons.Filled.Menu,
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = stringResource(R.string.open_menu_content_description)
                         )
                     }
@@ -61,7 +61,6 @@ fun SettingsScreenContent(
         },
         modifier = Modifier.imePadding(),
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .padding(innerPadding),
@@ -69,8 +68,14 @@ fun SettingsScreenContent(
             LazyColumn {
                 item {
                     ListItem(
+                        headlineContent = { Text("Default input method") },
+                        supportingContent = { Text("Keyboard")}
+                    )
+                }
+                item {
+                    ListItem(
                         headlineContent = { Text("Input") },
-                        supportingContent = { Text("Format, Localization, Autocomplete")},
+                        supportingContent = { Text("Format, Localization, Completion")},
                         leadingContent = { Icon(Icons.Outlined.Keyboard, contentDescription = null)})
                 }
                 item {
