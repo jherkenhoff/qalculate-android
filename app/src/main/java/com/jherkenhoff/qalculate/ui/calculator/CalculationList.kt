@@ -1,6 +1,5 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -8,10 +7,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -28,7 +25,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import kotlinx.coroutines.launch
@@ -47,8 +43,7 @@ fun CalculationList(
     calculationHistory: List<CalculationHistoryItem>,
     currentParsed: () -> String,
     currentResult: () -> String,
-    modifier: Modifier = Modifier,
-    bottomSpacing: Dp = 0.dp,
+    modifier: Modifier = Modifier
 ) {
 
     val scrollState = rememberLazyListState()
@@ -64,7 +59,7 @@ fun CalculationList(
         LazyColumn(
             verticalArrangement = Arrangement.Bottom,
             state = scrollState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
             calculationHistory.groupBy { it.time.toLocalDate() }
                 .map { (id, list) ->
@@ -77,12 +72,10 @@ fun CalculationList(
                         CalculationDivider(text = dayString)
                     }
                     list.forEach {
-                        it.time.toLocalDate()
                         item() {
                             CalculationListItem(
                                 it.parsed,
                                 it.result,
-                                //modifier = Modifier.animateItemPlacement()
                             )
                         }
                     }
@@ -95,10 +88,8 @@ fun CalculationList(
                     currentParsed(),
                     currentResult()
                 )
-                Spacer(modifier = Modifier.size(bottomSpacing))
             }
         }
-
 
         val isScrolledToTheEnd by remember {
             derivedStateOf {
@@ -121,7 +112,6 @@ fun CalculationList(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(10.dp)
-                    .padding(bottom = bottomSpacing)
             )
         }
     }
@@ -178,6 +168,15 @@ private fun DefaultPreview() {
 
     CalculationList(
         testCalculationHistory,
+        { "1+1" },
+        { "2" }
+    )
+}
+@Preview(showBackground = true)
+@Composable
+private fun EmptyPreview() {
+    CalculationList(
+        emptyList(),
         { "1+1" },
         { "2" }
     )

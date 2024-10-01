@@ -5,10 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material3.Button
@@ -19,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -37,27 +34,13 @@ fun AltKeyboard(
     onAC: () -> Unit = {},
     onSubmit: () -> Unit = {}
 ) {
-    Surface(
+    BasicAltKeyboard(
+        onKey = onKey,
+        onDel = onDel,
+        onAC = onAC,
+        onSubmit = onSubmit,
         modifier = modifier
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp)
-        ) {
-            //AltKeyboardSelector(
-            //    modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-            //)
-            Spacer(modifier = Modifier.height(16.dp))
-            BasicAltKeyboard(
-                onKey = onKey,
-                onDel = onDel,
-                onAC = onAC,
-                onSubmit = onSubmit,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-        }
-    }
+    )
 }
 
 val basicKeyboardKeys = arrayOf(

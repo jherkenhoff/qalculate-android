@@ -4,12 +4,20 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +33,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import com.jherkenhoff.qalculate.domain.AutocompleteItem
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
@@ -62,7 +73,7 @@ fun CalculatorScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CalculatorScreenContent(
     input: () -> TextFieldValue,
@@ -126,41 +137,57 @@ fun CalculatorScreenContent(
             Box(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .weight(1f)
+                    .weight(1f),
+                contentAlignment = Alignment.BottomCenter
             ) {
                 CalculationList(
                     calculationHistory,
                     parsedString,
-                    resultString,
-                    bottomSpacing = 64.dp
+                    resultString
                 )
-                Column(modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp)
-                ) {
+                this@Column.AnimatedVisibility(!autocompleteDismissed && autocompleteList().isNotEmpty()) {
+                    AutocompleteList(
+                        autocompleteText,
+                        entries = autocompleteList,
+                        onEntryClick = onAutocompleteClick,
+                        onDismiss = { autocompleteDismissed = true },
+                        modifier = Modifier
+                            .padding(vertical = 16.dp)
+                            .heightIn(max = 300.dp)
+                    )
+                }
+            }
 
-                    AnimatedVisibility(!autocompleteDismissed && autocompleteList().isNotEmpty()) {
-                            AutocompleteList(
-                                autocompleteText,
-                                entries = autocompleteList,
-                                onEntryClick = onAutocompleteClick,
-                                onDismiss = { autocompleteDismissed = true },
-                                modifier = Modifier
-                                    .padding(vertical = 16.dp)
-                                    .heightIn(max = 300.dp)
-                            )
-                    }
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+            ) {
+                FilledIconToggleButton(
+                    checked = isAltKeyboardOpen,
+                    onCheckedChange = {
+                        isAltKeyboardOpen = !isAltKeyboardOpen
+                        runBlocking {
+                            screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
+                        }
+                    },
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(Icons.Filled.Calculate, contentDescription = null)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                InterceptPlatformTextInput(
+                    interceptor = { request, nextHandler ->
+                        if (!isAltKeyboardOpen) {
+                            nextHandler.startInputMethod(request)
+                        } else {
+                            awaitCancellation()
+                        }
+                    },
+                ) {
                     InputBar(
                         textFieldValue = input,
                         onValueChange = onInputChanged,
                         onSubmit = { onCalculationSubmit() },
-                        altKeyboardEnabled = isAltKeyboardOpen,
-                        onKeyboardToggleClick = {
-                            isAltKeyboardOpen = !isAltKeyboardOpen
-                            runBlocking {
-                                screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
-                            }
-                        }
                     )
                 }
             }
@@ -171,7 +198,8 @@ fun CalculatorScreenContent(
                         onKey = onQuickKeyPressed,
                         onDel = onDelKeyPressed,
                         onAC = onACKeyPressed,
-                        onSubmit = onCalculationSubmit
+                        onSubmit = onCalculationSubmit,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                     )
                 } else {
                     SupplementaryBar(
