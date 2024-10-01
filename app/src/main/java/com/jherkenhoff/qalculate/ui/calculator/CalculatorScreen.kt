@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -164,19 +165,21 @@ fun CalculatorScreenContent(
                 }
             }
 
-            if (isAltKeyboardOpen) {
-                AltKeyboard(
-                    onKey = onQuickKeyPressed,
-                    onDel = onDelKeyPressed,
-                    onAC = onACKeyPressed,
-                    onSubmit = onCalculationSubmit
-                )
-            } else {
-                SupplementaryBar(
-                    onKey = onQuickKeyPressed,
-                    autocompleteItems = { emptyList() }, // autocompleteList
-                    onAutocompleteClick = onAutocompleteClick
-                )
+            AnimatedContent(targetState = isAltKeyboardOpen) {
+                if (it) {
+                    AltKeyboard(
+                        onKey = onQuickKeyPressed,
+                        onDel = onDelKeyPressed,
+                        onAC = onACKeyPressed,
+                        onSubmit = onCalculationSubmit
+                    )
+                } else {
+                    SupplementaryBar(
+                        onKey = onQuickKeyPressed,
+                        autocompleteItems = { emptyList() }, // autocompleteList
+                        onAutocompleteClick = onAutocompleteClick
+                    )
+                }
             }
         }
     }
