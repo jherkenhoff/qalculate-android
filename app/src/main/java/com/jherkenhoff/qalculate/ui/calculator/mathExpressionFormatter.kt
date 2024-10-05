@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.em
 fun mathExpressionFormatter(
     text: String
 ): AnnotatedString {
-    val tokens = Regex("""<.*?>|([^<]+)?|(&nbsp;)""").findAll(text)
+    val tokens = Regex("""<.*?>|(&nbsp;)+|([^<&]+)?""").findAll(text)
 
     // TODO: Implement <small> tags. (Apparently only used for base designation? https://github.com/Qalculate/libqalculate/blob/21f28b27bf99dc6d9f3325c4960a92ec9ee8934d/libqalculate/MathStructure-print.cc#L3604 )
 
@@ -32,7 +32,7 @@ fun mathExpressionFormatter(
                 "</sup>" -> pop()
                 "<sub>" -> pushStyle(SpanStyle(baselineShift = BaselineShift.Subscript, fontSize = 0.7.em))
                 "</sub>" -> pop()
-                "&nbsp;" -> append("\n")
+                "&nbsp;" -> pop()
                 else -> append(token.value)
             }
         }
