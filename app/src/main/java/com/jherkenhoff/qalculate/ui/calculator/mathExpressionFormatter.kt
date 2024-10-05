@@ -32,7 +32,7 @@ fun mathExpressionFormatter(
                 "</sup>" -> pop()
                 "<sub>" -> pushStyle(SpanStyle(baselineShift = BaselineShift.Subscript, fontSize = 0.7.em))
                 "</sub>" -> pop()
-                "&nbsp;" -> pop()
+                "&nbsp;" -> append("")
                 else -> append(token.value)
             }
         }
