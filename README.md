@@ -65,6 +65,7 @@ _For more details about the syntax, and available functions, units, and variable
       <td align="center" valign="top" width="14.28%"><a href="https://www.bytehamster.com"><img src="https://avatars.githubusercontent.com/u/5811634?v=4?s=100" width="100px;" alt="ByteHamster"/><br /><sub><b>ByteHamster</b></sub></a><br /><a href="#code-ByteHamster" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/keinezeit8"><img src="https://avatars.githubusercontent.com/u/59264615?v=4?s=100" width="100px;" alt="keinezeit8"/><br /><sub><b>keinezeit8</b></sub></a><br /><a href="#doc-keinezeit8" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://play.google.com/store/apps/details?id=com.inidamleader.ovtracker"><img src="https://avatars.githubusercontent.com/u/24585476?v=4?s=100" width="100px;" alt="Inidam Leader"/><br /><sub><b>Inidam Leader</b></sub></a><br /><a href="#code-inidamleader" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://hoverth.github.io"><img src="https://avatars.githubusercontent.com/u/31601374?v=4?s=100" width="100px;" alt="Thomas Dickson"/><br /><sub><b>Thomas Dickson</b></sub></a><br /><a href="#code-Hoverth" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
