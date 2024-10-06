@@ -7,7 +7,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -52,14 +53,14 @@ fun CalculationList(
     LaunchedEffect(calculationHistory.size) {
         scrollState.animateScrollToItem(calculationHistory.size)
     }
-    
+
     Box(
         modifier = modifier
     ) {
         LazyColumn(
             verticalArrangement = Arrangement.Bottom,
             state = scrollState,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             calculationHistory.groupBy { it.time.toLocalDate() }
                 .map { (id, list) ->
@@ -115,6 +116,11 @@ fun CalculationList(
             )
         }
     }
+}
+
+@Composable
+private fun EmptyState() {
+    Text("Empty")
 }
 
 @Composable

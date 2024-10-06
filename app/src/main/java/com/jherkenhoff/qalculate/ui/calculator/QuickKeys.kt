@@ -49,7 +49,7 @@ fun QuickKeys(
     val chevronWidth = 20.dp
 
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        color = MaterialTheme.colorScheme.surfaceContainer,
     ) {
 
         Box(
@@ -64,7 +64,7 @@ fun QuickKeys(
                 Icon(
                     Icons.Filled.ChevronLeft,
                     contentDescription = "Arrow to the left",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
             LazyRow(
@@ -97,7 +97,7 @@ fun QuickKeys(
                 Icon(
                     Icons.Filled.ChevronRight,
                     contentDescription = "Arrow to the right",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

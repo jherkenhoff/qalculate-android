@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -49,7 +50,7 @@ fun InputBar(
     val placeholdeVisible by remember { derivedStateOf { textFieldValue().text.isEmpty() } }
 
     Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
+        color = MaterialTheme.colorScheme.surfaceContainerHighest,
         shape = RoundedCornerShape(24.dp),
         //shadowElevation = 3.dp,
         modifier = modifier.fillMaxWidth().heightIn(48.dp, 200.dp)
@@ -74,7 +75,7 @@ fun InputBar(
                     if (textFieldValue().text.isNotBlank()) onSubmit(textFieldValue().text)
                 },
                 cursorBrush = SolidColor(LocalContentColor.current),
-                textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimaryContainer),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
             )
 
 
@@ -82,7 +83,7 @@ fun InputBar(
             if (placeholdeVisible) {
                 Text(
                     text = stringResource(R.string.textfield_hint),
-                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)),
+                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)),
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }

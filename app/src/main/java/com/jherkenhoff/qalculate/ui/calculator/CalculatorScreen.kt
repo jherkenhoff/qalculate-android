@@ -14,12 +14,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
@@ -170,6 +169,14 @@ fun CalculatorScreenContent(
                             screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
                         }
                     },
+                    colors = IconToggleButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        checkedContainerColor = MaterialTheme.colorScheme.primary,
+                        checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                        disabledContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(Icons.Filled.Calculate, contentDescription = null)
@@ -202,10 +209,8 @@ fun CalculatorScreenContent(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                     )
                 } else {
-                    SupplementaryBar(
-                        onKey = onQuickKeyPressed,
-                        autocompleteItems = { emptyList() }, // autocompleteList
-                        onAutocompleteClick = onAutocompleteClick
+                    QuickKeys(
+                        onKey = onQuickKeyPressed
                     )
                 }
             }

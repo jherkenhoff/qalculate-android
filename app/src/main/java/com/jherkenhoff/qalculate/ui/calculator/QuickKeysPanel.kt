@@ -41,7 +41,7 @@ fun QuickKeysPanel(
                 ) {
                     Text(
                         text = i,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -61,7 +61,7 @@ fun QuickKeysPanel(
                 ) {
                     Text(
                         text = i.toString(),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
