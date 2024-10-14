@@ -4,4 +4,11 @@
     <string name="top_sheet_menu">Menu button</string>
     <string name="textfield_hint">Enter expression</string>
     <string name="about_qalculate_text">Powerful and versatile multi-purpose calculator based on the almighty Qalculate! desktop calculator.</string>
+    <string name="navigation_calculator">Calculator</string>
+    <string name="navigation_functions">Functions</string>
+    <string name="navigation_variables">Variables</string>
+    <string name="navigation_units">Units</string>
+    <string name="navigation_datasets">Datasets</string>
+    <string name="navigation_about">About</string>
+    <string name="navigation_settings">Settings</string>
 </resources>

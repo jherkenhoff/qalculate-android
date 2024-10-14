@@ -1,4 +1,4 @@
-package com.jherkenhoff.qalculate.ui.calculator
+package com.jherkenhoff.qalculate.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -26,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.R
@@ -56,48 +58,48 @@ fun NavigationDrawer(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Qalculate logo",
+                contentDescription = null,
                 modifier = Modifier
                     .size(80.dp)
                     .shadow(6.dp, shape = CircleShape)
             )
         }
         NavigationDrawerItem(
-            label = { Text(text = "Calculator") },
+            label = { Text(text = stringResource(R.string.navigation_calculator)) },
             selected = calculatorActive,
             onClick = onCalculatorClick,
-            icon = { Icon(Icons.Filled.Calculate, contentDescription = "Calculator icon") },
+            icon = { Icon(Icons.Filled.Calculate, contentDescription = null) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         HorizontalDivider(
             Modifier
                 .padding(horizontal = 25.dp, vertical = 15.dp))
         NavigationDrawerItem(
-            label = { Text(text = "Functions") },
+            label = { Text(text = stringResource(R.string.navigation_functions), textDecoration = TextDecoration.LineThrough) },
             selected = functionsActive,
             onClick = onFunctionsClick,
-            icon = { Icon(Icons.Outlined.Functions, contentDescription = "Functions icon") },
+            icon = { Icon(Icons.Outlined.Functions, contentDescription = null) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
-            label = { Text(text = "Variables") },
+            label = { Text(text = stringResource(R.string.navigation_variables), textDecoration = TextDecoration.LineThrough) },
             selected = variablesActive,
             onClick = onVariablesClick,
-            icon = { Icon(Icons.Outlined.Pin, contentDescription = "Variables icon") },
+            icon = { Icon(Icons.Outlined.Pin, contentDescription = null) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
-            label = { Text(text = "Units") },
+            label = { Text(text = stringResource(R.string.navigation_units)) },
             selected = unitsActive,
             onClick = onUnitsClick,
-            icon = { Icon(Icons.Outlined.Straighten, contentDescription = "Units icon") },
+            icon = { Icon(Icons.Outlined.Straighten, contentDescription = null) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
-            label = { Text(text = "Datasets") },
+            label = { Text(text = stringResource(R.string.navigation_datasets), textDecoration = TextDecoration.LineThrough) },
             selected = datasetsActive,
             onClick = onDatasetsClick,
-            icon = { Icon(Icons.Outlined.Dataset, contentDescription = "Datasets icon") },
+            icon = { Icon(Icons.Outlined.Dataset, contentDescription = null) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
 
@@ -107,17 +109,17 @@ fun NavigationDrawer(
                 .padding(horizontal = 25.dp)
                 .padding(top = 15.dp))
         NavigationDrawerItem(
-            label = { Text(text = "About") },
+            label = { Text(text = stringResource(R.string.navigation_about)) },
             selected = false,
             onClick = onAboutClick,
-            icon = { Icon(Icons.Filled.Info, contentDescription = "About icon") },
+            icon = { Icon(Icons.Filled.Info, contentDescription = null) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
-            label = { Text(text = "Settings") },
+            label = { Text(text = stringResource(R.string.navigation_settings), textDecoration = TextDecoration.LineThrough) },
             selected = false,
             onClick = onSettingsClick,
-            icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings icon") },
+            icon = { Icon(Icons.Filled.Settings, contentDescription = null) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
     }
