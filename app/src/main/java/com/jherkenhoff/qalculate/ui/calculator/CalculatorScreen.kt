@@ -77,7 +77,7 @@ fun CalculatorScreen(
 fun CalculatorScreenContent(
     input: () -> TextFieldValue,
     onInputChanged: (TextFieldValue) -> Unit,
-    onQuickKeyPressed: (String) -> Unit,
+    onQuickKeyPressed: (String, String) -> Unit,
     onDelKeyPressed: () -> Unit,
     onACKeyPressed: () -> Unit,
     calculationHistory: List<CalculationHistoryItem>,
@@ -94,10 +94,6 @@ fun CalculatorScreenContent(
     var isAltKeyboardOpen = screenSettingsRepository.isAltKeyboardOpen.collectAsState(true).value
 
     var autocompleteDismissed by remember { mutableStateOf(false) }
-
-    if (autocompleteList().isEmpty()) {
-        autocompleteDismissed = false
-    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -202,7 +198,7 @@ fun CalculatorScreenContent(
             AnimatedContent(targetState = isAltKeyboardOpen) {
                 if (it) {
                     AltKeyboard(
-                        onKey = onQuickKeyPressed,
+                        onKey = { text -> onQuickKeyPressed(text, "") },
                         onDel = onDelKeyPressed,
                         onAC = onACKeyPressed,
                         onSubmit = onCalculationSubmit,
@@ -251,7 +247,7 @@ private fun DefaultPreview() {
     CalculatorScreenContent(
         input = { TextFieldValue("1+1") },
         onInputChanged = {},
-        onQuickKeyPressed = {},
+        onQuickKeyPressed = {_, _ ->},
         onDelKeyPressed = {},
         onACKeyPressed = {},
         calculationHistory = testCalculationHistory,
@@ -276,7 +272,7 @@ private fun AutocompletePreview() {
     CalculatorScreenContent(
         input = { TextFieldValue("1*t") },
         onInputChanged = {},
-        onQuickKeyPressed = {},
+        onQuickKeyPressed = {_, _ ->},
         onDelKeyPressed = {},
         onACKeyPressed = {},
         calculationHistory = testCalculationHistory,

@@ -92,12 +92,12 @@ class CalculatorViewModel @Inject constructor(
         ))
     }
 
-    fun insertText(quickKeyText: String) {
+    fun insertText(preCursorText: String, postCursorText: String = "") {
         val maxChars = inputTextFieldValue.text.length
         val textBeforeSelection = inputTextFieldValue.getTextBeforeSelection(maxChars)
         val textAfterSelection = inputTextFieldValue.getTextAfterSelection(maxChars)
-        val newText = "$textBeforeSelection$quickKeyText$textAfterSelection"
-        val newCursorPosition = textBeforeSelection.length + quickKeyText.length
+        val newText = "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
+        val newCursorPosition = textBeforeSelection.length + preCursorText.length
 
         updateInput(TextFieldValue(
             text = newText,

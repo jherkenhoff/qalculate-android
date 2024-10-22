@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun QuickKeys(
-    onKey: (String) -> Unit
+    onKey: (String, String) -> Unit
 ) {
 
 
@@ -73,18 +73,25 @@ fun QuickKeys(
                 state = state,
                 flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
             ) {
-                for (i in 0..nPanels-1) {
-                    item(key = i) {
-                        QuickKeysPanel(
-                            onKeyAction = onKey,
-                            modifier = Modifier
-                                .fillParentMaxWidth()
-                                .padding(
-                                    start = if (i != 0) chevronWidth else 0.dp,
-                                    end = if (i != nPanels - 1) chevronWidth else 0.dp
-                                )
-                        )
-                    }
+                item(key = 0) {
+                    QuickKeysPanel(
+                        onKeyAction = onKey,
+                        modifier = Modifier
+                            .fillParentMaxWidth()
+                            .padding(
+                                end = chevronWidth
+                            )
+                    )
+                }
+                item(key = 1) {
+                    QuickKeysPanel2(
+                        onKeyAction = onKey,
+                        modifier = Modifier
+                            .fillParentMaxWidth()
+                            .padding(
+                                start = chevronWidth
+                            )
+                    )
                 }
             }
 
@@ -109,5 +116,5 @@ fun QuickKeys(
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
-    QuickKeys(onKey = {})
+    QuickKeys(onKey = {_, _, -> })
 }

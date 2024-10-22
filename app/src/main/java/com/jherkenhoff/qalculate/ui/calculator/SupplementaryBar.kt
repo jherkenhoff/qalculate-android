@@ -17,16 +17,16 @@ import com.jherkenhoff.qalculate.domain.AutocompleteItem
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SupplementaryBar(
-    onKey: (String) -> Unit,
+    onKey: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     autocompleteItems: () -> List<AutocompleteItem>,
     onAutocompleteClick: (String) -> Unit = {}
 ) {
     val haptic = LocalHapticFeedback.current
 
-    fun onClick(text: String) {
+    fun onClick(preCursorText: String, postCursorText: String) {
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-        onKey(text)
+        onKey(preCursorText, postCursorText)
     }
 
     Surface(
@@ -63,7 +63,7 @@ private fun DefaultPreview() {
     )
 
     SupplementaryBar(
-        onKey = {},
+        onKey = {_, _ ->},
         autocompleteItems = { list }
     )
 }
