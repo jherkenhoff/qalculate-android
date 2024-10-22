@@ -143,17 +143,9 @@ class CalculatorViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            val parsedMathStructure = parseUseCase(inputTextFieldValue.text)
+            parsedString = parseUseCase(inputTextFieldValue.text)
 
             val calculatedMathStructure = calculateUseCase(inputTextFieldValue.text)
-
-            val parsedPrintOptions = PrintOptions()
-            parsedPrintOptions.place_units_separately = false
-            parsedPrintOptions.preserve_format = true
-            parsedPrintOptions.use_unicode_signs = 1
-            parsedPrintOptions.abbreviate_names = false
-            parsedPrintOptions.short_multiplication = false
-            parsedString = calculator.print(parsedMathStructure, 2000, parsedPrintOptions, true, 1, TAG_TYPE_HTML)
 
             val resultPo = PrintOptions()
             resultPo.interval_display = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
