@@ -40,11 +40,10 @@ private fun LazyListState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.las
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CalculationList(
+fun HistroyList(
     calculationHistory: List<CalculationHistoryItem>,
-    currentParsed: () -> String,
-    currentResult: () -> String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onTextToInput: (String) -> Unit = {}
 ) {
 
     val scrollState = rememberLazyListState()
@@ -58,7 +57,8 @@ fun CalculationList(
         modifier = modifier
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             state = scrollState,
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -74,22 +74,15 @@ fun CalculationList(
                     }
                     list.forEach {
                         item() {
-                            CalculationListItem(
-                                it.parsed,
-                                it.result,
+                            HistoryItem(
+                                inputText = it.input,
+                                parsedText = it.parsed,
+                                resultText = it.result,
+                                onTextToInput = onTextToInput
                             )
                         }
                     }
                 }
-            item {
-                CalculationDivider(text = "Now")
-            }
-            item {
-                CalculationListItem(
-                    currentParsed(),
-                    currentResult()
-                )
-            }
         }
 
         val isScrolledToTheEnd by remember {
@@ -99,7 +92,7 @@ fun CalculationList(
         }
 
         AnimatedVisibility(
-            visible = !isScrolledToTheEnd,
+            visible = !isScrolledToTheEnd && calculationHistory.isNotEmpty(),
             enter = fadeIn() + slideInVertically(initialOffsetY = { it/2 }),
             exit = fadeOut(),
             modifier = Modifier.align(Alignment.BottomCenter)
@@ -148,8 +141,8 @@ private fun DefaultPreview() {
     val testCalculationHistory = listOf(
         CalculationHistoryItem(
             LocalDateTime.now().minusDays(10),
-            "1m + 1m",
-            "1 m + 1 m",
+            "1 kilometer + 5 meter",
+            "1.005 m",
             "2 m"
         ),
         CalculationHistoryItem(
@@ -166,24 +159,20 @@ private fun DefaultPreview() {
         ),
         CalculationHistoryItem(
             LocalDateTime.now().minusMinutes(20),
-            "1m + 1m",
-            "1 m + 1 m",
-            "2 m"
+            "1km + 5m",
+            "1 kilometer + 5 meter",
+            "1.005 m",
         )
     )
 
-    CalculationList(
-        testCalculationHistory,
-        { "1+1" },
-        { "2" }
+    HistroyList(
+        testCalculationHistory
     )
 }
 @Preview(showBackground = true)
 @Composable
 private fun EmptyPreview() {
-    CalculationList(
-        emptyList(),
-        { "1+1" },
-        { "2" }
+    HistroyList (
+        emptyList()
     )
 }

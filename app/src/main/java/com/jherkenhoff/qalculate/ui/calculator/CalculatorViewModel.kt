@@ -44,7 +44,7 @@ class CalculatorViewModel @Inject constructor(
             emptyList()
         )
 
-    var parsedString by mutableStateOf("0")
+    var parsedString by mutableStateOf("")
         private set
 
     var resultString by mutableStateOf("0")

@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 
 @Composable
 fun ColumnScope.CalculationListItem(

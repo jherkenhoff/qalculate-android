@@ -2,23 +2,19 @@ package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
@@ -72,7 +68,9 @@ fun CalculatorScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
+    ExperimentalSharedTransitionApi::class
+)
 @Composable
 fun CalculatorScreenContent(
     input: () -> TextFieldValue,
@@ -135,10 +133,9 @@ fun CalculatorScreenContent(
                     .weight(1f),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                CalculationList(
+                HistroyList(
                     calculationHistory,
-                    parsedString,
-                    resultString
+                    onTextToInput = { onQuickKeyPressed(it, "") }
                 )
                 this@Column.AnimatedVisibility(!autocompleteDismissed && autocompleteList().isNotEmpty()) {
                     AutocompleteList(
@@ -147,53 +144,41 @@ fun CalculatorScreenContent(
                         onEntryClick = onAutocompleteClick,
                         onDismiss = { autocompleteDismissed = true },
                         modifier = Modifier
-                            .padding(vertical = 16.dp)
                             .heightIn(max = 300.dp)
                     )
                 }
             }
 
-            Row(
-                verticalAlignment = Alignment.Bottom,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            InterceptPlatformTextInput(
+                interceptor = { request, nextHandler ->
+                    if (!isAltKeyboardOpen) {
+                        nextHandler.startInputMethod(request)
+                    } else {
+                        awaitCancellation()
+                    }
+                },
             ) {
-                FilledIconToggleButton(
-                    checked = isAltKeyboardOpen,
-                    onCheckedChange = {
+                InputSheet(
+                    textFieldValue = input,
+                    parsed = parsedString(),
+                    result = resultString(),
+                    isAltKeyboardOpen = isAltKeyboardOpen,
+                    onValueChange = onInputChanged,
+                    onSubmit = { onCalculationSubmit() },
+                    onToggleAltKeyboard = {
                         isAltKeyboardOpen = !isAltKeyboardOpen
                         runBlocking {
                             screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
                         }
                     },
-                    colors = IconToggleButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        contentColor = MaterialTheme.colorScheme.primary,
-                        checkedContainerColor = MaterialTheme.colorScheme.primary,
-                        checkedContentColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        disabledContentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                    modifier = Modifier.size(48.dp)
-                ) {
-                    Icon(Icons.Filled.Calculate, contentDescription = null)
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                InterceptPlatformTextInput(
-                    interceptor = { request, nextHandler ->
-                        if (!isAltKeyboardOpen) {
-                            nextHandler.startInputMethod(request)
-                        } else {
-                            awaitCancellation()
-                        }
-                    },
-                ) {
-                    InputBar(
-                        textFieldValue = input,
-                        onValueChange = onInputChanged,
-                        onSubmit = { onCalculationSubmit() },
-                    )
-                }
+                    onClearAll = onACKeyPressed,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             AnimatedContent(targetState = isAltKeyboardOpen) {
                 if (it) {
@@ -214,6 +199,7 @@ fun CalculatorScreenContent(
     }
 }
 
+
 private val testCalculationHistory = listOf(
     CalculationHistoryItem(
         LocalDateTime.now().minusDays(10),
@@ -223,18 +209,6 @@ private val testCalculationHistory = listOf(
     ),
     CalculationHistoryItem(
         LocalDateTime.now().minusDays(1),
-        "1m + 1m",
-        "1 m + 1 m",
-        "2 m"
-    ),
-    CalculationHistoryItem(
-        LocalDateTime.now().minusDays(1).minusHours(2),
-        "1m + 1m",
-        "1 m + 1 m",
-        "2 m"
-    ),
-    CalculationHistoryItem(
-        LocalDateTime.now().minusMinutes(20),
         "1m + 1m",
         "1 m + 1 m",
         "2 m"
@@ -253,6 +227,22 @@ private fun DefaultPreview() {
         calculationHistory = testCalculationHistory,
         parsedString = { "1+1" },
         resultString = { "2" },
+        onCalculationSubmit = {}
+    )
+}
+
+@Preview
+@Composable
+private fun EmptyPreview() {
+    CalculatorScreenContent(
+        input = { TextFieldValue("") },
+        onInputChanged = {},
+        onQuickKeyPressed = {_, _ ->},
+        onDelKeyPressed = {},
+        onACKeyPressed = {},
+        calculationHistory = emptyList(),
+        parsedString = { "0" },
+        resultString = { "0" },
         onCalculationSubmit = {}
     )
 }

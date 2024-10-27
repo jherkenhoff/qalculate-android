@@ -24,7 +24,6 @@ class ParseUseCase @Inject constructor(
             parsedPrintOptions.abbreviate_names = false
             parsedPrintOptions.short_multiplication = false
 
-
             // TODO: Implement proper conversion handling
             val toExpressions = input.split(" to ")
             if (toExpressions.size == 2) {

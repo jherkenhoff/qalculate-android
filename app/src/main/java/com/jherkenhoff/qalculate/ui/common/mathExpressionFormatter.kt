@@ -1,4 +1,4 @@
-package com.jherkenhoff.qalculate.ui.calculator
+package com.jherkenhoff.qalculate.ui.common
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -11,7 +11,8 @@ import androidx.compose.ui.unit.em
 
 @Composable
 fun mathExpressionFormatter(
-    text: String
+    text: String,
+    color: Boolean = true
 ): AnnotatedString {
     val tokens = Regex("""<.*?>|(&[a-z]+;)+|([^<&]+)?""").findAll(text)
 
@@ -23,11 +24,11 @@ fun mathExpressionFormatter(
             when (token.value) {
                 "<i>" -> pushStyle(SpanStyle(fontStyle = FontStyle.Italic))
                 "</i>" -> pop()
-                "<span style=\"color:#800000\">" -> pushStyle(SpanStyle(color = MaterialTheme.colorScheme.error))
-                "<span style=\"color:#005858\">" -> pushStyle(SpanStyle(color = MaterialTheme.colorScheme.primary))
-                "<span style=\"color:#585800\">" -> pushStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary))
-                "<span style=\"color:#008000\">" -> pushStyle(SpanStyle(color = MaterialTheme.colorScheme.tertiary))
-                "</span>" -> pop()
+                "<span style=\"color:#800000\">" -> if (color) pushStyle(SpanStyle(color = MaterialTheme.colorScheme.error))
+                "<span style=\"color:#005858\">" -> if (color) pushStyle(SpanStyle(color = MaterialTheme.colorScheme.primary))
+                "<span style=\"color:#585800\">" -> if (color) pushStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary))
+                "<span style=\"color:#008000\">" -> if (color) pushStyle(SpanStyle(color = MaterialTheme.colorScheme.tertiary))
+                "</span>" -> if (color) pop()
                 "<sup>" -> pushStyle(SpanStyle(baselineShift = BaselineShift.Superscript, fontSize = 0.7.em))
                 "</sup>" -> pop()
                 "<sub>" -> pushStyle(SpanStyle(baselineShift = BaselineShift.Subscript, fontSize = 0.7.em))
