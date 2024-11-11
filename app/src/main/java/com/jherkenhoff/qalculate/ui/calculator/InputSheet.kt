@@ -72,7 +72,7 @@ fun InputSheet(
     Surface(
         //shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
         shape = RoundedCornerShape(25.dp, 25.dp, 25.dp, 25.dp),
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = MaterialTheme.colorScheme.primaryContainer,
         modifier = modifier.fillMaxWidth()
     ) {
         Column {
@@ -87,6 +87,7 @@ fun InputSheet(
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .defaultMinSize(minHeight = 60.dp)
             )
 
 
@@ -95,7 +96,7 @@ fun InputSheet(
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .height(24.dp)
+                    .defaultMinSize(minHeight = 24.dp)
                     .wrapContentHeight(),
             )
             HorizontalDivider(

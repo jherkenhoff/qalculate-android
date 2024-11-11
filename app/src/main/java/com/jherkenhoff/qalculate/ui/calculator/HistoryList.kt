@@ -57,7 +57,6 @@ fun HistroyList(
         modifier = modifier
     ) {
         LazyColumn(
-            horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(16.dp),
             state = scrollState,
             modifier = Modifier.fillMaxWidth(),
@@ -74,11 +73,12 @@ fun HistroyList(
                     }
                     list.forEach {
                         item() {
-                            HistoryItem(
+                            HistoryBubble(
                                 inputText = it.input,
                                 parsedText = it.parsed,
                                 resultText = it.result,
-                                onTextToInput = onTextToInput
+                                onTextToInput = onTextToInput,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
@@ -169,6 +169,7 @@ private fun DefaultPreview() {
         testCalculationHistory
     )
 }
+
 @Preview(showBackground = true)
 @Composable
 private fun EmptyPreview() {

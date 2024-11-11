@@ -26,11 +26,11 @@ import androidx.compose.ui.window.Dialog
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 
 
-private val HistoryItemShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp)
+private val BubbleShape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp)
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun HistoryItem(
+fun HistoryBubble(
     inputText: String,
     parsedText: String,
     resultText: String,
@@ -47,7 +47,7 @@ fun HistoryItem(
             onDismissRequest = { detailDialogOpen = false }
         ) {
             HistoryItemDetailCard(
-                inputString = inputText,
+                inputString = "",
                 parsedString = parsedText,
                 resultString = resultText,
                 onTextToInput = { onTextToInput(it); detailDialogOpen = false }
@@ -55,27 +55,10 @@ fun HistoryItem(
         }
     }
 
-//    SwipeToDismissBox(
-//        state = dismissState,
-//        backgroundContent = {
-//            val color by animateColorAsState(
-//                when (dismissState.targetValue) {
-//                    SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.surfaceContainer
-//                    SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.errorContainer
-//                    SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.secondaryContainer
-//                }
-//            )
-//            Box(
-//                Modifier
-//                    .fillMaxSize()
-//                    .background(color, shape = HistoryItemShape))
-//        }
-//
-//    ) {
     Surface(
-        shape = HistoryItemShape,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        modifier = Modifier.combinedClickable(
+        shape = BubbleShape,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        modifier = modifier.combinedClickable(
             onClick = { detailDialogOpen = true },
             onLongClick = {  }
         )
@@ -106,7 +89,7 @@ fun HistoryItem(
 @Preview()
 @Composable
 private fun DefaultPreview() {
-    HistoryItem(
+    HistoryBubble(
         "1km + 5m",
         "1 kilometer + 5 meter",
         "1.005 m"
@@ -116,7 +99,7 @@ private fun DefaultPreview() {
 @Preview()
 @Composable
 private fun DefaultPreview2() {
-    HistoryItem(
+    HistoryBubble(
         "c",
         "SpeedOfLight",
         "299.792 458 km/ms"
