@@ -18,7 +18,7 @@ val abiFilterList = (properties["ABI_FILTERS"] as String).split(';')
 
 android {
     namespace = "com.jherkenhoff.qalculate"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.jherkenhoff.qalculate"
