@@ -27,16 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InterceptPlatformTextInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import com.jherkenhoff.qalculate.domain.AutocompleteItem
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
 
@@ -45,19 +42,20 @@ fun CalculatorScreen(
     viewModel: CalculatorViewModel = viewModel(),
     openDrawer: () -> Unit = {}
 ) {
-    val calculationHistory = viewModel.calculationHistory.collectAsState()
 
     CalculatorScreenContent(
         input = { viewModel.inputTextFieldValue },
+        altKeyboardVisible = viewModel.altKeyboardOpen.collectAsState(false).value,
         onInputChanged = viewModel::updateInput,
         onQuickKeyPressed = viewModel::insertText,
         onDelKeyPressed = viewModel::removeLastChar,
         onACKeyPressed = viewModel::clearAll,
-        calculationHistory = calculationHistory.value,
+        calculationHistory = viewModel.calculationHistory.collectAsState().value,
         parsedString = { viewModel.parsedString },
         resultString = { viewModel.resultString },
         onCalculationSubmit = viewModel::submitCalculation,
         onAutocompleteClick = viewModel::acceptAutocomplete,
+        onAltKeyboardToggle = viewModel::toggleAltKeyboard,
         openDrawer = openDrawer,
         autocompleteList = { viewModel.autocompleteResult.items },
         autocompleteText = { viewModel.autocompleteResult.relevantText }
@@ -70,6 +68,7 @@ fun CalculatorScreen(
 @Composable
 fun CalculatorScreenContent(
     input: () -> TextFieldValue,
+    altKeyboardVisible: Boolean,
     onInputChanged: (TextFieldValue) -> Unit,
     onQuickKeyPressed: (String, String) -> Unit,
     onDelKeyPressed: () -> Unit,
@@ -78,14 +77,15 @@ fun CalculatorScreenContent(
     parsedString: () -> String,
     resultString: () -> String,
     onCalculationSubmit: () -> Unit = {},
+    onAltKeyboardToggle: (Boolean) -> Unit = {},
     autocompleteText: () -> String = {""},
     autocompleteList: () -> List<AutocompleteItem> = { emptyList() },
     onAutocompleteClick: (String, String) -> Unit = {_, _ ->},
     openDrawer: () -> Unit = {  }
 ) {
 
-    val screenSettingsRepository = ScreenSettingsRepository(LocalContext.current)
-    var isAltKeyboardOpen = screenSettingsRepository.isAltKeyboardOpen.collectAsState(true).value
+    //val screenSettingsRepository = ScreenSettingsRepository(LocalContext.current)
+    //var isAltKeyboardOpen = screenSettingsRepository.isAltKeyboardOpen.collectAsState(true).value
 
     var autocompleteDismissed by remember { mutableStateOf(false) }
 
@@ -133,7 +133,8 @@ fun CalculatorScreenContent(
 
             InterceptPlatformTextInput(
                 interceptor = { request, nextHandler ->
-                    if (!isAltKeyboardOpen) {
+
+                    if (!altKeyboardVisible) {
                         nextHandler.startInputMethod(request)
                     } else {
                         awaitCancellation()
@@ -144,15 +145,10 @@ fun CalculatorScreenContent(
                     textFieldValue = input,
                     parsed = parsedString(),
                     result = resultString(),
-                    isAltKeyboardOpen = isAltKeyboardOpen,
+                    isAltKeyboardOpen = altKeyboardVisible,
                     onValueChange = onInputChanged,
                     onSubmit = { onCalculationSubmit() },
-                    onToggleAltKeyboard = {
-                        isAltKeyboardOpen = !isAltKeyboardOpen
-                        runBlocking {
-                            screenSettingsRepository.saveAltKeyboardOpen(isAltKeyboardOpen)
-                        }
-                    },
+                    onToggleAltKeyboard = { onAltKeyboardToggle(!altKeyboardVisible) },
                     onClearAll = onACKeyPressed,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
@@ -160,7 +156,7 @@ fun CalculatorScreenContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            AnimatedContent(targetState = isAltKeyboardOpen) {
+            AnimatedContent(targetState = altKeyboardVisible) {
                 if (it) {
                     AltKeyboard(
                         onKey = { text -> onQuickKeyPressed(text, "") },
@@ -202,6 +198,7 @@ private val testCalculationHistory = listOf(
 private fun DefaultPreview() {
     CalculatorScreenContent(
         input = { TextFieldValue("1+1") },
+        altKeyboardVisible = false,
         onInputChanged = {},
         onQuickKeyPressed = {_, _ ->},
         onDelKeyPressed = {},
@@ -218,6 +215,7 @@ private fun DefaultPreview() {
 private fun EmptyPreview() {
     CalculatorScreenContent(
         input = { TextFieldValue("") },
+        altKeyboardVisible = false,
         onInputChanged = {},
         onQuickKeyPressed = {_, _ ->},
         onDelKeyPressed = {},
@@ -236,6 +234,7 @@ private fun AutocompletePreview() {
 
     CalculatorScreenContent(
         input = { TextFieldValue("1*t") },
+        altKeyboardVisible = false,
         onInputChanged = {},
         onQuickKeyPressed = {_, _ ->},
         onDelKeyPressed = {},

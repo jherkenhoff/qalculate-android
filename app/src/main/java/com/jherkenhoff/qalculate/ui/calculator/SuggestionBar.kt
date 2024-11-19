@@ -39,7 +39,6 @@ fun SuggestionBar(
                 SuggestionCard(
                     title = it.title,
                     abbreviations = it.abbreviations,
-                    description = it.description,
                     modifier = Modifier.clickable { onEntryClick(it.typeBeforeCursor, it.typeAfterCursor) }
                 )
             }

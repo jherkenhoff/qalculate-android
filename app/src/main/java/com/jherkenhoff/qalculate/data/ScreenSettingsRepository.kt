@@ -22,9 +22,9 @@ class ScreenSettingsRepository(private val context : Context) {
             preferences[IS_ALT_KEYBOARD_OPEN] ?: true
         }
 
-   suspend fun saveAltKeyboardOpen(isAltKeyboardOpen: Boolean) {
-       context.screenSettingsDataStore.edit { preferences ->
-           preferences[IS_ALT_KEYBOARD_OPEN] = isAltKeyboardOpen
-       }
-   }
+    suspend fun saveAltKeyboardOpen(isAltKeyboardOpen: Boolean) {
+        context.screenSettingsDataStore.edit { preferences ->
+            preferences[IS_ALT_KEYBOARD_OPEN] = isAltKeyboardOpen
+        }
+    }
 }

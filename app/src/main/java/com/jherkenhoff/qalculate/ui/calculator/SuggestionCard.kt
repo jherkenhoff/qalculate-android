@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 fun SuggestionCard(
     title: String,
     abbreviations: List<String>,
-    description: String,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -55,7 +54,6 @@ fun SuggestionCard(
 private fun DefaultPreview() {
     SuggestionCard(
         "Tesla",
-        listOf("tesla", "T"),
-        "Magnetic Flux Density"
+        listOf("tesla", "T")
     )
 }

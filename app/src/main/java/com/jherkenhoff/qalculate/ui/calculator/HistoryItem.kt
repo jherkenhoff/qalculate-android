@@ -1,14 +1,10 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
@@ -20,17 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 
 
-private val BubbleShape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp)
-
-@OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun HistoryBubble(
+fun HistoryItem(
     inputText: String,
     parsedText: String,
     resultText: String,
@@ -55,22 +47,16 @@ fun HistoryBubble(
         }
     }
 
-    Surface(
-        shape = BubbleShape,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        modifier = modifier.combinedClickable(
-            onClick = { detailDialogOpen = true },
-            onLongClick = {  }
-        )
+    Column(
+        horizontalAlignment = Alignment.End,
+        modifier = modifier.fillMaxWidth()
     ) {
-        Column(
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-        ) {
+        SelectionContainer {
             Text(
-                mathExpressionFormatter(parsedText, color=false),
-                style = MaterialTheme.typography.bodySmall
+                mathExpressionFormatter(parsedText, color = false),
             )
+        }
+        SelectionContainer {
             AutoSizeText(
                 text = mathExpressionFormatter(resultText),
                 alignment = Alignment.CenterEnd,
@@ -86,20 +72,20 @@ fun HistoryBubble(
 }
 
 
-@Preview()
+@Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
-    HistoryBubble(
+    HistoryItem(
         "1km + 5m",
         "1 kilometer + 5 meter",
         "1.005 m"
     )
 }
 
-@Preview()
+@Preview(showBackground = true)
 @Composable
 private fun DefaultPreview2() {
-    HistoryBubble(
+    HistoryItem(
         "c",
         "SpeedOfLight",
         "299.792 458 km/ms"

@@ -102,7 +102,8 @@ fun InputSheet(
             HorizontalDivider(
                 modifier = Modifier
                     .height(1.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
             Row(

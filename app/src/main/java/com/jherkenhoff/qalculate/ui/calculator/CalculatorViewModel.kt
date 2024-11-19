@@ -15,6 +15,7 @@ import com.jherkenhoff.libqalculate.IntervalDisplay
 import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_HTML
 import com.jherkenhoff.qalculate.data.CalculationHistoryRepository
+import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
@@ -24,6 +25,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -33,7 +35,8 @@ class CalculatorViewModel @Inject constructor(
     private val parseUseCase: ParseUseCase,
     private val calculateUseCase: CalculateUseCase,
     private val autocompleteUseCase: AutocompleteUseCase,
-    private val calculationHistoryRepository: CalculationHistoryRepository
+    private val calculationHistoryRepository: CalculationHistoryRepository,
+    private val screenSettingsRepository: ScreenSettingsRepository
 ) : ViewModel() {
 
     val calculationHistory = calculationHistoryRepository
@@ -43,6 +46,8 @@ class CalculatorViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList()
         )
+
+    val altKeyboardOpen = screenSettingsRepository.isAltKeyboardOpen
 
     var parsedString by mutableStateOf("")
         private set
@@ -67,6 +72,12 @@ class CalculatorViewModel @Inject constructor(
         )
 
         updateInput(TextFieldValue(""))
+    }
+
+    fun toggleAltKeyboard(newState: Boolean) {
+        runBlocking {
+            screenSettingsRepository.saveAltKeyboardOpen(newState)
+        }
     }
 
     fun updateInput(input: TextFieldValue) {

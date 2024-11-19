@@ -57,7 +57,7 @@ fun HistroyList(
         modifier = modifier
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
             state = scrollState,
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -73,7 +73,7 @@ fun HistroyList(
                     }
                     list.forEach {
                         item() {
-                            HistoryBubble(
+                            HistoryItem(
                                 inputText = it.input,
                                 parsedText = it.parsed,
                                 resultText = it.result,
