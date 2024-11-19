@@ -12,7 +12,10 @@ import javax.inject.Inject
 data class AutocompleteItem(
     val title: String,
     val name: String,
-    val abbreviation: String
+    val abbreviations: List<String>,
+    val description: String,
+    val typeBeforeCursor: String,
+    val typeAfterCursor: String
 )
 
 enum class AutocompleteContext{
@@ -54,16 +57,23 @@ class AutocompleteUseCase @Inject constructor(
 
             val relevantText = match.value
 
-            val autocompleteItems = calc.units.filter {
+            val unitSuggestions = calc.units.filter {
                 it.title().lowercase().startsWith(relevantText.lowercase())
                         || it.name().lowercase().startsWith(relevantText.lowercase())
                 }.map {
-                    AutocompleteItem(formatUnit(it), it.name(), it.abbreviation())
+                    AutocompleteItem(it.title(), it.name(), listOf(it.abbreviation()), it.description(), it.abbreviation(), "")
                 }
+
+            val funcSuggestions = calc.functions.filter {
+                it.title().lowercase().startsWith(relevantText.lowercase())
+                        || it.name().lowercase().startsWith(relevantText.lowercase())
+            }.map {
+                AutocompleteItem(it.title(), it.name(), listOf(it.name()), it.description(), "${it.name()}(", ")")
+            }
 
             return@withContext AutocompleteResult(
                 success = true,
-                items = autocompleteItems,
+                items = unitSuggestions + funcSuggestions,
                 relevantText = relevantText,
                 textBefore = textBeforeWithoutRelevant,
                 textAfter = textAfter,

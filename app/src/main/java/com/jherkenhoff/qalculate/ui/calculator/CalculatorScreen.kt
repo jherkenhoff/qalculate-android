@@ -1,13 +1,10 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -27,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InterceptPlatformTextInput
@@ -84,7 +80,7 @@ fun CalculatorScreenContent(
     onCalculationSubmit: () -> Unit = {},
     autocompleteText: () -> String = {""},
     autocompleteList: () -> List<AutocompleteItem> = { emptyList() },
-    onAutocompleteClick: (String) -> Unit = {},
+    onAutocompleteClick: (String, String) -> Unit = {_, _ ->},
     openDrawer: () -> Unit = {  }
 ) {
 
@@ -127,27 +123,11 @@ fun CalculatorScreenContent(
             modifier = Modifier
                 .padding(innerPadding),
         ) {
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .weight(1f),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                HistroyList(
-                    calculationHistory,
-                    onTextToInput = { onQuickKeyPressed(it, "") }
-                )
-                this@Column.AnimatedVisibility(!autocompleteDismissed && autocompleteList().isNotEmpty()) {
-                    AutocompleteList(
-                        autocompleteText,
-                        entries = autocompleteList,
-                        onEntryClick = onAutocompleteClick,
-                        onDismiss = { autocompleteDismissed = true },
-                        modifier = Modifier
-                            .heightIn(max = 300.dp)
-                    )
-                }
-            }
+            HistroyList(
+                calculationHistory,
+                onTextToInput = { onQuickKeyPressed(it, "") },
+                modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -190,8 +170,10 @@ fun CalculatorScreenContent(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                     )
                 } else {
-                    QuickKeys(
-                        onKey = onQuickKeyPressed
+                    SupplementaryBar(
+                        onKey = onQuickKeyPressed,
+                        autocompleteItems = autocompleteList,
+                        onAutocompleteClick = onAutocompleteClick
                     )
                 }
             }
@@ -252,13 +234,6 @@ private fun EmptyPreview() {
 @Composable
 private fun AutocompletePreview() {
 
-    val list = listOf(
-        AutocompleteItem("Tesla", "M", "T"),
-        AutocompleteItem("Thomson cross section", "M", "T"),
-        AutocompleteItem("Terabyte", "M", "T"),
-        AutocompleteItem("Planck temperature", "M", "T"),
-    )
-
     CalculatorScreenContent(
         input = { TextFieldValue("1*t") },
         onInputChanged = {},
@@ -270,6 +245,6 @@ private fun AutocompletePreview() {
         resultString = { "" },
         onCalculationSubmit = {},
         autocompleteText = { "t" },
-        autocompleteList = { list }
+        autocompleteList = { emptyList() }
     )
 }

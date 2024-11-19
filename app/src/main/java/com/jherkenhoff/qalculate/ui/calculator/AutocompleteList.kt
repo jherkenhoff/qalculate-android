@@ -77,7 +77,7 @@ fun AutocompleteList(
                         ListItem(
                             headlineContent = { Text(entry.title) },
                             trailingContent = { Text(entry.name) },
-                            modifier = Modifier.clickable { onEntryClick(entry.abbreviation) },
+                            modifier = Modifier.clickable { onEntryClick(entry.name) },
                             colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                         )
                     }
@@ -92,10 +92,10 @@ fun AutocompleteList(
 @Composable
 private fun DefaultPreview() {
     val list = listOf(
-        AutocompleteItem("Tesla", "M", "T"),
-        AutocompleteItem("Thomson cross section", "M", "T"),
-        AutocompleteItem("Terabyte", "M", "T"),
-        AutocompleteItem("Planck temperature", "M", "T"),
+        AutocompleteItem("Tesla", "M", emptyList(), "T", "", ""),
+        AutocompleteItem("Thomson cross section", "M", emptyList(), "T", "", ""),
+        AutocompleteItem("Terabyte", "M", emptyList(), "T", "", ""),
+        AutocompleteItem("Planck temperature", "M", emptyList(), "T", "", ""),
     )
     AutocompleteList(
         { "t" },

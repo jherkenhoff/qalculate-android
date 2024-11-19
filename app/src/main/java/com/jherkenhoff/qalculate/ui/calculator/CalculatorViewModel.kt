@@ -81,14 +81,17 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    fun acceptAutocomplete(autocompleteString: String) {
+    fun acceptAutocomplete(beforeCursorText: String, afterCursorText: String) {
 
         // HACK: Add a space behind the accepted autocomplete text in order for the autocomplete list to dissapear
-        val fullautocompleteString = "$autocompleteString "
+        var beforeCursorText2 = beforeCursorText
+        if (afterCursorText.isEmpty()) {
+            beforeCursorText2 += " "
+        }
 
         updateInput(TextFieldValue(
-            text = autocompleteResult.textBefore + fullautocompleteString + autocompleteResult.textAfter,
-            selection = TextRange(autocompleteResult.textBefore.length + fullautocompleteString.length)
+            text = autocompleteResult.textBefore + beforeCursorText2 + afterCursorText + autocompleteResult.textAfter,
+            selection = TextRange(autocompleteResult.textBefore.length + beforeCursorText2.length)
         ))
     }
 

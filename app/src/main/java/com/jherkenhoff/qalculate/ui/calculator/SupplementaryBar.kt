@@ -1,9 +1,8 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -14,13 +13,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.domain.AutocompleteItem
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SupplementaryBar(
     onKey: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     autocompleteItems: () -> List<AutocompleteItem>,
-    onAutocompleteClick: (String) -> Unit = {}
+    onAutocompleteClick: (String, String) -> Unit = {_, _ ->}
 ) {
     val haptic = LocalHapticFeedback.current
 
@@ -30,20 +28,20 @@ fun SupplementaryBar(
     }
 
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        color = MaterialTheme.colorScheme.surfaceContainer,
         modifier = modifier
             .fillMaxWidth()
-            .defaultMinSize(minHeight = 100.dp)
+            .height(100.dp)
     ) {
         AnimatedContent(targetState = autocompleteItems().isNotEmpty()) {autocompleteVisible ->
             if (autocompleteVisible) {
-                AutocompleteChips(
+                SuggestionBar(
                     entries = autocompleteItems,
                     onEntryClick = onAutocompleteClick
                 )
             } else {
-                QuickKeysPanel(
-                    onKeyAction = onKey,
+                QuickKeys(
+                    onKey = onKey
                 )
             }
             
@@ -52,14 +50,14 @@ fun SupplementaryBar(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun DefaultPreview() {
     val list = listOf(
-        AutocompleteItem("Tesla", "M", "T"),
-        AutocompleteItem("Thomson cross section", "M", "T"),
-        AutocompleteItem("Terabyte", "M", "T"),
-        AutocompleteItem("Planck temperature", "M", "T"),
+        AutocompleteItem("Tesla", "M", emptyList(), "T", "", ""),
+        AutocompleteItem("Thomson cross section", "M", emptyList(), "T", "", ""),
+        AutocompleteItem("Terabyte", "M", emptyList(), "T", "", ""),
+        AutocompleteItem("Planck temperature", "M", emptyList(), "T", "", ""),
     )
 
     SupplementaryBar(

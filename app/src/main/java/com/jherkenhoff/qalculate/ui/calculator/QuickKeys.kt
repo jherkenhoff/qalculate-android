@@ -14,7 +14,6 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -48,67 +47,61 @@ fun QuickKeys(
 
     val chevronWidth = 20.dp
 
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainer,
+    Box(
+        modifier = Modifier.fillMaxWidth(),
     ) {
-
-        Box(
-            modifier = Modifier.fillMaxWidth(),
+        AnimatedVisibility(
+            visible = leftChevronVisible,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .width(chevronWidth)
         ) {
-            AnimatedVisibility(
-                visible = leftChevronVisible,
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .width(chevronWidth)
-            ) {
-                Icon(
-                    Icons.Filled.ChevronLeft,
-                    contentDescription = "Arrow to the left",
-                    tint = MaterialTheme.colorScheme.onSurface
+            Icon(
+                Icons.Filled.ChevronLeft,
+                contentDescription = "Arrow to the left",
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            state = state,
+            flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
+        ) {
+            item(key = 0) {
+                QuickKeysPanel(
+                    onKeyAction = onKey,
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .padding(
+                            end = chevronWidth
+                        )
                 )
             }
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                state = state,
-                flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
-            ) {
-                item(key = 0) {
-                    QuickKeysPanel(
-                        onKeyAction = onKey,
-                        modifier = Modifier
-                            .fillParentMaxWidth()
-                            .padding(
-                                end = chevronWidth
-                            )
-                    )
-                }
-                item(key = 1) {
-                    QuickKeysPanel2(
-                        onKeyAction = onKey,
-                        modifier = Modifier
-                            .fillParentMaxWidth()
-                            .padding(
-                                start = chevronWidth
-                            )
-                    )
-                }
-            }
-
-            AnimatedVisibility(
-                visible = rightChevronVisible,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .width(chevronWidth)
-            ) {
-                Icon(
-                    Icons.Filled.ChevronRight,
-                    contentDescription = "Arrow to the right",
-                    tint = MaterialTheme.colorScheme.onSurface
+            item(key = 1) {
+                QuickKeysPanel2(
+                    onKeyAction = onKey,
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .padding(
+                            start = chevronWidth
+                        )
                 )
             }
         }
 
+        AnimatedVisibility(
+            visible = rightChevronVisible,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .width(chevronWidth)
+        ) {
+            Icon(
+                Icons.Filled.ChevronRight,
+                contentDescription = "Arrow to the right",
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }
 
