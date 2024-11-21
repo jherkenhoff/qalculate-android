@@ -46,7 +46,7 @@ fun InputBar(
 
     val focusRequester = remember { FocusRequester() }
     var lastFocusState by remember { mutableStateOf(false) }
-    val placeholdeVisible by remember { derivedStateOf { textFieldValue().text.isEmpty() } }
+    val placeholdeVisible by remember { derivedStateOf { textFieldValue().text.isEmpty() && !lastFocusState } }
 
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerHighest,

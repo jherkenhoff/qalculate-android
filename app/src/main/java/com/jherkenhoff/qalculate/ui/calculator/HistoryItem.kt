@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,8 +51,14 @@ fun HistoryItem(
         modifier = modifier.fillMaxWidth()
     ) {
         SelectionContainer {
-            Text(
-                mathExpressionFormatter(parsedText, color = false),
+            AutoSizeText(
+                text = mathExpressionFormatter(parsedText),
+                alignment = Alignment.CenterEnd,
+                style = MaterialTheme.typography.displayMedium,
+                minTextSize = 14.sp,
+                maxTextSize = 30.sp,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
             )
         }
         SelectionContainer {
@@ -62,7 +67,7 @@ fun HistoryItem(
                 alignment = Alignment.CenterEnd,
                 style = MaterialTheme.typography.displayMedium,
                 minTextSize = 14.sp,
-                maxTextSize = 30.sp,
+                maxTextSize = 20.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )

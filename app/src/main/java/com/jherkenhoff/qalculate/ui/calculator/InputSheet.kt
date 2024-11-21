@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,7 +68,12 @@ fun InputSheet(
 
     val focusRequester = remember { FocusRequester() }
     var lastFocusState by remember { mutableStateOf(false) }
-    val placeholdeVisible by remember { derivedStateOf { textFieldValue().text.isEmpty() } }
+    val placeholdeVisible by remember { derivedStateOf { textFieldValue().text.isEmpty() && !lastFocusState } }
+
+    // Focus the input text field on app startup
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     Surface(
         //shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
