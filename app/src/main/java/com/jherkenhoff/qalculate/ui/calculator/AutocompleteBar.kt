@@ -16,10 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jherkenhoff.qalculate.domain.AutocompleteItem
+import com.jherkenhoff.qalculate.model.AutocompleteItem
 
 @Composable
-fun SuggestionBar(
+fun AutocompleteBar(
     entries: () -> List<AutocompleteItem>,
     modifier: Modifier = Modifier,
     onEntryClick: (String, String) -> Unit = {_, _ ->},
@@ -36,11 +36,7 @@ fun SuggestionBar(
             contentPadding = PaddingValues(8.dp, 8.dp, 8.dp, 8.dp)
         ) {
             items(entries()) {
-                SuggestionCard(
-                    title = it.title,
-                    abbreviations = it.abbreviations,
-                    modifier = Modifier.clickable { onEntryClick(it.typeBeforeCursor, it.typeAfterCursor) }
-                )
+                AutocompleteCard(it, modifier = Modifier.clickable(onClick = {onEntryClick(it.typeBeforeCursor, it.typeAfterCursor)}))
             }
         }
     }
@@ -49,13 +45,8 @@ fun SuggestionBar(
 @Preview
 @Composable
 private fun DefaultPreview() {
-    val list = listOf(
-        AutocompleteItem("Tesla", "M", emptyList(), "T", "", ""),
-        AutocompleteItem("Thomson cross section", "M", emptyList(), "T", "", ""),
-        AutocompleteItem("Terabyte", "M", emptyList(), "T", "", ""),
-        AutocompleteItem("Planck temperature", "M", emptyList(), "T", "", ""),
-    )
-    SuggestionBar(
+    val list = emptyList<AutocompleteItem>()
+    AutocompleteBar(
         { list },
         modifier = Modifier.height(100.dp)
     )

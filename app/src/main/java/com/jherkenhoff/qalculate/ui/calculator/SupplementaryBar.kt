@@ -11,7 +11,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jherkenhoff.qalculate.domain.AutocompleteItem
+import com.jherkenhoff.qalculate.model.AutocompleteItem
 
 @Composable
 fun SupplementaryBar(
@@ -35,7 +35,7 @@ fun SupplementaryBar(
     ) {
         AnimatedContent(targetState = autocompleteItems().isNotEmpty()) {autocompleteVisible ->
             if (autocompleteVisible) {
-                SuggestionBar(
+                AutocompleteBar(
                     entries = autocompleteItems,
                     onEntryClick = onAutocompleteClick
                 )
@@ -53,12 +53,7 @@ fun SupplementaryBar(
 @Preview
 @Composable
 private fun DefaultPreview() {
-    val list = listOf(
-        AutocompleteItem("Tesla", "M", emptyList(), "T", "", ""),
-        AutocompleteItem("Thomson cross section", "M", emptyList(), "T", "", ""),
-        AutocompleteItem("Terabyte", "M", emptyList(), "T", "", ""),
-        AutocompleteItem("Planck temperature", "M", emptyList(), "T", "", ""),
-    )
+    val list = emptyList<AutocompleteItem>()
 
     SupplementaryBar(
         onKey = {_, _ ->},

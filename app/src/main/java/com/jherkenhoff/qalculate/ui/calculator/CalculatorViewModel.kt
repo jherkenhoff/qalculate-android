@@ -14,30 +14,45 @@ import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.IntervalDisplay
 import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_HTML
+import com.jherkenhoff.qalculate.data.AutocompleteRepository
 import com.jherkenhoff.qalculate.data.CalculationHistoryRepository
 import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
-import com.jherkenhoff.qalculate.domain.AutocompleteResult
-import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
+import com.jherkenhoff.qalculate.model.AutocompleteItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 import javax.inject.Inject
+
+data class CalculatorUiState (
+    val autocompleteList: List<AutocompleteItem> = emptyList()
+)
 
 @HiltViewModel
 class CalculatorViewModel @Inject constructor(
     private val calculator: Calculator,
     private val parseUseCase: ParseUseCase,
     private val calculateUseCase: CalculateUseCase,
-    private val autocompleteUseCase: AutocompleteUseCase,
     private val calculationHistoryRepository: CalculationHistoryRepository,
-    private val screenSettingsRepository: ScreenSettingsRepository
+    private val screenSettingsRepository: ScreenSettingsRepository,
+    private val autocompleteRepository: AutocompleteRepository
 ) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(CalculatorUiState())
+    val uiState: StateFlow<CalculatorUiState> = _uiState.asStateFlow()
+
+    private var autocompleteJob: Job? = null
 
     val calculationHistory = calculationHistoryRepository
         .observeCalculationHistory()
@@ -53,9 +68,6 @@ class CalculatorViewModel @Inject constructor(
         private set
 
     var resultString by mutableStateOf("0")
-        private set
-
-    var autocompleteResult by mutableStateOf(AutocompleteResult(success = false))
         private set
 
     var inputTextFieldValue by mutableStateOf(TextFieldValue(""))
@@ -87,22 +99,55 @@ class CalculatorViewModel @Inject constructor(
     }
 
     private fun handleAutocomplete() {
-        viewModelScope.launch {
-            autocompleteResult = autocompleteUseCase(inputTextFieldValue)
+
+        val textBefore = inputTextFieldValue.getTextBeforeSelection(inputTextFieldValue.text.length).toString()
+
+        val pattern = Regex("([a-zA-Z_]+$)")
+
+        val match = pattern.find(textBefore)
+
+        if (match == null) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    autocompleteList = emptyList()
+                )
+            }
+            return
         }
+
+        autocompleteJob?.cancel()
+
+        autocompleteJob = viewModelScope.launch {
+            delay(100)
+
+            val relevantText = match.value
+
+            val autocompleteList = autocompleteRepository.getAutocompleteSuggestions(relevantText)
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    autocompleteList = autocompleteList
+                )
+            }
+        }
+
     }
 
     fun acceptAutocomplete(beforeCursorText: String, afterCursorText: String) {
 
-        // HACK: Add a space behind the accepted autocomplete text in order for the autocomplete list to dissapear
-        var beforeCursorText2 = beforeCursorText
-        if (afterCursorText.isEmpty()) {
-            beforeCursorText2 += " "
-        }
+        val textBefore = inputTextFieldValue.getTextBeforeSelection(inputTextFieldValue.text.length).toString()
+        val textAfter = inputTextFieldValue.getTextAfterSelection(inputTextFieldValue.text.length).toString()
+
+
+        val pattern = Regex("([a-zA-Z_]+$)")
+
+        val match = pattern.find(textBefore)
+
+        val textBeforeWithoutRelevant = pattern.split(textBefore).first()
 
         updateInput(TextFieldValue(
-            text = autocompleteResult.textBefore + beforeCursorText2 + afterCursorText + autocompleteResult.textAfter,
-            selection = TextRange(autocompleteResult.textBefore.length + beforeCursorText2.length)
+            text = textBeforeWithoutRelevant + beforeCursorText + afterCursorText + textAfter,
+            selection = TextRange(textBeforeWithoutRelevant.length + beforeCursorText.length)
         ))
     }
 

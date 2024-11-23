@@ -5,6 +5,7 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class QalculateApplication : Application() {
+
     companion object {
         init {
             // TODO: Move library loading to libqalculate library
