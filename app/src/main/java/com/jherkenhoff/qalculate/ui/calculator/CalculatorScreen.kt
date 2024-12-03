@@ -57,8 +57,9 @@ fun CalculatorScreen(
         parsedString = { viewModel.parsedString },
         resultString = { viewModel.resultString },
         onCalculationSubmit = viewModel::submitCalculation,
-        onAutocompleteClick = viewModel::acceptAutocomplete,
         onAltKeyboardToggle = viewModel::toggleAltKeyboard,
+        onAutocompleteClick = viewModel::acceptAutocomplete,
+        onAutocompleteDismiss = viewModel::dismissAutocomplete,
         openDrawer = openDrawer,
     )
 }
@@ -81,6 +82,7 @@ fun CalculatorScreenContent(
     onCalculationSubmit: () -> Unit = {},
     onAltKeyboardToggle: (Boolean) -> Unit = {},
     onAutocompleteClick: (String, String) -> Unit = {_, _ ->},
+    onAutocompleteDismiss: () -> Unit = {  },
     openDrawer: () -> Unit = {  }
 ) {
 
@@ -169,7 +171,8 @@ fun CalculatorScreenContent(
                     SupplementaryBar(
                         onKey = onQuickKeyPressed,
                         autocompleteItems = { uiState.autocompleteList },
-                        onAutocompleteClick = onAutocompleteClick
+                        onAutocompleteClick = onAutocompleteClick,
+                        onAutocompleteDismiss = onAutocompleteDismiss
                     )
                 }
             }

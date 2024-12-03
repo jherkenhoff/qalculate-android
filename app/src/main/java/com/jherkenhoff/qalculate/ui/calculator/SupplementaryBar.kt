@@ -18,7 +18,8 @@ fun SupplementaryBar(
     onKey: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     autocompleteItems: () -> List<AutocompleteItem>,
-    onAutocompleteClick: (String, String) -> Unit = {_, _ ->}
+    onAutocompleteClick: (String, String) -> Unit = {_, _ ->},
+    onAutocompleteDismiss: () -> Unit = {  }
 ) {
     val haptic = LocalHapticFeedback.current
 
@@ -37,7 +38,8 @@ fun SupplementaryBar(
             if (autocompleteVisible) {
                 AutocompleteBar(
                     entries = autocompleteItems,
-                    onEntryClick = onAutocompleteClick
+                    onEntryClick = onAutocompleteClick,
+                    onDismiss = onAutocompleteDismiss
                 )
             } else {
                 QuickKeys(

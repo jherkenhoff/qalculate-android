@@ -36,7 +36,7 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 
 data class CalculatorUiState (
-    val autocompleteList: List<AutocompleteItem> = emptyList()
+    val autocompleteList: List<AutocompleteItem> = emptyList(),
 )
 
 @HiltViewModel
@@ -53,6 +53,9 @@ class CalculatorViewModel @Inject constructor(
     val uiState: StateFlow<CalculatorUiState> = _uiState.asStateFlow()
 
     private var autocompleteJob: Job? = null
+    private var calculateJob: Job? = null
+
+    private var autocompleteDismissed = false
 
     val calculationHistory = calculationHistoryRepository
         .observeCalculationHistory()
@@ -72,6 +75,16 @@ class CalculatorViewModel @Inject constructor(
 
     var inputTextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
+
+    fun dismissAutocomplete() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                autocompleteList = emptyList()
+            )
+        }
+
+        autocompleteDismissed = true
+    }
 
     fun submitCalculation() {
         calculationHistoryRepository.appendCalculation(
@@ -112,8 +125,12 @@ class CalculatorViewModel @Inject constructor(
                     autocompleteList = emptyList()
                 )
             }
+
+            autocompleteDismissed = false
             return
         }
+
+        if (autocompleteDismissed) return
 
         autocompleteJob?.cancel()
 
@@ -200,7 +217,11 @@ class CalculatorViewModel @Inject constructor(
 
     private fun recalculate() {
 
-        viewModelScope.launch {
+        calculateJob
+        calculateJob?.cancel()
+
+        calculateJob = viewModelScope.launch {
+            delay(200)
 
             parsedString = parseUseCase(inputTextFieldValue.text)
 

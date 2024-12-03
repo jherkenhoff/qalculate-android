@@ -12,51 +12,43 @@ import javax.inject.Singleton
 class AutocompleteRepository @Inject constructor(
     private val calc: Calculator
 ) {
-    private val unitTrie = Trie<Int>()
-    private val functionTree = Trie<Int>()
-    private val variableTree = Trie<Int>()
+    private val trie = Trie<AutocompleteItem>()
 
     fun initialize() {
+
         calc.units.forEachIndexed { index, unit ->
-            unitTrie.insert(unit.name(), index)
-        }
-        calc.functions.forEachIndexed { index, function ->
-            functionTree.insert(function.name(), index)
-        }
-    }
-
-    fun getAutocompleteSuggestions(key: String): List<AutocompleteItem> {
-
-        val unitSuggestions = unitTrie.search(key).map {
-            val unit = calc.units[it.value]
-
-            return@map AutocompleteItem(
+            val item = AutocompleteItem(
                 type = if (unit.isCurrency) AutocompleteType.CURRENCY else AutocompleteType.UNIT,
                 name = unit.print(false, true),
                 title = unit.title(),
                 abbreviations = emptyList(),
                 description = unit.description(),
-                matchDepth = it.matchDepth,
                 typeBeforeCursor = unit.print(false, true) + " ",
                 typeAfterCursor = ""
             )
+
+            trie.insert(unit.name(), item)
         }
 
-        val functionSuggestions = functionTree.search(key).map {
-            val function = calc.functions[it.value]
+        calc.functions.forEachIndexed { index, function ->
 
-            return@map AutocompleteItem(
+            val item = AutocompleteItem(
                 type = AutocompleteType.FUNCTION,
                 name = function.name() + "()",
                 title = function.title(),
                 abbreviations = emptyList(),
                 description = function.description(),
-                matchDepth = it.matchDepth,
                 typeBeforeCursor = function.name() + "(",
                 typeAfterCursor = ")"
             )
+            trie.insert(function.name(), item)
         }
+    }
 
-        return unitSuggestions + functionSuggestions
+    fun getAutocompleteSuggestions(key: String): List<AutocompleteItem> {
+
+        return trie.search(key).map {
+            it.value
+        }
     }
 }

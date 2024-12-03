@@ -10,7 +10,6 @@ data class AutocompleteItem (
     val title: String,
     val abbreviations: List<String>,
     val description: String,
-    val matchDepth: Int,
     val typeBeforeCursor: String,
     val typeAfterCursor: String
 )

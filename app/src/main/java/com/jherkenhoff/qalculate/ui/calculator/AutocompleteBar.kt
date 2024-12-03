@@ -22,13 +22,14 @@ import com.jherkenhoff.qalculate.model.AutocompleteItem
 fun AutocompleteBar(
     entries: () -> List<AutocompleteItem>,
     modifier: Modifier = Modifier,
+    onDismiss: () -> Unit = {  },
     onEntryClick: (String, String) -> Unit = {_, _ ->},
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = onDismiss) {
             Icon(Icons.Outlined.Close, contentDescription = "Close suggestions")
         }
         LazyRow(
