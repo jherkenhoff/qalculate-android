@@ -109,17 +109,17 @@ fun NavigationDrawer(
                 .padding(horizontal = 25.dp)
                 .padding(top = 15.dp))
         NavigationDrawerItem(
+            label = { Text(text = stringResource(R.string.navigation_settings)) },
+            selected = false,
+            onClick = onSettingsClick,
+            icon = { Icon(Icons.Filled.Settings, contentDescription = null) },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        )
+        NavigationDrawerItem(
             label = { Text(text = stringResource(R.string.navigation_about)) },
             selected = false,
             onClick = onAboutClick,
             icon = { Icon(Icons.Filled.Info, contentDescription = null) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
-        NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_settings), textDecoration = TextDecoration.LineThrough) },
-            selected = false,
-            onClick = onSettingsClick,
-            icon = { Icon(Icons.Filled.Settings, contentDescription = null) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
     }
