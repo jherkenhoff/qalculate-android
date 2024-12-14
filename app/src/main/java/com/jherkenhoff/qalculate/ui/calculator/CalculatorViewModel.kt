@@ -147,7 +147,6 @@ class CalculatorViewModel @Inject constructor(
                 )
             }
         }
-
     }
 
     fun acceptAutocomplete(beforeCursorText: String, afterCursorText: String) {
@@ -221,7 +220,7 @@ class CalculatorViewModel @Inject constructor(
         calculateJob?.cancel()
 
         calculateJob = viewModelScope.launch {
-            delay(200)
+            delay(100)
 
             parsedString = parseUseCase(inputTextFieldValue.text)
 
