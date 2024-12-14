@@ -47,12 +47,14 @@ fun QalculateApp() {
                     onCalculatorClick = { navController.navigate(NavDestinations.Calculator); coroutineScope.launch { drawerState.close() } },
                     onUnitsClick = { navController.navigate(NavDestinations.Units); coroutineScope.launch { drawerState.close() } },
                     onAboutClick = { navController.navigate(NavDestinations.About); coroutineScope.launch { drawerState.close() } },
+                    onSettingsClick = { navController.navigate(NavDestinations.Settings); coroutineScope.launch { drawerState.close() } },
                 )
             }
         ) {
             QalculateNavGraph(
                 navController = navController,
                 openDrawer = { coroutineScope.launch { drawerState.open() } },
+                onNavigateUp = { navController.popBackStack() }
             )
         }
     }

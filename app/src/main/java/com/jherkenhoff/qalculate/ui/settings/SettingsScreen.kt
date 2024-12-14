@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Keyboard
 import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,17 +27,17 @@ import com.jherkenhoff.qalculate.R
 
 @Composable
 fun SettingsScreen(
-    openDrawer: () -> Unit = {}
+    onNavigateUp: () -> Unit = {}
 ) {
     SettingsScreenContent(
-        openDrawer = openDrawer,
+        onNavigateUp = onNavigateUp,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreenContent(
-    openDrawer: () -> Unit = {  }
+    onNavigateUp: () -> Unit = {  }
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -48,7 +49,7 @@ fun SettingsScreenContent(
                 ),
                 title = { Text("Settings")},
                 navigationIcon = {
-                    IconButton(onClick = openDrawer) {
+                    IconButton(onClick = onNavigateUp) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = stringResource(R.string.open_menu_content_description)
@@ -68,21 +69,19 @@ fun SettingsScreenContent(
             LazyColumn {
                 item {
                     ListItem(
-                        headlineContent = { Text("Default input method") },
-                        supportingContent = { Text("Keyboard")}
-                    )
-                }
-                item {
-                    ListItem(
                         headlineContent = { Text("Input") },
-                        supportingContent = { Text("Format, Localization, Completion")},
-                        leadingContent = { Icon(Icons.Outlined.Keyboard, contentDescription = null)})
+                        supportingContent = { Text("Format, Localization, Autocompletion")},
+                        leadingContent = { Icon(Icons.Outlined.Keyboard, contentDescription = null)},
+                        trailingContent = { Icon(Icons.Outlined.ChevronRight, contentDescription = null)}
+                    )
                 }
                 item {
                     ListItem(
                         headlineContent = { Text("Output") },
                         supportingContent = { Text("Format, Localization, Autocomplete")},
-                        leadingContent = { Icon(Icons.Outlined.TextFields, contentDescription = null)})
+                        leadingContent = { Icon(Icons.Outlined.TextFields, contentDescription = null)},
+                        trailingContent = { Icon(Icons.Outlined.ChevronRight, contentDescription = null)}
+                    )
                 }
             }
         }
