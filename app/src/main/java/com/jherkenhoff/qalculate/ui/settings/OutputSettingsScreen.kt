@@ -1,21 +1,18 @@
 package com.jherkenhoff.qalculate.ui.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material.icons.outlined.Keyboard
-import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
@@ -23,25 +20,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jherkenhoff.qalculate.R
-
+import com.jherkenhoff.qalculate.model.PrintPreferences
+import com.jherkenhoff.qalculate.model.PrintPreferencesCallbacks
 
 @Composable
-fun SettingsScreen(
-    onOutputSettingsClick: () -> Unit = {},
+fun OutputSettingsScreen(
+    viewModel: SettingsViewModel,
     onNavigateUp: () -> Unit = {}
 ) {
-    SettingsScreenContent(
-        onOutputSettingsClick = onOutputSettingsClick,
-        onNavigateUp = onNavigateUp,
+    val printPreferences = viewModel.printPreferences.collectAsStateWithLifecycle(PrintPreferences.Default).value
+
+    OutputSettingsScreenContent(
+        printPreferences = printPreferences,
+        printPreferencesCallbacks = viewModel.printPreferencesCallbacks,
+        onNavigateUp = onNavigateUp
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreenContent(
-    onOutputSettingsClick: () -> Unit = {},
-    onNavigateUp: () -> Unit = {}
+fun OutputSettingsScreenContent(
+    printPreferences: PrintPreferences,
+    printPreferencesCallbacks: PrintPreferencesCallbacks,
+    onNavigateUp: () -> Unit = {  }
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -51,7 +54,7 @@ fun SettingsScreenContent(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = { Text("Settings")},
+                title = { Text("Output settings")},
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -59,9 +62,7 @@ fun SettingsScreenContent(
                             contentDescription = stringResource(R.string.open_menu_content_description)
                         )
                     }
-
-                },
-
+                }
             )
         },
         modifier = Modifier.imePadding(),
@@ -73,19 +74,9 @@ fun SettingsScreenContent(
             LazyColumn {
                 item {
                     ListItem(
-                        headlineContent = { Text("Input") },
-                        supportingContent = { Text("Localization, Autocompletion")},
-                        leadingContent = { Icon(Icons.Outlined.Keyboard, contentDescription = null)},
-                        trailingContent = { Icon(Icons.Outlined.ChevronRight, contentDescription = null)}
-                    )
-                }
-                item {
-                    ListItem(
-                        headlineContent = { Text("Output") },
-                        supportingContent = { Text("Formatting, Localization, Autocomplete")},
-                        leadingContent = { Icon(Icons.Outlined.TextFields, contentDescription = null)},
-                        trailingContent = { Icon(Icons.Outlined.ChevronRight, contentDescription = null)},
-                        modifier = Modifier.clickable(onClick = onOutputSettingsClick)
+                        headlineContent = { Text("Abbreviate names") },
+                        supportingContent = { Text("Prefer abbreviations of units and functions")},
+                        trailingContent = { Switch(checked = printPreferences.abbreviateNames, onCheckedChange = { printPreferencesCallbacks.onAbbreviateNamesChanged(it) }) }
                     )
                 }
             }
@@ -97,6 +88,8 @@ fun SettingsScreenContent(
 @Preview
 @Composable
 private fun DefaultPreview() {
-    SettingsScreenContent(
+    OutputSettingsScreenContent(
+        printPreferences = PrintPreferences.Default,
+        printPreferencesCallbacks = PrintPreferencesCallbacks.Default
     )
 }

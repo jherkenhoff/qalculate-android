@@ -10,7 +10,9 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorScreen
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorViewModel
+import com.jherkenhoff.qalculate.ui.settings.OutputSettingsScreen
 import com.jherkenhoff.qalculate.ui.settings.SettingsScreen
+import com.jherkenhoff.qalculate.ui.settings.SettingsViewModel
 import com.jherkenhoff.qalculate.ui.units.UnitsScreen
 import com.jherkenhoff.qalculate.ui.units.UnitsViewModel
 import kotlinx.serialization.Serializable
@@ -21,6 +23,7 @@ sealed class NavDestinations{
     @Serializable data object Units
     @Serializable data object About
     @Serializable data object Settings
+    @Serializable data object SettingsOutput
 }
 
 @Composable
@@ -52,6 +55,14 @@ fun QalculateNavGraph(
 
         composable<NavDestinations.Settings> {
             SettingsScreen(
+                onOutputSettingsClick = { navController.navigate(NavDestinations.SettingsOutput) },
+                onNavigateUp = onNavigateUp,
+            )
+        }
+
+        composable<NavDestinations.SettingsOutput> {
+            OutputSettingsScreen(
+                viewModel = hiltViewModel<SettingsViewModel>(),
                 onNavigateUp = onNavigateUp,
             )
         }
