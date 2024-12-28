@@ -12,10 +12,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.IntervalDisplay
-import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_HTML
 import com.jherkenhoff.qalculate.data.AutocompleteRepository
 import com.jherkenhoff.qalculate.data.CalculationHistoryRepository
+import com.jherkenhoff.qalculate.data.PrintPreferencesRepository
 import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
@@ -46,7 +46,8 @@ class CalculatorViewModel @Inject constructor(
     private val calculateUseCase: CalculateUseCase,
     private val calculationHistoryRepository: CalculationHistoryRepository,
     private val screenSettingsRepository: ScreenSettingsRepository,
-    private val autocompleteRepository: AutocompleteRepository
+    private val autocompleteRepository: AutocompleteRepository,
+    private val printPreferencesRepository: PrintPreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalculatorUiState())
@@ -225,11 +226,12 @@ class CalculatorViewModel @Inject constructor(
             parsedString = parseUseCase(inputTextFieldValue.text)
 
             val calculatedMathStructure = calculateUseCase(inputTextFieldValue.text)
+            val printOptions = printPreferencesRepository.getQalculatePrintOptions()
 
-            val resultPo = PrintOptions()
-            resultPo.interval_display = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
-            resultPo.use_unicode_signs = 1
-            resultString = calculator.print(calculatedMathStructure, 2000, resultPo, true, 1, TAG_TYPE_HTML)
+            // Custom options (TODO: Replace with user preferences)
+            printOptions.interval_display = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
+            printOptions.use_unicode_signs = 1
+            resultString = calculator.print(calculatedMathStructure, 2000, printOptions, true, 1, TAG_TYPE_HTML)
         }
     }
 }
