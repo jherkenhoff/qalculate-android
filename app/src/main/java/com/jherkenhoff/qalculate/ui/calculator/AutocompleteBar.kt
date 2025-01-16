@@ -20,7 +20,7 @@ import com.jherkenhoff.qalculate.model.AutocompleteItem
 
 @Composable
 fun AutocompleteBar(
-    entries: () -> List<AutocompleteItem>,
+    entries: List<AutocompleteItem>,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit = {  },
     onEntryClick: (String, String) -> Unit = {_, _ ->},
@@ -36,7 +36,7 @@ fun AutocompleteBar(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             contentPadding = PaddingValues(8.dp, 8.dp, 8.dp, 8.dp)
         ) {
-            items(entries()) {
+            items(entries) {
                 AutocompleteCard(it, modifier = Modifier.clickable(onClick = {onEntryClick(it.typeBeforeCursor, it.typeAfterCursor)}))
             }
         }
@@ -48,7 +48,7 @@ fun AutocompleteBar(
 private fun DefaultPreview() {
     val list = emptyList<AutocompleteItem>()
     AutocompleteBar(
-        { list },
+        list,
         modifier = Modifier.height(100.dp)
     )
 }

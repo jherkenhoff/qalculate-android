@@ -25,13 +25,13 @@ import com.jherkenhoff.qalculate.R
 import com.jherkenhoff.qalculate.data.model.UserPreferences
 
 @Composable
-fun OutputSettingsScreen(
+fun CalculationSettingsScreen(
     viewModel: SettingsViewModel,
     onNavigateUp: () -> Unit = {}
 ) {
     val userPreferences = viewModel.userPreferences.collectAsStateWithLifecycle().value
 
-    OutputSettingsScreenContent(
+    CalculationSettingsScreenContent(
         userPreferences = userPreferences,
         userPreferencesCallbacks = viewModel.userPreferencesCallbacks,
         onNavigateUp = onNavigateUp
@@ -40,7 +40,7 @@ fun OutputSettingsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OutputSettingsScreenContent(
+fun CalculationSettingsScreenContent(
     userPreferences: UserPreferences,
     userPreferencesCallbacks: UserPreferencesCallbacks,
     onNavigateUp: () -> Unit = {  }
@@ -53,7 +53,7 @@ fun OutputSettingsScreenContent(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = { Text("Output settings")},
+                title = { Text("Calculation settings")},
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -77,28 +77,17 @@ fun OutputSettingsScreenContent(
                         supportingContent = { Text("Prefer abbreviations of units and functions")},
                         trailingContent = { Switch(checked = false, onCheckedChange = { userPreferencesCallbacks.onAbbreviateNamesChanged(it) }) }
                     )
-                    ListItem(
-                        headlineContent = { Text("Negative exponents") },
-                        supportingContent = { Text("Use m^-1 instead of 1/m")},
-                        trailingContent = { Switch(checked = false, onCheckedChange = { userPreferencesCallbacks.onNegativeExponentsChanged(it) }) }
-                    )
-                    ListItem(
-                        headlineContent = { Text("Spacious output") },
-                        supportingContent = { Text("Description")},
-                        trailingContent = { Switch(checked = false, onCheckedChange = { userPreferencesCallbacks.onSpaciousChanged(it) }) }
-                    )
                 }
             }
         }
     }
 }
 
-
 @Preview
 @Composable
 private fun DefaultPreview() {
-    OutputSettingsScreenContent(
+    CalculationSettingsScreenContent(
         userPreferences = UserPreferences.getDefaultInstance(),
-        userPreferencesCallbacks = object : UserPreferencesCallbacks{}
+        userPreferencesCallbacks = object: UserPreferencesCallbacks{}
     )
 }

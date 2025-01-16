@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Keyboard
+import androidx.compose.material.icons.outlined.Numbers
 import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,10 +29,12 @@ import com.jherkenhoff.qalculate.R
 
 @Composable
 fun SettingsScreen(
+    onCalculationSettingsClick: () -> Unit = {},
     onOutputSettingsClick: () -> Unit = {},
     onNavigateUp: () -> Unit = {}
 ) {
     SettingsScreenContent(
+        onCalculationSettingsClick = onCalculationSettingsClick,
         onOutputSettingsClick = onOutputSettingsClick,
         onNavigateUp = onNavigateUp,
     )
@@ -40,6 +43,7 @@ fun SettingsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreenContent(
+    onCalculationSettingsClick: () -> Unit = {},
     onOutputSettingsClick: () -> Unit = {},
     onNavigateUp: () -> Unit = {}
 ) {
@@ -73,6 +77,15 @@ fun SettingsScreenContent(
             LazyColumn {
                 item {
                     ListItem(
+                        headlineContent = { Text("Calculation") },
+                        supportingContent = { Text("Approximation, Evaluation")},
+                        leadingContent = { Icon(Icons.Outlined.Numbers, contentDescription = null)},
+                        trailingContent = { Icon(Icons.Outlined.ChevronRight, contentDescription = null)},
+                        modifier = Modifier.clickable(onClick = onCalculationSettingsClick)
+                    )
+                }
+                item {
+                    ListItem(
                         headlineContent = { Text("Input") },
                         supportingContent = { Text("Localization, Autocompletion")},
                         leadingContent = { Icon(Icons.Outlined.Keyboard, contentDescription = null)},
@@ -82,7 +95,7 @@ fun SettingsScreenContent(
                 item {
                     ListItem(
                         headlineContent = { Text("Output") },
-                        supportingContent = { Text("Formatting, Localization, Autocomplete")},
+                        supportingContent = { Text("Expression formatting")},
                         leadingContent = { Icon(Icons.Outlined.TextFields, contentDescription = null)},
                         trailingContent = { Icon(Icons.Outlined.ChevronRight, contentDescription = null)},
                         modifier = Modifier.clickable(onClick = onOutputSettingsClick)

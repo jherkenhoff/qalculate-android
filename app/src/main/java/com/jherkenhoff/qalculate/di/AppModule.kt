@@ -2,11 +2,11 @@ package com.jherkenhoff.qalculate.di
 
 import android.app.Application
 import android.content.Context
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.dataStoreFile
 import com.jherkenhoff.libqalculate.Calculator
-import com.jherkenhoff.qalculate.data.PrintPreferencesRepository
-import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
+import com.jherkenhoff.qalculate.data.UserPreferencesRepository
+import com.jherkenhoff.qalculate.data.model.UserPreferencesSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,19 +28,11 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideScreenSettings(@ApplicationContext context: Context): ScreenSettingsRepository {
-        val dataStore = PreferenceDataStoreFactory.create {
-            context.preferencesDataStoreFile("screenPreferences")
-        }
-        return ScreenSettingsRepository(dataStore)
-    }
-
-    @Provides
-    @Singleton
-    fun providePrintPreferencesRepository(@ApplicationContext context: Context): PrintPreferencesRepository {
-        val dataStore = PreferenceDataStoreFactory.create {
-            context.preferencesDataStoreFile("printPreferences")
-        }
-        return PrintPreferencesRepository(dataStore)
+    fun provideUserPreferencesRepository(@ApplicationContext context: Context): UserPreferencesRepository {
+        val dataStore = DataStoreFactory.create(
+            serializer = UserPreferencesSerializer,
+            produceFile = { context.dataStoreFile("user_prefs.pb") },
+        )
+        return UserPreferencesRepository(dataStore)
     }
 }
