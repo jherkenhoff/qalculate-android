@@ -23,7 +23,7 @@ class TrieTest {
 
         val result = trie.search("car")
         assertEquals(1, result.size)
-        assertTrue(result[0] == 4)
+        assertTrue(result[0].value == 4)
     }
 
     @Test
@@ -35,8 +35,8 @@ class TrieTest {
 
         val result = trie.search("ca")
         assertEquals(2, result.size)
-        assertTrue(result.contains(3))
-        assertTrue(result.contains(4))
-        assertFalse(result.contains(2))
+        assertTrue(result.map({it.value}).contains(3))
+        assertTrue(result.map({it.value}).contains(4))
+        assertFalse(result.map({it.value}).contains(2))
     }
 }

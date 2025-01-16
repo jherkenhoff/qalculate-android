@@ -2,22 +2,18 @@ package com.jherkenhoff.qalculate.domain
 
 import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.MathStructure
-import com.jherkenhoff.qalculate.data.EvaluationOptionsRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.jherkenhoff.qalculate.data.model.UserPreferences
+import com.jherkenhoff.qalculate.data.model.getQalculateEvaluationOptions
 import javax.inject.Inject
 
 class CalculateUseCase @Inject constructor(
-    private val evaluationOptionsRepository: EvaluationOptionsRepository,
     private val calc: Calculator
 ) {
-    suspend operator fun invoke(expression: String): MathStructure {
-        return withContext(Dispatchers.Default) {
-            val evaluationOptions = evaluationOptionsRepository.getEvaluationOptions()
+    operator fun invoke(expression: String, userPreferences: UserPreferences): MathStructure {
+        val eo = userPreferences.getQalculateEvaluationOptions()
 
-            val result = calc.calculate(expression, evaluationOptions)
+        val result = calc.calculate(expression)
 
-            return@withContext result
-        }
+        return result
     }
 }

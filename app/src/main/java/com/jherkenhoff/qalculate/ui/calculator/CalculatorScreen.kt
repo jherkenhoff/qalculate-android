@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
+import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import kotlinx.coroutines.awaitCancellation
 import java.time.LocalDateTime
 
@@ -42,24 +43,25 @@ fun CalculatorScreen(
     viewModel: CalculatorViewModel = viewModel(),
     openDrawer: () -> Unit = {}
 ) {
-
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val autocompleteResult by viewModel.autocompleteResult.collectAsStateWithLifecycle()
+    val inputTextFieldValue by viewModel.inputTextFieldValue.collectAsStateWithLifecycle()
+    val parsedString by viewModel.parsedString.collectAsStateWithLifecycle()
+    val resultString by viewModel.resultString.collectAsStateWithLifecycle()
 
     CalculatorScreenContent(
-        uiState = uiState,
-        input = { viewModel.inputTextFieldValue },
+        autocompleteResult = autocompleteResult,
+        input = { inputTextFieldValue },
         altKeyboardVisible = viewModel.altKeyboardOpen.collectAsState(false).value,
         onInputChanged = viewModel::updateInput,
         onQuickKeyPressed = viewModel::insertText,
         onDelKeyPressed = viewModel::removeLastChar,
-        onACKeyPressed = viewModel::clearAll,
+        onACKeyPressed = viewModel::clearInput,
         calculationHistory = viewModel.calculationHistory.collectAsState().value,
-        parsedString = { viewModel.parsedString },
-        resultString = { viewModel.resultString },
+        parsedString = { parsedString },
+        resultString = { resultString },
         onCalculationSubmit = viewModel::submitCalculation,
         onAltKeyboardToggle = viewModel::toggleAltKeyboard,
         onAutocompleteClick = viewModel::acceptAutocomplete,
-        onAutocompleteDismiss = viewModel::dismissAutocomplete,
         openDrawer = openDrawer,
     )
 }
@@ -69,7 +71,7 @@ fun CalculatorScreen(
 )
 @Composable
 fun CalculatorScreenContent(
-    uiState: CalculatorUiState,
+    autocompleteResult: AutocompleteResult,
     input: () -> TextFieldValue,
     altKeyboardVisible: Boolean,
     onInputChanged: (TextFieldValue) -> Unit,
@@ -82,14 +84,12 @@ fun CalculatorScreenContent(
     onCalculationSubmit: () -> Unit = {},
     onAltKeyboardToggle: (Boolean) -> Unit = {},
     onAutocompleteClick: (String, String) -> Unit = {_, _ ->},
-    onAutocompleteDismiss: () -> Unit = {  },
     openDrawer: () -> Unit = {  }
 ) {
 
     //val screenSettingsRepository = ScreenSettingsRepository(LocalContext.current)
     //var isAltKeyboardOpen = screenSettingsRepository.isAltKeyboardOpen.collectAsState(true).value
 
-    var autocompleteDismissed by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -170,9 +170,8 @@ fun CalculatorScreenContent(
                 } else {
                     SupplementaryBar(
                         onKey = onQuickKeyPressed,
-                        autocompleteItems = { uiState.autocompleteList },
+                        autocompleteResult = { autocompleteResult },
                         onAutocompleteClick = onAutocompleteClick,
-                        onAutocompleteDismiss = onAutocompleteDismiss
                     )
                 }
             }
@@ -200,7 +199,7 @@ private val testCalculationHistory = listOf(
 @Composable
 private fun DefaultPreview() {
     CalculatorScreenContent(
-        uiState = CalculatorUiState(),
+        autocompleteResult = AutocompleteResult(),
         input = { TextFieldValue("1+1") },
         altKeyboardVisible = false,
         onInputChanged = {},
@@ -218,7 +217,7 @@ private fun DefaultPreview() {
 @Composable
 private fun EmptyPreview() {
     CalculatorScreenContent(
-        uiState = CalculatorUiState(),
+        autocompleteResult = AutocompleteResult(),
         input = { TextFieldValue("") },
         altKeyboardVisible = false,
         onInputChanged = {},
@@ -238,7 +237,7 @@ private fun EmptyPreview() {
 private fun AutocompletePreview() {
 
     CalculatorScreenContent(
-        uiState = CalculatorUiState(),
+        autocompleteResult = AutocompleteResult(),
         input = { TextFieldValue("1*t") },
         altKeyboardVisible = false,
         onInputChanged = {},

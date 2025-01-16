@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.compose)
+    id("com.google.protobuf") version("0.9.4")
+
 }
 
 val splitApks = !project.hasProperty("noSplits")
@@ -108,6 +110,26 @@ android {
     }
 }
 
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.21.11"
+    }
+
+    generateProtoTasks {
+        all().forEach { task ->
+            task.plugins {
+                create("java") {
+                    option("lite")
+                }
+                create("kotlin") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -122,6 +144,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.dataStore)
     implementation(libs.androidx.dataStore.preferences)
+    implementation(libs.protobuf.javalite)
+    implementation(libs.protobuf.kotlin.lite)
     implementation(libs.hilt.core)
     implementation(libs.hilt.android)
     implementation(libs.androidx.compose.material3)

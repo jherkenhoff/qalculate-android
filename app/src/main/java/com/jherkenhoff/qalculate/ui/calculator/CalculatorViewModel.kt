@@ -1,8 +1,5 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -11,26 +8,25 @@ import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jherkenhoff.libqalculate.Calculator
-import com.jherkenhoff.libqalculate.IntervalDisplay
-import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_HTML
 import com.jherkenhoff.qalculate.data.AutocompleteRepository
 import com.jherkenhoff.qalculate.data.CalculationHistoryRepository
-import com.jherkenhoff.qalculate.data.PrintPreferencesRepository
-import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
+import com.jherkenhoff.qalculate.data.UserPreferencesRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
+import com.jherkenhoff.qalculate.domain.AutocompleteResult
+import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
+import com.jherkenhoff.qalculate.domain.PrintUseCase
 import com.jherkenhoff.qalculate.model.AutocompleteItem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -44,19 +40,18 @@ class CalculatorViewModel @Inject constructor(
     private val calculator: Calculator,
     private val parseUseCase: ParseUseCase,
     private val calculateUseCase: CalculateUseCase,
+    private val printUseCase: PrintUseCase,
+    private val autocompleteUseCase: AutocompleteUseCase,
     private val calculationHistoryRepository: CalculationHistoryRepository,
-    private val screenSettingsRepository: ScreenSettingsRepository,
     private val autocompleteRepository: AutocompleteRepository,
-    private val printPreferencesRepository: PrintPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalculatorUiState())
     val uiState: StateFlow<CalculatorUiState> = _uiState.asStateFlow()
 
-    private var autocompleteJob: Job? = null
-    private var calculateJob: Job? = null
-
-    private var autocompleteDismissed = false
+    private val _inputTextFieldValue = MutableStateFlow(TextFieldValue(""))
+    val inputTextFieldValue = _inputTextFieldValue.asStateFlow()
 
     val calculationHistory = calculationHistoryRepository
         .observeCalculationHistory()
@@ -66,34 +61,40 @@ class CalculatorViewModel @Inject constructor(
             emptyList()
         )
 
-    val altKeyboardOpen = screenSettingsRepository.isAltKeyboardOpen
+    val altKeyboardOpen = userPreferencesRepository.userPreferencesFlow.map { it.altKeyboardOpen }
 
-    var parsedString by mutableStateOf("")
-        private set
+    val parsedString = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
+        return@combine parseUseCase(inputTextFieldValue.text, userPreferences)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue = ""
+    )
 
-    var resultString by mutableStateOf("0")
-        private set
+    val resultString = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
+        val mathStructure = calculateUseCase(inputTextFieldValue.text, userPreferences)
+        return@combine printUseCase(mathStructure, userPreferences)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue = ""
+    )
 
-    var inputTextFieldValue by mutableStateOf(TextFieldValue(""))
-        private set
-
-    fun dismissAutocomplete() {
-        _uiState.update { currentState ->
-            currentState.copy(
-                autocompleteList = emptyList()
-            )
-        }
-
-        autocompleteDismissed = true
-    }
+    val autocompleteResult = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
+        autocompleteUseCase(inputTextFieldValue, userPreferences)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue = AutocompleteResult("", emptyList())
+    )
 
     fun submitCalculation() {
         calculationHistoryRepository.appendCalculation(
             CalculationHistoryItem(
                 LocalDateTime.now(),
-                inputTextFieldValue.text,
-                parsedString,
-                resultString
+                inputTextFieldValue.value.text,
+                parsedString.value,
+                resultString.value
             )
         )
 
@@ -102,58 +103,17 @@ class CalculatorViewModel @Inject constructor(
 
     fun toggleAltKeyboard(newState: Boolean) {
         runBlocking {
-            screenSettingsRepository.saveAltKeyboardOpen(newState)
+            userPreferencesRepository.setIsAltKeyboardOpen(newState)
         }
     }
 
-    fun updateInput(input: TextFieldValue) {
-        inputTextFieldValue = input
-        handleAutocomplete()
-        recalculate()
-    }
-
-    private fun handleAutocomplete() {
-
-        val textBefore = inputTextFieldValue.getTextBeforeSelection(inputTextFieldValue.text.length).toString()
-
-        val pattern = Regex("([a-zA-Z_]+$)")
-
-        val match = pattern.find(textBefore)
-
-        if (match == null) {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    autocompleteList = emptyList()
-                )
-            }
-
-            autocompleteDismissed = false
-            return
-        }
-
-        if (autocompleteDismissed) return
-
-        autocompleteJob?.cancel()
-
-        autocompleteJob = viewModelScope.launch {
-            delay(100)
-
-            val relevantText = match.value
-
-            val autocompleteList = autocompleteRepository.getAutocompleteSuggestions(relevantText)
-
-            _uiState.update { currentState ->
-                currentState.copy(
-                    autocompleteList = autocompleteList
-                )
-            }
-        }
-    }
+    fun updateInput(input: TextFieldValue) = _inputTextFieldValue.update { input }
+    fun clearInput() = _inputTextFieldValue.update { TextFieldValue("") }
 
     fun acceptAutocomplete(beforeCursorText: String, afterCursorText: String) {
 
-        val textBefore = inputTextFieldValue.getTextBeforeSelection(inputTextFieldValue.text.length).toString()
-        val textAfter = inputTextFieldValue.getTextAfterSelection(inputTextFieldValue.text.length).toString()
+        val textBefore = inputTextFieldValue.value.getTextBeforeSelection(inputTextFieldValue.value.text.length).toString()
+        val textAfter = inputTextFieldValue.value.getTextAfterSelection(inputTextFieldValue.value.text.length).toString()
 
 
         val pattern = Regex("([a-zA-Z_]+$)")
@@ -169,9 +129,9 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun insertText(preCursorText: String, postCursorText: String = "") {
-        val maxChars = inputTextFieldValue.text.length
-        val textBeforeSelection = inputTextFieldValue.getTextBeforeSelection(maxChars)
-        val textAfterSelection = inputTextFieldValue.getTextAfterSelection(maxChars)
+        val maxChars = inputTextFieldValue.value.text.length
+        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
+        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
         val newText = "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
         val newCursorPosition = textBeforeSelection.length + preCursorText.length
 
@@ -182,10 +142,10 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun removeLastChar() {
-        val maxChars = inputTextFieldValue.text.length
-        val textBeforeSelection = inputTextFieldValue.getTextBeforeSelection(maxChars)
-        val textAfterSelection = inputTextFieldValue.getTextAfterSelection(maxChars)
-        val selectedText = inputTextFieldValue.getSelectedText()
+        val maxChars = inputTextFieldValue.value.text.length
+        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
+        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
+        val selectedText = inputTextFieldValue.value.getSelectedText()
 
         var newText: String
         var newCursorPosition: Int
@@ -206,32 +166,5 @@ class CalculatorViewModel @Inject constructor(
             text = newText,
             selection = TextRange(newCursorPosition)
         ))
-    }
-
-    fun clearAll() {
-        updateInput(TextFieldValue(
-            text = "",
-            selection = TextRange(0)
-        ))
-    }
-
-    private fun recalculate() {
-
-        calculateJob
-        calculateJob?.cancel()
-
-        calculateJob = viewModelScope.launch {
-            delay(100)
-
-            parsedString = parseUseCase(inputTextFieldValue.text)
-
-            val calculatedMathStructure = calculateUseCase(inputTextFieldValue.text)
-            val printOptions = printPreferencesRepository.getQalculatePrintOptions()
-
-            // Custom options (TODO: Replace with user preferences)
-            printOptions.interval_display = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
-            printOptions.use_unicode_signs = 1
-            resultString = calculator.print(calculatedMathStructure, 2000, printOptions, true, 1, TAG_TYPE_HTML)
-        }
     }
 }
