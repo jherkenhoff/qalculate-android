@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface UserPreferencesCallbacks {
+    fun onSyncUnitsChanged(newValue: Boolean) {}
     fun onAbbreviateNamesChanged(newValue: Boolean) {}
     fun onNegativeExponentsChanged(newValue: Boolean) {}
     fun onSpaciousChanged(newValue: Boolean) {}
@@ -28,22 +29,20 @@ class SettingsViewModel @Inject constructor(
     )
 
     val userPreferencesCallbacks = object: UserPreferencesCallbacks {
+        override fun onSyncUnitsChanged(newValue: Boolean) {
+            viewModelScope.launch { userPreferencesRepository.setSyncUnits(newValue) }
+        }
+
         override fun onAbbreviateNamesChanged(newValue: Boolean) {
-            viewModelScope.launch {
-                userPreferencesRepository.setAbbreviateNames(newValue)
-            }
+            viewModelScope.launch { userPreferencesRepository.setAbbreviateNames(newValue) }
         }
 
         override fun onNegativeExponentsChanged(newValue: Boolean) {
-            viewModelScope.launch {
-                userPreferencesRepository.setNegativeExponents(newValue)
-            }
+            viewModelScope.launch { userPreferencesRepository.setNegativeExponents(newValue) }
         }
 
         override fun onSpaciousChanged(newValue: Boolean) {
-            viewModelScope.launch {
-                userPreferencesRepository.setSpacious(newValue)
-            }
+            viewModelScope.launch { userPreferencesRepository.setSpacious(newValue) }
         }
     }
 }

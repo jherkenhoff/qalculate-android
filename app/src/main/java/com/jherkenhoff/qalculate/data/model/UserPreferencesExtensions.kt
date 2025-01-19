@@ -19,5 +19,6 @@ fun UserPreferences.getQalculatePrintOptions() : PrintOptions {
 
 fun UserPreferences.getQalculateEvaluationOptions() : EvaluationOptions {
     var eo = EvaluationOptions()
+    eo.sync_units = syncUnits
     return eo
 }
