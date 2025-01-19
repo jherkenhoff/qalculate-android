@@ -11,6 +11,9 @@ fun UserPreferences.getQalculateParseOptions() : ParseOptions {
 
 fun UserPreferences.getQalculatePrintOptions() : PrintOptions {
     var po = PrintOptions()
+    po.negative_exponents = negativeExponents
+    po.abbreviate_names   = abbreviateNames
+    po.spacious           = spacious
     return po
 }
 
