@@ -12,9 +12,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -23,21 +20,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jherkenhoff.qalculate.R
-
+import com.jherkenhoff.qalculate.data.model.UserPreferences
 
 @Composable
 fun InputSettingsScreen(
+    viewModel: SettingsViewModel,
     onNavigateUp: () -> Unit = {}
 ) {
-    SettingsScreenContent(
-        onNavigateUp = onNavigateUp,
+    val userPreferences = viewModel.userPreferences.collectAsStateWithLifecycle().value
+
+    InputSettingsScreenContent(
+        userPreferences = userPreferences,
+        userPreferencesCallbacks = viewModel.userPreferencesCallbacks,
+        onNavigateUp = onNavigateUp
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputSettingsScreenContent(
+    userPreferences: UserPreferences,
+    userPreferencesCallbacks: UserPreferencesCallbacks,
     onNavigateUp: () -> Unit = {  }
 ) {
     Scaffold(
@@ -56,9 +61,7 @@ fun InputSettingsScreenContent(
                             contentDescription = stringResource(R.string.open_menu_content_description)
                         )
                     }
-
-                },
-
+                }
             )
         },
         modifier = Modifier.imePadding(),
@@ -70,9 +73,9 @@ fun InputSettingsScreenContent(
             LazyColumn {
                 item {
                     ListItem(
-                        headlineContent = { Text("Negative exponents") },
-                        supportingContent = { Text("Prefer negative exponent over fractions")},
-                        trailingContent = { Switch(checked = false, onCheckedChange = null) }
+                        headlineContent = { Text("Preserve format") },
+                        supportingContent = { Text("Prefer abbreviations of units and functions")},
+                        trailingContent = { Switch(checked = userPreferences.abbreviateNames, onCheckedChange = { userPreferencesCallbacks.onAbbreviateNamesChanged(it) }) }
                     )
                 }
             }
@@ -85,5 +88,7 @@ fun InputSettingsScreenContent(
 @Composable
 private fun DefaultPreview() {
     InputSettingsScreenContent(
+        userPreferences = UserPreferences.getDefaultInstance(),
+        userPreferencesCallbacks = object : UserPreferencesCallbacks{}
     )
 }

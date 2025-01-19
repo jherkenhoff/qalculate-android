@@ -73,9 +73,9 @@ fun CalculationSettingsScreenContent(
             LazyColumn {
                 item {
                     ListItem(
-                        headlineContent = { Text("Abbreviate names") },
-                        supportingContent = { Text("Prefer abbreviations of units and functions")},
-                        trailingContent = { Switch(checked = false, onCheckedChange = { userPreferencesCallbacks.onAbbreviateNamesChanged(it) }) }
+                        headlineContent = { Text("Sync units") },
+                        supportingContent = { Text("If units will be synced/converted to allow evaluation (ex. 1 min + 60 s = 2 min)")},
+                        trailingContent = { Switch(checked = userPreferences.syncUnits, onCheckedChange = { userPreferencesCallbacks.onSyncUnitsChanged(it) }) }
                     )
                 }
             }

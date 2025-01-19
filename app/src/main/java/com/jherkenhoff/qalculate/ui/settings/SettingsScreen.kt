@@ -30,11 +30,13 @@ import com.jherkenhoff.qalculate.R
 @Composable
 fun SettingsScreen(
     onCalculationSettingsClick: () -> Unit = {},
+    onInputSettingsClick: () -> Unit = {},
     onOutputSettingsClick: () -> Unit = {},
     onNavigateUp: () -> Unit = {}
 ) {
     SettingsScreenContent(
         onCalculationSettingsClick = onCalculationSettingsClick,
+        onInputSettingsClick = onInputSettingsClick,
         onOutputSettingsClick = onOutputSettingsClick,
         onNavigateUp = onNavigateUp,
     )
@@ -44,6 +46,7 @@ fun SettingsScreen(
 @Composable
 fun SettingsScreenContent(
     onCalculationSettingsClick: () -> Unit = {},
+    onInputSettingsClick: () -> Unit = {},
     onOutputSettingsClick: () -> Unit = {},
     onNavigateUp: () -> Unit = {}
 ) {
@@ -89,7 +92,8 @@ fun SettingsScreenContent(
                         headlineContent = { Text("Input") },
                         supportingContent = { Text("Localization, Autocompletion")},
                         leadingContent = { Icon(Icons.Outlined.Keyboard, contentDescription = null)},
-                        trailingContent = { Icon(Icons.Outlined.ChevronRight, contentDescription = null)}
+                        trailingContent = { Icon(Icons.Outlined.ChevronRight, contentDescription = null)},
+                        modifier = Modifier.clickable(onClick = onInputSettingsClick)
                     )
                 }
                 item {

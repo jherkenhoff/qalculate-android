@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorScreen
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorViewModel
 import com.jherkenhoff.qalculate.ui.settings.CalculationSettingsScreen
+import com.jherkenhoff.qalculate.ui.settings.InputSettingsScreen
 import com.jherkenhoff.qalculate.ui.settings.OutputSettingsScreen
 import com.jherkenhoff.qalculate.ui.settings.SettingsScreen
 import com.jherkenhoff.qalculate.ui.settings.SettingsViewModel
@@ -25,6 +26,7 @@ sealed class NavDestinations{
     @Serializable data object About
     @Serializable data object Settings
     @Serializable data object SettingsCalculation
+    @Serializable data object SettingsInput
     @Serializable data object SettingsOutput
 }
 
@@ -45,6 +47,7 @@ fun QalculateNavGraph(
             CalculatorScreen(
                 viewModel = hiltViewModel<CalculatorViewModel>(),
                 openDrawer = openDrawer,
+                openSettings = { navController.navigate(NavDestinations.Settings) },
             )
         }
 
@@ -58,6 +61,7 @@ fun QalculateNavGraph(
         composable<NavDestinations.Settings> {
             SettingsScreen(
                 onCalculationSettingsClick = { navController.navigate(NavDestinations.SettingsCalculation) },
+                onInputSettingsClick = { navController.navigate(NavDestinations.SettingsInput) },
                 onOutputSettingsClick = { navController.navigate(NavDestinations.SettingsOutput) },
                 onNavigateUp = onNavigateUp,
             )
@@ -65,6 +69,13 @@ fun QalculateNavGraph(
 
         composable<NavDestinations.SettingsCalculation> {
             CalculationSettingsScreen(
+                viewModel = hiltViewModel<SettingsViewModel>(),
+                onNavigateUp = onNavigateUp,
+            )
+        }
+
+        composable<NavDestinations.SettingsInput> {
+            InputSettingsScreen(
                 viewModel = hiltViewModel<SettingsViewModel>(),
                 onNavigateUp = onNavigateUp,
             )

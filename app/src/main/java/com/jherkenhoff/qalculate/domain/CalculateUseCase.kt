@@ -12,7 +12,7 @@ class CalculateUseCase @Inject constructor(
     operator fun invoke(expression: String, userPreferences: UserPreferences): MathStructure {
         val eo = userPreferences.getQalculateEvaluationOptions()
 
-        val result = calc.calculate(expression)
+        val result = calc.calculate(expression, eo)
 
         return result
     }
