@@ -75,17 +75,17 @@ fun OutputSettingsScreenContent(
                     ListItem(
                         headlineContent = { Text("Abbreviate names") },
                         supportingContent = { Text("Prefer abbreviations of units and functions")},
-                        trailingContent = { Switch(checked = false, onCheckedChange = { userPreferencesCallbacks.onAbbreviateNamesChanged(it) }) }
+                        trailingContent = { Switch(checked = userPreferences.abbreviateNames, onCheckedChange = { userPreferencesCallbacks.onAbbreviateNamesChanged(it) }) }
                     )
                     ListItem(
                         headlineContent = { Text("Negative exponents") },
                         supportingContent = { Text("Use m^-1 instead of 1/m")},
-                        trailingContent = { Switch(checked = false, onCheckedChange = { userPreferencesCallbacks.onNegativeExponentsChanged(it) }) }
+                        trailingContent = { Switch(checked = userPreferences.negativeExponents, onCheckedChange = { userPreferencesCallbacks.onNegativeExponentsChanged(it) }) }
                     )
                     ListItem(
                         headlineContent = { Text("Spacious output") },
                         supportingContent = { Text("Description")},
-                        trailingContent = { Switch(checked = false, onCheckedChange = { userPreferencesCallbacks.onSpaciousChanged(it) }) }
+                        trailingContent = { Switch(checked = userPreferences.spacious, onCheckedChange = { userPreferencesCallbacks.onSpaciousChanged(it) }) }
                     )
                 }
             }

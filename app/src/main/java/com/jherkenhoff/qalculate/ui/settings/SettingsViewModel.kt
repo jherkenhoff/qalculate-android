@@ -30,19 +30,19 @@ class SettingsViewModel @Inject constructor(
     val userPreferencesCallbacks = object: UserPreferencesCallbacks {
         override fun onAbbreviateNamesChanged(newValue: Boolean) {
             viewModelScope.launch {
-                //userPreferencesRepository.setAbbreviateNames(newValue)
+                userPreferencesRepository.setAbbreviateNames(newValue)
             }
         }
 
         override fun onNegativeExponentsChanged(newValue: Boolean) {
             viewModelScope.launch {
-                //printPreferencesRepository.setNegativeExponents(newValue)
+                userPreferencesRepository.setNegativeExponents(newValue)
             }
         }
 
         override fun onSpaciousChanged(newValue: Boolean) {
             viewModelScope.launch {
-                //printPreferencesRepository.setSpacious(newValue)
+                userPreferencesRepository.setSpacious(newValue)
             }
         }
     }
