@@ -4,24 +4,24 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InterceptPlatformTextInput
@@ -91,95 +91,88 @@ fun CalculatorScreenContent(
     //val screenSettingsRepository = ScreenSettingsRepository(LocalContext.current)
     //var isAltKeyboardOpen = screenSettingsRepository.isAltKeyboardOpen.collectAsState(true).value
 
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.surface,
-        topBar = {
-            TopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                },
-                navigationIcon = {
-                    IconButton(onClick = openDrawer) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
-                        )
-                    }
+        InterceptPlatformTextInput(
+            interceptor = { request, nextHandler ->
 
-                },
-                actions = {
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("DEG") })
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exact") })
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exp.") })
-                    IconButton(onClick = { openSettings() }) { Icon(Icons.Default.Settings, contentDescription = "Open settings") }
-                }
-
-            )
-        },
-        modifier = Modifier.imePadding(),
-    ) { innerPadding ->
-
-        Column(
-            modifier = Modifier
-                .padding(innerPadding),
-        ) {
-            HistroyList(
-                calculationHistory,
-                onTextToInput = { onQuickKeyPressed(it, "") },
-                modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            InterceptPlatformTextInput(
-                interceptor = { request, nextHandler ->
-
-                    if (!altKeyboardVisible) {
-                        nextHandler.startInputMethod(request)
-                    } else {
-                        awaitCancellation()
-                    }
-                },
-            ) {
-                InputSheet(
-                    textFieldValue = input,
-                    parsed = parsedString(),
-                    result = resultString(),
-                    isAltKeyboardOpen = altKeyboardVisible,
-                    onValueChange = onInputChanged,
-                    onSubmit = { onCalculationSubmit() },
-                    onToggleAltKeyboard = { onAltKeyboardToggle(!altKeyboardVisible) },
-                    onClearAll = onACKeyPressed,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            AnimatedContent(targetState = altKeyboardVisible) {
-                if (it) {
-                    AltKeyboard(
-                        onKey = { text -> onQuickKeyPressed(text, "") },
-                        onDel = onDelKeyPressed,
-                        onAC = onACKeyPressed,
-                        onSubmit = onCalculationSubmit,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
-                    )
+                if (!altKeyboardVisible) {
+                    nextHandler.startInputMethod(request)
                 } else {
-                    SupplementaryBar(
-                        onKey = onQuickKeyPressed,
-                        autocompleteResult = { autocompleteResult },
-                        onAutocompleteClick = onAutocompleteClick,
-                    )
+                    awaitCancellation()
                 }
+            },
+        ) {
+            InputSheet(
+                textFieldValue = input,
+                parsed = parsedString(),
+                result = resultString(),
+                isAltKeyboardOpen = altKeyboardVisible,
+                onValueChange = onInputChanged,
+                onSubmit = { onCalculationSubmit() },
+                onToggleAltKeyboard = { onAltKeyboardToggle(!altKeyboardVisible) },
+                onClearAll = onACKeyPressed,
+                modifier = Modifier
+            )
+        }
+
+        HistroyList(
+            calculationHistory,
+            onTextToInput = { onQuickKeyPressed(it, "") },
+            modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier
+                .padding(horizontal = 5.dp)
+        ) {
+            SegmentedButton(
+                selected = altKeyboardVisible,
+                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                onClick = { onAltKeyboardToggle(!altKeyboardVisible) },
+                icon = { Icon(Icons.Default.Calculate, contentDescription = null) }
+            ) {
+                Text("Basic")
+            }
+            SegmentedButton(
+                selected = !altKeyboardVisible,
+                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                onClick = { onAltKeyboardToggle(!altKeyboardVisible) },
+                icon = { Icon(Icons.Default.Keyboard, contentDescription = null) }
+            ) {
+                Text("Keyboard")
             }
         }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        AnimatedContent(targetState = altKeyboardVisible) {
+            if (it) {
+                AltKeyboard(
+                    onKey = { text -> onQuickKeyPressed(text, "") },
+                    onDel = onDelKeyPressed,
+                    onAC = onACKeyPressed,
+                    onSubmit = onCalculationSubmit,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+                )
+            } else {
+                SupplementaryBar(
+                    onKey = onQuickKeyPressed,
+                    autocompleteResult = { autocompleteResult },
+                    onAutocompleteClick = onAutocompleteClick,
+                )
+            }
+        }
+        
+        Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
     }
 }
+
+
 
 
 private val testCalculationHistory = listOf(
@@ -197,7 +190,7 @@ private val testCalculationHistory = listOf(
     )
 )
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
     CalculatorScreenContent(
@@ -215,7 +208,7 @@ private fun DefaultPreview() {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun EmptyPreview() {
     CalculatorScreenContent(
@@ -234,10 +227,9 @@ private fun EmptyPreview() {
 }
 
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun AutocompletePreview() {
-
     CalculatorScreenContent(
         autocompleteResult = AutocompleteResult(),
         input = { TextFieldValue("1*t") },

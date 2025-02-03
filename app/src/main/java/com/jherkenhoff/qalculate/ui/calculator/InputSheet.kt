@@ -5,25 +5,30 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButtonColors
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -49,6 +54,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.jherkenhoff.qalculate.R
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 
@@ -70,6 +76,8 @@ fun InputSheet(
     var lastFocusState by remember { mutableStateOf(false) }
     val placeholdeVisible by remember { derivedStateOf { textFieldValue().text.isEmpty() && !lastFocusState } }
 
+    var angleUnitDialogOpen = remember { mutableStateOf(false) }
+
     // Focus the input text field on app startup
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -77,11 +85,33 @@ fun InputSheet(
 
     Surface(
         //shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
-        shape = RoundedCornerShape(25.dp, 25.dp, 25.dp, 25.dp),
-        color = MaterialTheme.colorScheme.primaryContainer,
+        shape = RoundedCornerShape(0.dp, 0.dp, 30.dp, 30.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer,
         modifier = modifier.fillMaxWidth()
     ) {
         Column {
+
+            Spacer(
+                Modifier.windowInsetsTopHeight(
+                    WindowInsets.safeDrawing
+                )
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                IconButton(onClick = {  }) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "Open navigation menu"
+                    )
+                }
+                Spacer(Modifier.weight(1f))
+                AssistChip(onClick = { angleUnitDialogOpen.value = true }, label = { Text("Degrees") }, modifier = Modifier.padding(horizontal = 3.dp))
+                AssistChip(onClick = { /*TODO*/ }, label = { Text("Scientific") }, modifier = Modifier.padding(horizontal = 3.dp))
+                FilterChip(selected = true, onClick = { /*TODO*/ }, label = { Text("Exact") }, modifier = Modifier.padding(horizontal = 3.dp), colors = FilterChipDefaults.filterChipColors().copy(selectedContainerColor = MaterialTheme.colorScheme.secondary, selectedLabelColor = MaterialTheme.colorScheme.onSecondary))
+            }
             AutoSizeText(
                 text = mathExpressionFormatter(result),
                 alignment = Alignment.CenterEnd,
@@ -114,28 +144,8 @@ fun InputSheet(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.defaultMinSize(minHeight = 50.dp)
+                modifier = Modifier.defaultMinSize(minHeight = 64.dp).padding(horizontal = 16.dp)
             ) {
-                FilledIconToggleButton(
-                    checked = isAltKeyboardOpen,
-                    onCheckedChange = { onToggleAltKeyboard() },
-                    colors = IconToggleButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        disabledContentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .size(40.dp)
-                ) {
-                    Icon(Icons.Filled.Calculate, contentDescription = null)
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
                 Box(
                     contentAlignment = Alignment.CenterStart,
                     modifier = Modifier.weight(1f)
@@ -185,6 +195,36 @@ fun InputSheet(
                         Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.clear_input))
                     }
                 }
+            }
+        }
+    }
+
+    AnimatedVisibility(angleUnitDialogOpen.value) {
+        AngleUnitDialog(onDismissRequest = { angleUnitDialogOpen.value = false })
+    }
+}
+
+@Composable
+fun AngleUnitDialog(
+    onDismissRequest: () -> Unit = {  }
+) {
+    Dialog(onDismissRequest = onDismissRequest) {
+        Surface(
+            modifier = Modifier
+                .wrapContentWidth()
+                .wrapContentHeight(),
+            shape = MaterialTheme.shapes.large,
+            tonalElevation = AlertDialogDefaults.TonalElevation
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Angle unit", style = MaterialTheme.typography.headlineSmall)
+                RadioButtonRow(text = "Degrees", selected = false, onClick = {  })
+                RadioButtonRow(text = "Radians", selected = true, onClick = {  })
+                RadioButtonRow(text = "Gradians", selected = false, onClick = {  })
+                HorizontalDivider()
+                RadioButtonRow(text = "Arcminute", selected = false, onClick = {  })
+                RadioButtonRow(text = "Arcsecond", selected = false, onClick = {  })
+                RadioButtonRow(text = "Turn", selected = false, onClick = {  })
             }
         }
     }
