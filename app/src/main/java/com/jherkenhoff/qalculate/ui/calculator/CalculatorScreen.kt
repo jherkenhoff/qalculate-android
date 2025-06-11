@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -96,11 +97,10 @@ fun CalculatorScreenContent(
         topBar = {
             TopAppBar(
                 colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
                 ),
-                title = {
-                },
+                title = {},
                 navigationIcon = {
                     IconButton(onClick = openDrawer) {
                         Icon(
@@ -111,9 +111,11 @@ fun CalculatorScreenContent(
 
                 },
                 actions = {
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("DEG") })
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exact") })
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exp.") })
+                    SuggestionChip(onClick = { /*TODO*/ }, enabled = false, label = { Text("DEG") })
+                    Spacer(Modifier.width(8.dp))
+                    SuggestionChip(onClick = { /*TODO*/ }, enabled = false, label = { Text("Exact") })
+                    Spacer(Modifier.width(8.dp))
+                    SuggestionChip(onClick = { /*TODO*/ }, enabled = false, label = { Text("Exp.") })
                 }
 
             )

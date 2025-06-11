@@ -25,22 +25,18 @@ fun CalculationDivider(
             .height(16.dp)
     ) {
         HorizontalDivider(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+            modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
+            color = MaterialTheme.colorScheme.outlineVariant
         )
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
         HorizontalDivider(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+            modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
+            color = MaterialTheme.colorScheme.outlineVariant
         )
     }
 }
