@@ -33,7 +33,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jherkenhoff.libqalculate.libqalculateConstants;
 import com.jherkenhoff.qalculate.BuildConfig
 import com.jherkenhoff.qalculate.R
 
@@ -65,12 +64,7 @@ fun AboutCard(
                     Column {
                         Text(text = "Qalculate!", style = MaterialTheme.typography.headlineSmall)
                         Text(
-                            text = "App version " + BuildConfig.VERSION_NAME
-                        )
-                        Text(
-                            text = "libqalculate version ${libqalculateConstants.QALCULATE_MAJOR_VERSION}" +
-                                    ".${libqalculateConstants.QALCULATE_MINOR_VERSION}" +
-                                    ".${libqalculateConstants.QALCULATE_MICRO_VERSION}"
+                            text = "Version " + BuildConfig.VERSION_NAME
                         )
                     }
                 }
@@ -102,7 +96,7 @@ fun LicenseText() {
                     TextLinkStyles(style = SpanStyle(textDecoration = TextDecoration.Underline))
                 )
             ) {
-                append("GNU General Public License, version 2 or later")
+                append("GNU  General Public License, version 2 or later")
             }
             append(" for details.")
         },
