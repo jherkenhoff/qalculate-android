@@ -16,10 +16,6 @@ class ParseUseCase @Inject constructor(
         val printOptions = userPreferences.getQalculatePrintOptions()
 
         printOptions.place_units_separately = false
-        printOptions.preserve_format = true
-        printOptions.use_unicode_signs = 1
-        printOptions.abbreviate_names = false
-        printOptions.short_multiplication = false
 
         // TODO: Implement proper conversion handling
         val toExpressions = input.split(" to ")

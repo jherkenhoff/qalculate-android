@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -86,20 +87,14 @@ fun InputSheet(
     Surface(
         //shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
         shape = RoundedCornerShape(0.dp, 0.dp, 30.dp, 30.dp),
-        color = MaterialTheme.colorScheme.secondaryContainer,
+        color = MaterialTheme.colorScheme.surfaceContainer,
         modifier = modifier.fillMaxWidth()
     ) {
         Column {
 
-            Spacer(
-                Modifier.windowInsetsTopHeight(
-                    WindowInsets.safeDrawing
-                )
-            )
+            Spacer( Modifier.windowInsetsTopHeight(WindowInsets.safeContent))
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 IconButton(onClick = {  }) {
                     Icon(
@@ -127,21 +122,6 @@ fun InputSheet(
             )
 
 
-            Text(
-                mathExpressionFormatter(parsed, color=true),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .defaultMinSize(minHeight = 24.dp)
-                    .wrapContentHeight(),
-            )
-            HorizontalDivider(
-                modifier = Modifier
-                    .height(1.dp)
-                    .fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.defaultMinSize(minHeight = 64.dp).padding(horizontal = 16.dp)
@@ -161,7 +141,8 @@ fun InputSheet(
                         keyboardOptions = KeyboardOptions(
                             capitalization = KeyboardCapitalization.None,
                             autoCorrectEnabled = false,
-                            imeAction = ImeAction.Send
+                            imeAction = ImeAction.Send,
+                            keyboardType = KeyboardType.Password
                         ),
                         keyboardActions = KeyboardActions {
                             if (textFieldValue().text.isNotBlank()) onSubmit(textFieldValue().text)
@@ -196,6 +177,21 @@ fun InputSheet(
                     }
                 }
             }
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .height(1.dp)
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                mathExpressionFormatter(parsed, color=true),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .defaultMinSize(minHeight = 24.dp)
+                    .wrapContentHeight(),
+            )
         }
     }
 

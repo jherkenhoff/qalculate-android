@@ -2,6 +2,7 @@ package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,7 +49,7 @@ fun QuickKeys(
     val chevronWidth = 20.dp
 
     Box(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer),
     ) {
         AnimatedVisibility(
             visible = leftChevronVisible,

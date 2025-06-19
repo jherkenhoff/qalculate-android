@@ -30,11 +30,12 @@ fun QuickKeysPanel(
         modifier = modifier,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            for (i in arrayOf("_", "=", "√", "^", "(", ")", "÷", "×", "-", "+")) {
+            for (i in arrayOf( "=", "√", "^", "(", ")", "÷", "×", "-", "+", ".")) {
                 TextButton(
                     onClick = {onClick(i)},
                     modifier = Modifier

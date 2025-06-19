@@ -16,23 +16,26 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
+import com.jherkenhoff.qalculate.model.Calculation
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.UUID
 
 
 private fun LazyListState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
@@ -41,28 +44,31 @@ private fun LazyListState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.las
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CalculationList(
-    calculationHistory: List<CalculationHistoryItem>,
-    currentParsed: () -> String,
-    currentResult: () -> String,
-    modifier: Modifier = Modifier
+    calculations: Map<UUID, Calculation>,
+    modifier: Modifier = Modifier,
+    onInputFieldValueChange: (UUID, TextFieldValue) -> Unit = {_, _ -> },
+    onDeleteClick: (UUID) -> Unit = {}
 ) {
 
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(calculationHistory.size) {
-        scrollState.animateScrollToItem(calculationHistory.size)
+    var focusedCalculationUuid by remember { mutableStateOf(UUID.randomUUID()) }
+
+    LaunchedEffect(calculations.size) {
+        scrollState.animateScrollToItem(calculations.size)
     }
 
     Box(
         modifier = modifier
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.Bottom,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             state = scrollState,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
         ) {
-            calculationHistory.groupBy { it.time.toLocalDate() }
+            calculations.entries.groupBy { it.value.creationTime.toLocalDate() }
                 .map { (id, list) ->
                     stickyHeader{
                         val dayString = when (id) {
@@ -72,24 +78,21 @@ fun CalculationList(
                         }
                         CalculationDivider(text = dayString)
                     }
-                    list.forEach {
+                    list.forEach { entry ->
+                        val isExpandedItem = entry.key == focusedCalculationUuid
                         item() {
-                            CalculationListItem(
-                                it.parsed,
-                                it.result,
+                            CalculationItem(
+                                entry.value.input,
+                                entry.value.parsed,
+                                entry.value.result,
+                                expanded = isExpandedItem,
+                                onFocusChange = { if (it.isFocused) focusedCalculationUuid = entry.key},
+                                onInputFieldValueChange = { onInputFieldValueChange(entry.key, it) },
+                                onDeleteClick = { onDeleteClick(entry.key) }
                             )
                         }
                     }
                 }
-            item {
-                CalculationDivider(text = "Now")
-            }
-            item {
-                CalculationListItem(
-                    currentParsed(),
-                    currentResult()
-                )
-            }
         }
 
         val isScrolledToTheEnd by remember {
@@ -107,7 +110,7 @@ fun CalculationList(
             JumpToBottomButton(
                 onClick = {
                     scope.launch {
-                        scrollState.animateScrollToItem(calculationHistory.size)
+                        scrollState.animateScrollToItem(calculations.size)
                     }
                 },
                 modifier = Modifier
@@ -116,11 +119,6 @@ fun CalculationList(
             )
         }
     }
-}
-
-@Composable
-private fun EmptyState() {
-    Text("Empty")
 }
 
 @Composable
@@ -139,34 +137,22 @@ private fun JumpToBottomButton(
     }
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
 
-    val testCalculationHistory = listOf(
-        CalculationHistoryItem(
+    val testCalculationHistory = mapOf(
+        UUID.randomUUID() to Calculation(
             LocalDateTime.now().minusDays(10),
-            "1m + 1m",
+            LocalDateTime.now().minusDays(10),
+            TextFieldValue("1m + 1m"),
             "1 m + 1 m",
             "2 m"
         ),
-        CalculationHistoryItem(
-            LocalDateTime.now().minusDays(1),
-            "1m + 1m",
-            "1 m + 1 m",
-            "2 m"
-        ),
-        CalculationHistoryItem(
-            LocalDateTime.now().minusDays(1).minusHours(2),
-            "1m + 1m",
-            "1 m + 1 m",
-            "2 m"
-        ),
-        CalculationHistoryItem(
-            LocalDateTime.now().minusMinutes(20),
-            "1m + 1m",
+        UUID.randomUUID() to Calculation(
+            LocalDateTime.now().minusDays(10),
+            LocalDateTime.now().minusDays(10),
+            TextFieldValue("1m + 1m"),
             "1 m + 1 m",
             "2 m"
         )
@@ -174,16 +160,13 @@ private fun DefaultPreview() {
 
     CalculationList(
         testCalculationHistory,
-        { "1+1" },
-        { "2" }
     )
 }
+
 @Preview(showBackground = true)
 @Composable
 private fun EmptyPreview() {
     CalculationList(
-        emptyList(),
-        { "1+1" },
-        { "2" }
+        emptyMap(),
     )
 }

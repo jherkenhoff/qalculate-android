@@ -8,7 +8,6 @@ class UserPreferencesRepository(private val dataStore: DataStore<UserPreferences
 
     val userPreferencesFlow: Flow<UserPreferences> = dataStore.data
 
-
     suspend fun setSyncUnits(enabled: Boolean) = dataStore.updateData { it.toBuilder().setSyncUnits(enabled).build() }
 
     suspend fun setAbbreviateNames(enabled: Boolean) = dataStore.updateData { it.toBuilder().setAbbreviateNames(enabled).build() }
