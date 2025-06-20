@@ -53,6 +53,9 @@ class CalculatorViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CalculatorUiState())
     val uiState: StateFlow<CalculatorUiState> = _uiState.asStateFlow()
 
+    private val _focusedCalculationUuid = MutableStateFlow<UUID?>(null)
+    val focusedCalculationUuid = _focusedCalculationUuid.asStateFlow()
+
     private val _inputTextFieldValue = MutableStateFlow(TextFieldValue(""))
     val inputTextFieldValue = _inputTextFieldValue.asStateFlow()
 
@@ -97,9 +100,25 @@ class CalculatorViewModel @Inject constructor(
         initialValue = AutocompleteResult("", emptyList())
     )
 
-    fun submitCalculation() {
+    fun submitCalculation(uuid: UUID) {
+        viewModelScope.launch {
+            val newUuid = calculationsRepository.appendCalculation(
+                Calculation(
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    TextFieldValue(""),
+                    "0",
+                    "0"
+                )
+            )
 
-        updateInput(TextFieldValue(""))
+            _focusedCalculationUuid.value = newUuid
+        }
+    }
+
+
+    fun onCalculationFocusChange(uuid: UUID) {
+        _focusedCalculationUuid.value = uuid
     }
 
     fun toggleAltKeyboard(newState: Boolean) {
@@ -114,7 +133,7 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    fun onInputFieldValueChange(uuid: UUID, input: TextFieldValue) {
+    fun updateCalculation(uuid: UUID, input: TextFieldValue) {
         viewModelScope.launch {
             val parsed = parseUseCase(input.text, userPreferences.value)
             val mathStructure = calculateUseCase(input.text, userPreferences.value)
@@ -152,16 +171,23 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun insertText(preCursorText: String, postCursorText: String = "") {
-        val maxChars = inputTextFieldValue.value.text.length
-        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
-        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
-        val newText = "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
-        val newCursorPosition = textBeforeSelection.length + preCursorText.length
 
-        updateInput(TextFieldValue(
-            text = newText,
-            selection = TextRange(newCursorPosition)
-        ))
+        focusedCalculationUuid.value?.let { uuid ->
+            calculations.value[uuid]?.input?.let { inputTextFieldValue ->
+                val maxChars = inputTextFieldValue.text.length
+                val textBeforeSelection = inputTextFieldValue.getTextBeforeSelection(maxChars)
+                val textAfterSelection = inputTextFieldValue.getTextAfterSelection(maxChars)
+                val newText = "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
+                val newCursorPosition = textBeforeSelection.length + preCursorText.length
+
+                updateCalculation(uuid, TextFieldValue(
+                    text = newText,
+                    selection = TextRange(newCursorPosition)
+                ))
+            }
+
+
+        }
     }
 
     fun removeLastChar() {

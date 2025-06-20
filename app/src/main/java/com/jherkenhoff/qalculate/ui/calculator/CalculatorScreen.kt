@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -51,15 +52,17 @@ fun CalculatorScreen(
         onDelKeyPressed = viewModel::removeLastChar,
         onACKeyPressed = viewModel::clearInput,
         calculations = viewModel.calculations.collectAsState().value,
+        focusedCalculationUuid = viewModel.focusedCalculationUuid.collectAsStateWithLifecycle().value,
         parsedString = { parsedString },
         resultString = { resultString },
-        onInputFieldValueChange = viewModel::onInputFieldValueChange,
+        onInputFieldValueChange = viewModel::updateCalculation,
         onDeleteCalculation = viewModel::deleteCalculation,
         onCalculationSubmit = viewModel::submitCalculation,
         onAltKeyboardToggle = viewModel::toggleAltKeyboard,
         onAutocompleteClick = viewModel::acceptAutocomplete,
         openDrawer = openDrawer,
-        openSettings = openSettings
+        openSettings = openSettings,
+        onCalculationFocusChange = viewModel::onCalculationFocusChange
     )
 }
 
@@ -76,11 +79,13 @@ fun CalculatorScreenContent(
     onDelKeyPressed: () -> Unit,
     onACKeyPressed: () -> Unit,
     calculations: Map<UUID, Calculation>,
+    focusedCalculationUuid: UUID?,
     parsedString: () -> String,
     resultString: () -> String,
     onInputFieldValueChange: (UUID, TextFieldValue) -> Unit = {_, _ -> },
     onDeleteCalculation: (UUID) -> Unit = {},
-    onCalculationSubmit: () -> Unit = {},
+    onCalculationSubmit: (UUID) -> Unit = {},
+    onCalculationFocusChange: (UUID) -> Unit = {},
     onAltKeyboardToggle: (Boolean) -> Unit = {},
     onAutocompleteClick: (String, String) -> Unit = {_, _ ->},
     openDrawer: () -> Unit = {  },
@@ -96,7 +101,8 @@ fun CalculatorScreenContent(
             snackbarHostState.showSnackbar(
                 "Deleted calculation " + calculations[uuid]?.input?.text,
                 actionLabel = "Undo",
-                withDismissAction = true
+                withDismissAction = true,
+                duration = SnackbarDuration.Short
             )
         }
 
@@ -114,8 +120,11 @@ fun CalculatorScreenContent(
             Box(contentAlignment = Alignment.BottomCenter) {
                 CalculationList(
                     calculations,
+                    focusedCalculationUuid,
                     onInputFieldValueChange = onInputFieldValueChange,
-                    onDeleteClick = { deleteCalculationWithSnackbar(it) }
+                    onDeleteClick = { deleteCalculationWithSnackbar(it) },
+                    onSubmit = onCalculationSubmit,
+                    onCalculationFocusChange = onCalculationFocusChange
                 )
 
                 SnackbarHost(snackbarHostState)
@@ -158,6 +167,7 @@ private fun DefaultPreview() {
         onDelKeyPressed = {},
         onACKeyPressed = {},
         calculations = testCalculationHistory,
+        focusedCalculationUuid = null,
         parsedString = { "1+1" },
         resultString = { "2" },
         onCalculationSubmit = {}
@@ -176,6 +186,7 @@ private fun EmptyPreview() {
         onDelKeyPressed = {},
         onACKeyPressed = {},
         calculations = emptyMap(),
+        focusedCalculationUuid = null,
         parsedString = { "0" },
         resultString = { "0" },
         onCalculationSubmit = {}
@@ -194,6 +205,7 @@ private fun AutocompletePreview() {
         onDelKeyPressed = {},
         onACKeyPressed = {},
         calculations = testCalculationHistory,
+        focusedCalculationUuid = null,
         parsedString = { "" },
         resultString = { "" },
         onCalculationSubmit = {},

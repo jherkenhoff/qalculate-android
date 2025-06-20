@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -53,6 +54,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
@@ -94,7 +98,8 @@ fun CalculationItem(
     expanded: Boolean = false,
     onFocusChange: (FocusState) -> Unit = {},
     onInputFieldValueChange: (TextFieldValue) -> Unit = {},
-    onDeleteClick: () -> Unit = {}
+    onDeleteClick: () -> Unit = {},
+    onSubmit: () -> Unit = {}
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -109,12 +114,6 @@ fun CalculationItem(
         label = "color",
         animationSpec = tween(200)
     )
-
-//    Popup(
-//        AutocompletePositionProvider()
-//    ) {
-//        Box(Modifier.size(20.dp).background(Color.Red))
-//    }
 
     SharedTransitionLayout(
         modifier = modifier
@@ -147,12 +146,21 @@ fun CalculationItem(
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp)
                                 .focusRequester(focusRequester)
-                                .onFocusChanged { state -> onFocusChange(state) },
+                                .onFocusChanged { state -> onFocusChange(state) }.onKeyEvent {
+                                    if (it.key.keyCode == Key.Enter.keyCode){
+                                        onSubmit()
+                                        true
+                                    }
+                                    false
+                                },
                             keyboardOptions = KeyboardOptions(
                                 capitalization = KeyboardCapitalization.None,
                                 autoCorrectEnabled = false,
                                 imeAction = ImeAction.Send,
                                 keyboardType = KeyboardType.Password
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onAny = { onSubmit() }
                             ),
                             cursorBrush = SolidColor(LocalContentColor.current),
                             textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),

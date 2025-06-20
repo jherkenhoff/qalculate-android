@@ -18,20 +18,6 @@ class CalculationsRepository @Inject constructor() {
             TextFieldValue(""),
             "",
             ""
-        ),
-        UUID.randomUUID() to Calculation(
-            LocalDateTime.now(),
-            LocalDateTime.now(),
-            TextFieldValue(""),
-            "",
-            ""
-        ),
-        UUID.randomUUID() to Calculation(
-            LocalDateTime.now(),
-            LocalDateTime.now(),
-            TextFieldValue(""),
-            "",
-            ""
         )
     ))
 
@@ -49,5 +35,14 @@ class CalculationsRepository @Inject constructor() {
         calculations.update { current ->
             current.filterKeys { it != uuid  }
         }
+    }
+
+    fun appendCalculation(calculation: Calculation): UUID {
+        val newUuid = UUID.randomUUID()
+        calculations.update { current ->
+            current + (newUuid to calculation)
+        }
+
+        return newUuid
     }
 }
