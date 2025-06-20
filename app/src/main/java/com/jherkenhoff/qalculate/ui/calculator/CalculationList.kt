@@ -20,10 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
@@ -45,15 +43,16 @@ private fun LazyListState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.las
 @Composable
 fun CalculationList(
     calculations: Map<UUID, Calculation>,
+    focusedCalculationUuid: UUID?,
     modifier: Modifier = Modifier,
     onInputFieldValueChange: (UUID, TextFieldValue) -> Unit = {_, _ -> },
-    onDeleteClick: (UUID) -> Unit = {}
+    onDeleteClick: (UUID) -> Unit = {},
+    onSubmit: (UUID) -> Unit = {},
+    onCalculationFocusChange: (UUID) -> Unit = {}
 ) {
 
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-
-    var focusedCalculationUuid by remember { mutableStateOf(UUID.randomUUID()) }
 
     LaunchedEffect(calculations.size) {
         scrollState.animateScrollToItem(calculations.size)
@@ -80,15 +79,17 @@ fun CalculationList(
                     }
                     list.forEach { entry ->
                         val isExpandedItem = entry.key == focusedCalculationUuid
-                        item() {
+                        item(key = entry.key) {
                             CalculationItem(
                                 entry.value.input,
                                 entry.value.parsed,
                                 entry.value.result,
                                 expanded = isExpandedItem,
-                                onFocusChange = { if (it.isFocused) focusedCalculationUuid = entry.key},
+                                onFocusChange = { if (it.isFocused) onCalculationFocusChange(entry.key)},
                                 onInputFieldValueChange = { onInputFieldValueChange(entry.key, it) },
-                                onDeleteClick = { onDeleteClick(entry.key) }
+                                onDeleteClick = { onDeleteClick(entry.key) },
+                                onSubmit = { onSubmit(entry.key) },
+                                modifier = Modifier.animateItem()
                             )
                         }
                     }
@@ -160,6 +161,7 @@ private fun DefaultPreview() {
 
     CalculationList(
         testCalculationHistory,
+        null
     )
 }
 
@@ -168,5 +170,6 @@ private fun DefaultPreview() {
 private fun EmptyPreview() {
     CalculationList(
         emptyMap(),
+        null
     )
 }
