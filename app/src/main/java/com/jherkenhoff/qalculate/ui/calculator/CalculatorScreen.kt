@@ -115,6 +115,7 @@ fun CalculatorScreenContent(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            CalculatorTopBar()
             Spacer(Modifier.weight(1f))
 
             Box(contentAlignment = Alignment.BottomCenter) {
