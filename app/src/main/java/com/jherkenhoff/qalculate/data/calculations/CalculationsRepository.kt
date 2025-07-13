@@ -16,9 +16,9 @@ class CalculationsRepository @Inject constructor() {
             LocalDateTime.now(),
             LocalDateTime.now(),
             TextFieldValue(""),
-            "",
-            ""
-        )
+            "0",
+            "0"
+        ),
     ))
 
     fun observeCalculations(): Flow<Map<UUID, Calculation>> = calculations
