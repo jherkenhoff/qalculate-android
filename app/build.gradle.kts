@@ -9,7 +9,6 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.compose)
     id("com.google.protobuf") version("0.9.4")
-
 }
 
 val splitApks = !project.hasProperty("noSplits")

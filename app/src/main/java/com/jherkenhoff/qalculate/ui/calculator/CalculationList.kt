@@ -1,10 +1,12 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jherkenhoff.qalculate.domain.AutocompleteResult
+import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Calculation
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -45,10 +49,12 @@ fun CalculationList(
     calculations: Map<UUID, Calculation>,
     focusedCalculationUuid: UUID?,
     modifier: Modifier = Modifier,
+    autocompleteResult: AutocompleteResult? = null,
     onInputFieldValueChange: (UUID, TextFieldValue) -> Unit = {_, _ -> },
     onDeleteClick: (UUID) -> Unit = {},
     onSubmit: (UUID) -> Unit = {},
-    onCalculationFocusChange: (UUID) -> Unit = {}
+    onCalculationFocusChange: (UUID?) -> Unit = {},
+    onAutocompleteClick: (AutocompleteItem) -> Unit = {}
 ) {
 
     val scrollState = rememberLazyListState()
@@ -58,8 +64,12 @@ fun CalculationList(
         scrollState.animateScrollToItem(calculations.size)
     }
 
+    BackHandler(enabled = focusedCalculationUuid != null) {
+        onCalculationFocusChange(null)
+    }
+
     Box(
-        modifier = modifier
+        modifier = modifier.clickable(interactionSource = null, onClick = { onCalculationFocusChange(null) }, indication = null)
     ) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -84,11 +94,13 @@ fun CalculationList(
                                 entry.value.input,
                                 entry.value.parsed,
                                 entry.value.result,
+                                autocompleteResult = autocompleteResult,
                                 expanded = isExpandedItem,
                                 onFocusChange = { if (it.isFocused) onCalculationFocusChange(entry.key)},
                                 onInputFieldValueChange = { onInputFieldValueChange(entry.key, it) },
                                 onDeleteClick = { onDeleteClick(entry.key) },
                                 onSubmit = { onSubmit(entry.key) },
+                                onAutocompleteClick = onAutocompleteClick,
                                 modifier = Modifier.animateItem()
                             )
                         }

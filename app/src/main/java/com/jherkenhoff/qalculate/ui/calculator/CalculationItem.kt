@@ -10,11 +10,16 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,6 +68,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.R
+import com.jherkenhoff.qalculate.domain.AutocompleteResult
+import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 
 private const val overflowFraction = 0.9f
@@ -73,21 +81,23 @@ fun CalculationItem(
     parsedText: String,
     resultText: String,
     modifier: Modifier = Modifier,
+    autocompleteResult: AutocompleteResult? = null,
     expanded: Boolean = false,
     onFocusChange: (FocusState) -> Unit = {},
     onInputFieldValueChange: (TextFieldValue) -> Unit = {},
     onDeleteClick: () -> Unit = {},
-    onSubmit: () -> Unit = {}
+    onSubmit: () -> Unit = {},
+    onAutocompleteClick: (AutocompleteItem) -> Unit = {}
 ) {
-
     val color: Color by animateColorAsState(
-        targetValue = if (expanded) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.background,
+        targetValue = if (expanded) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background,
         label = "color",
         animationSpec = tween(200)
     )
 
     Surface(
         color = color,
+        modifier = modifier
     ) {
         SharedTransitionLayout(
             Modifier.padding(top = 10.dp, bottom = 6.dp)
@@ -100,10 +110,12 @@ fun CalculationItem(
                             parsedText,
                             resultText,
                             this@AnimatedContent,
+                            autocompleteResult = autocompleteResult,
                             onFocusChange = onFocusChange,
                             onInputFieldValueChange = onInputFieldValueChange,
                             onSubmit = onSubmit,
-                            onDeleteClick = onDeleteClick
+                            onDeleteClick = onDeleteClick,
+                            onAutocompleteClick = onAutocompleteClick
                         )
                     } else {
                         CompactCalculationItem(
@@ -197,10 +209,12 @@ fun SharedTransitionScope.ExpandedCalculationItem(
     resultText: String,
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
+    autocompleteResult: AutocompleteResult? = null,
     onFocusChange: (FocusState) -> Unit = {},
     onInputFieldValueChange: (TextFieldValue) -> Unit = {},
     onDeleteClick: () -> Unit = {},
-    onSubmit: () -> Unit = {}
+    onSubmit: () -> Unit = {},
+    onAutocompleteClick: (AutocompleteItem) -> Unit = {}
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -210,7 +224,7 @@ fun SharedTransitionScope.ExpandedCalculationItem(
         focusRequester.requestFocus()
     }
 
-    Column {
+    Column(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.defaultMinSize(minHeight = 56.dp)
@@ -241,36 +255,37 @@ fun SharedTransitionScope.ExpandedCalculationItem(
                 }
             }
         }
-        HorizontalDivider()
 
-        SubcomposeLayout { constraints ->
-            val parsedTextPlaceable = subcompose("parsedText") {
-                Text(mathExpressionFormatter(parsedText), modifier = Modifier.padding(start = 16.dp))
-            }[0].measure(constraints)
-
-            val resultSectionPlaceable = subcompose("resultSection") {
-                ResultSection(
-                    resultText,
-                    onDeleteClick = onDeleteClick,
-                    modifier = Modifier.sharedElement(
-                        rememberSharedContentState(key = "result_section"),
-                        animatedVisibilityScope = animatedVisibilityScope
-                    )
-                )
-            }[0].measure(constraints.copy(maxWidth = (constraints.maxWidth*overflowFraction).toInt()))
-
-            val overflow =  parsedTextPlaceable.width + resultSectionPlaceable.width > constraints.maxWidth
-
-            val totalHeight = if (overflow) parsedTextPlaceable.height + resultSectionPlaceable.height else resultSectionPlaceable.height
-
-            layout(constraints.maxWidth, totalHeight) {
-                parsedTextPlaceable.place(0, 0)
-                if (overflow) {
-                    resultSectionPlaceable.place(constraints.maxWidth-resultSectionPlaceable.width, parsedTextPlaceable.height)
-                } else {
-                    resultSectionPlaceable.place(constraints.maxWidth-resultSectionPlaceable.width, 0)
+        AnimatedVisibility(autocompleteResult != null && autocompleteResult.items.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier.padding(horizontal = 8.dp).height(48.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                autocompleteResult?.let {
+                    items(it.items) {
+                        SuggestionChip(
+                            label = { Text(it.title) },
+                            onClick = { onAutocompleteClick(it) },
+                        )
+                    }
                 }
             }
+        }
+
+        HorizontalDivider()
+
+        Text(mathExpressionFormatter(parsedText), modifier = Modifier.padding(start = 16.dp))
+
+        Row{
+            Spacer(Modifier.weight(1f))
+            ResultSection(
+                resultText,
+                onDeleteClick = onDeleteClick,
+                modifier = Modifier.padding(start = 16.dp).sharedElement(
+                    rememberSharedContentState(key = "result_section"),
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            )
         }
     }
 }
@@ -302,7 +317,6 @@ fun InputTextField(
                     // but submit the calculation
                     if (it.type == KeyEventType.KeyDown && it.key == Key.Enter) {
                         onSubmit()
-                        focusManager.clearFocus()
                         true
                     } else {
                         false
@@ -315,11 +329,29 @@ fun InputTextField(
                 keyboardType = KeyboardType.Password
             ),
             keyboardActions = KeyboardActions(
-                onAny = { onSubmit() }
+                onAny = { onSubmit() },
             ),
             cursorBrush = SolidColor(LocalContentColor.current),
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
         )
+
+//        class MyPopupPositionProvider : PopupPositionProvider {
+//            override fun calculatePosition(
+//                anchorBounds: IntRect,
+//                windowSize: IntSize,
+//                layoutDirection: LayoutDirection,
+//                popupContentSize: IntSize
+//            ): IntOffset {
+//                return anchorBounds.topLeft
+//            }
+//
+//        }
+//
+//        Popup(
+//            MyPopupPositionProvider()
+//        ) {
+//            Text("aaaaaa")
+//        }
 
         if (inputFieldValue.text.isEmpty()) {
             Text(
@@ -327,6 +359,9 @@ fun InputTextField(
                 style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
             )
         }
+
+
+
     }
 }
 

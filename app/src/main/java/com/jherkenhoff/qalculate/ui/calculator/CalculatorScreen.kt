@@ -1,11 +1,15 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,7 +20,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -24,9 +27,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
+import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Calculation
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -38,31 +43,20 @@ fun CalculatorScreen(
     openDrawer: () -> Unit = { },
     openSettings: () -> Unit = { }
 ) {
-    val autocompleteResult by viewModel.autocompleteResult.collectAsStateWithLifecycle()
-    val inputTextFieldValue by viewModel.inputTextFieldValue.collectAsStateWithLifecycle()
-    val parsedString by viewModel.parsedString.collectAsStateWithLifecycle()
-    val resultString by viewModel.resultString.collectAsStateWithLifecycle()
+    // val autocompleteResult by viewModel.autocompleteResult.collectAsStateWithLifecycle()
 
     CalculatorScreenContent(
-        autocompleteResult = autocompleteResult,
-        input = { inputTextFieldValue },
-        altKeyboardVisible = viewModel.altKeyboardOpen.collectAsState(false).value,
-        onInputChanged = viewModel::updateInput,
         onQuickKeyPressed = viewModel::insertText,
-        onDelKeyPressed = viewModel::removeLastChar,
-        onACKeyPressed = viewModel::clearInput,
         calculations = viewModel.calculations.collectAsState().value,
         focusedCalculationUuid = viewModel.focusedCalculationUuid.collectAsStateWithLifecycle().value,
-        parsedString = { parsedString },
-        resultString = { resultString },
+        autocompleteResult = viewModel.autocompleteResult.collectAsStateWithLifecycle().value,
         onInputFieldValueChange = viewModel::updateCalculation,
         onDeleteCalculation = viewModel::deleteCalculation,
         onCalculationSubmit = viewModel::submitCalculation,
-        onAltKeyboardToggle = viewModel::toggleAltKeyboard,
-        onAutocompleteClick = viewModel::acceptAutocomplete,
-        openDrawer = openDrawer,
-        openSettings = openSettings,
-        onCalculationFocusChange = viewModel::onCalculationFocusChange
+        onMenuClick = openDrawer,
+        onSettingsClick = openSettings,
+        onCalculationFocusChange = viewModel::onCalculationFocusChange,
+        onAutocompleteClick = viewModel::acceptAutocomplete
     )
 }
 
@@ -71,25 +65,17 @@ fun CalculatorScreen(
 )
 @Composable
 fun CalculatorScreenContent(
-    autocompleteResult: AutocompleteResult,
-    input: () -> TextFieldValue,
-    altKeyboardVisible: Boolean,
-    onInputChanged: (TextFieldValue) -> Unit,
     onQuickKeyPressed: (String, String) -> Unit,
-    onDelKeyPressed: () -> Unit,
-    onACKeyPressed: () -> Unit,
     calculations: Map<UUID, Calculation>,
     focusedCalculationUuid: UUID?,
-    parsedString: () -> String,
-    resultString: () -> String,
+    autocompleteResult: AutocompleteResult? = null,
     onInputFieldValueChange: (UUID, TextFieldValue) -> Unit = {_, _ -> },
     onDeleteCalculation: (UUID) -> Unit = {},
     onCalculationSubmit: (UUID) -> Unit = {},
-    onCalculationFocusChange: (UUID) -> Unit = {},
-    onAltKeyboardToggle: (Boolean) -> Unit = {},
-    onAutocompleteClick: (String, String) -> Unit = {_, _ ->},
-    openDrawer: () -> Unit = {  },
-    openSettings: () -> Unit = {  }
+    onCalculationFocusChange: (UUID?) -> Unit = {},
+    onAutocompleteClick: (AutocompleteItem) -> Unit = {},
+    onMenuClick: () -> Unit = {  },
+    onSettingsClick: () -> Unit = {  }
 ) {
 
     val scope = rememberCoroutineScope()
@@ -97,7 +83,6 @@ fun CalculatorScreenContent(
 
     fun deleteCalculationWithSnackbar(uuid: UUID) {
         scope.launch {
-
             snackbarHostState.showSnackbar(
                 "Deleted calculation " + calculations[uuid]?.input?.text,
                 actionLabel = "Undo",
@@ -110,30 +95,46 @@ fun CalculatorScreenContent(
     }
 
     Surface(
-        color = MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.background,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            CalculatorTopBar()
-            Spacer(Modifier.weight(1f))
+            CalculatorTopBar(
+                onMenuClick = onMenuClick,
+                onSettingsClick = onSettingsClick
+            )
 
-            Box(contentAlignment = Alignment.BottomCenter) {
+            Box(
+                contentAlignment = Alignment.BottomCenter,
+                modifier = Modifier.weight(1f)
+            ) {
                 CalculationList(
                     calculations,
                     focusedCalculationUuid,
+                    autocompleteResult = autocompleteResult,
                     onInputFieldValueChange = onInputFieldValueChange,
                     onDeleteClick = { deleteCalculationWithSnackbar(it) },
                     onSubmit = onCalculationSubmit,
-                    onCalculationFocusChange = onCalculationFocusChange
+                    onCalculationFocusChange = onCalculationFocusChange,
+                    onAutocompleteClick = onAutocompleteClick,
+                    modifier = Modifier.fillMaxHeight()
                 )
 
                 SnackbarHost(snackbarHostState)
             }
 
-            QuickKeys(onKey = onQuickKeyPressed)
+
+            AnimatedVisibility(focusedCalculationUuid != null) {
+                Toolbar(Modifier.padding(bottom = 16.dp))
+            }
+
+
+            AnimatedVisibility(WindowInsets.isImeVisible && focusedCalculationUuid != null) {
+                QuickKeys(onKey = onQuickKeyPressed)
+            }
+
             Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.safeContent))
-            // AutocompleteBar(autocompleteResult.items)
         }
     }
 }
@@ -160,17 +161,9 @@ private val testCalculationHistory = mapOf(
 @Composable
 private fun DefaultPreview() {
     CalculatorScreenContent(
-        autocompleteResult = AutocompleteResult(),
-        input = { TextFieldValue("1+1") },
-        altKeyboardVisible = false,
-        onInputChanged = {},
         onQuickKeyPressed = {_, _ ->},
-        onDelKeyPressed = {},
-        onACKeyPressed = {},
         calculations = testCalculationHistory,
         focusedCalculationUuid = null,
-        parsedString = { "1+1" },
-        resultString = { "2" },
         onCalculationSubmit = {}
     )
 }
@@ -179,17 +172,9 @@ private fun DefaultPreview() {
 @Composable
 private fun EmptyPreview() {
     CalculatorScreenContent(
-        autocompleteResult = AutocompleteResult(),
-        input = { TextFieldValue("") },
-        altKeyboardVisible = false,
-        onInputChanged = {},
         onQuickKeyPressed = {_, _ ->},
-        onDelKeyPressed = {},
-        onACKeyPressed = {},
         calculations = emptyMap(),
         focusedCalculationUuid = null,
-        parsedString = { "0" },
-        resultString = { "0" },
         onCalculationSubmit = {}
     )
 }
@@ -198,17 +183,9 @@ private fun EmptyPreview() {
 @Composable
 private fun AutocompletePreview() {
     CalculatorScreenContent(
-        autocompleteResult = AutocompleteResult(),
-        input = { TextFieldValue("1*t") },
-        altKeyboardVisible = false,
-        onInputChanged = {},
         onQuickKeyPressed = {_, _ ->},
-        onDelKeyPressed = {},
-        onACKeyPressed = {},
         calculations = testCalculationHistory,
         focusedCalculationUuid = null,
-        parsedString = { "" },
-        resultString = { "" },
         onCalculationSubmit = {},
     )
 }
