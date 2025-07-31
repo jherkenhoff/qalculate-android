@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,12 +17,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -42,11 +42,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jherkenhoff.qalculate.R
@@ -78,7 +80,7 @@ fun InputSheet(
     Surface(
         //shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
         shape = RoundedCornerShape(25.dp, 25.dp, 25.dp, 25.dp),
-        color = MaterialTheme.colorScheme.primaryContainer,
+        color = MaterialTheme.colorScheme.surfaceContainer,
         modifier = modifier.fillMaxWidth()
     ) {
         Column {
@@ -96,42 +98,38 @@ fun InputSheet(
                     .defaultMinSize(minHeight = 60.dp)
             )
 
-
             Text(
-                mathExpressionFormatter(parsed, color=true),
+                // If the parsed expression is empty, add placeholder text to fill the gap.
+                mathExpressionFormatter(parsed, color=true).ifEmpty { AnnotatedString(stringResource(R.string.parsed_expr_empty)) },
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .defaultMinSize(minHeight = 24.dp)
                     .wrapContentHeight(),
             )
+
             HorizontalDivider(
-                modifier = Modifier
-                    .height(1.dp)
-                    .fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                thickness = Dp.Hairline,
+                color = MaterialTheme.colorScheme.outlineVariant
             )
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.defaultMinSize(minHeight = 50.dp)
             ) {
-                FilledIconToggleButton(
+                FilledTonalIconToggleButton(
                     checked = isAltKeyboardOpen,
                     onCheckedChange = { onToggleAltKeyboard() },
-                    colors = IconToggleButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        disabledContentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
+                    colors = IconButtonDefaults.filledTonalIconToggleButtonColors(),
                     modifier = Modifier
                         .padding(5.dp)
                         .size(40.dp)
                 ) {
-                    Icon(Icons.Filled.Calculate, contentDescription = null)
+                    if (isAltKeyboardOpen) {
+                        Icon(Icons.Filled.Calculate, contentDescription = null)
+                    } else {
+                        Icon(Icons.Outlined.Calculate, contentDescription = null)
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
