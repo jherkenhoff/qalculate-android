@@ -23,15 +23,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jherkenhoff.libqalculate.ApproximationMode
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import kotlinx.coroutines.awaitCancellation
 import java.time.LocalDateTime
@@ -61,6 +64,8 @@ fun CalculatorScreen(
         onAutocompleteClick = viewModel::acceptAutocomplete,
         onAutocompleteDismiss = viewModel::dismissAutocomplete,
         openDrawer = openDrawer,
+        onApproximationChanged = viewModel::setApproximationMode,
+        onDisplayExponentChanged = viewModel::setMinExponent
     )
 }
 
@@ -83,7 +88,9 @@ fun CalculatorScreenContent(
     onAltKeyboardToggle: (Boolean) -> Unit = {},
     onAutocompleteClick: (String, String) -> Unit = {_, _ ->},
     onAutocompleteDismiss: () -> Unit = {  },
-    openDrawer: () -> Unit = {  }
+    openDrawer: () -> Unit = {  },
+    onApproximationChanged: (ApproximationMode) -> Unit = {  },
+    onDisplayExponentChanged: (Int) -> Unit = {  }
 ) {
 
     //val screenSettingsRepository = ScreenSettingsRepository(LocalContext.current)
@@ -111,9 +118,21 @@ fun CalculatorScreenContent(
 
                 },
                 actions = {
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("DEG") })
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exact") })
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exp.") })
+
+                    var isExact by rememberSaveable { mutableStateOf(false) }
+                    var isExponent by rememberSaveable { mutableStateOf(false) }
+
+                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("RAD", textDecoration = TextDecoration.LineThrough) })
+
+                    SuggestionChip(label = { Text(if(isExact) "Exact" else "Approx.") }, onClick = {
+                        isExact = !isExact
+                        onApproximationChanged(if(isExact) ApproximationMode.APPROXIMATION_EXACT else ApproximationMode.APPROXIMATION_TRY_EXACT)
+                    })
+
+                    SuggestionChip(label = { Text(if(isExponent) "Exp." else "Dec.") }, onClick = {
+                        isExponent = !isExponent
+                        onDisplayExponentChanged(if(isExponent) 1 else -1)
+                    })
                 }
 
             )

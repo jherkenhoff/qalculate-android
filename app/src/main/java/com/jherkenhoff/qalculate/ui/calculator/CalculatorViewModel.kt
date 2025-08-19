@@ -10,6 +10,7 @@ import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jherkenhoff.libqalculate.ApproximationMode
 import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.IntervalDisplay
 import com.jherkenhoff.libqalculate.PrintOptions
@@ -50,6 +51,9 @@ class CalculatorViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CalculatorUiState())
+
+    private var approximationMode: ApproximationMode = ApproximationMode.APPROXIMATION_TRY_EXACT
+    private var minDisplayExponent: Int = -1 // Default value as per https://qalculate.github.io/reference/structPrintOptions.html
     val uiState: StateFlow<CalculatorUiState> = _uiState.asStateFlow()
 
     private var autocompleteJob: Job? = null
@@ -214,6 +218,16 @@ class CalculatorViewModel @Inject constructor(
         ))
     }
 
+    fun setApproximationMode(newApproximationMode: ApproximationMode) {
+        approximationMode = newApproximationMode
+        recalculate()
+    }
+
+    fun setMinExponent(newMin: Int) {
+        minDisplayExponent = newMin
+        recalculate()
+    }
+
     private fun recalculate() {
 
         calculateJob
@@ -224,11 +238,12 @@ class CalculatorViewModel @Inject constructor(
 
             parsedString = parseUseCase(inputTextFieldValue.text)
 
-            val calculatedMathStructure = calculateUseCase(inputTextFieldValue.text)
+            val calculatedMathStructure = calculateUseCase(inputTextFieldValue.text, approximationMode)
 
             val resultPo = PrintOptions()
             resultPo.interval_display = IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
             resultPo.use_unicode_signs = 1
+            resultPo.min_exp = minDisplayExponent
             resultString = calculator.print(calculatedMathStructure, 2000, resultPo, true, 1, TAG_TYPE_HTML)
         }
     }
