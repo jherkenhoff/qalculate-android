@@ -16,6 +16,7 @@ import com.jherkenhoff.qalculate.domain.ParseUseCase
 import com.jherkenhoff.qalculate.domain.PrintUseCase
 import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Calculation
+import com.jherkenhoff.qalculate.model.KeyAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -60,6 +61,33 @@ class CalculatorViewModel @Inject constructor(
 
     val altKeyboardOpen = userPreferencesRepository.userPreferencesFlow.map { it.altKeyboardOpen }
 
+
+    init {
+        viewModelScope.launch {
+            calculations.collect {
+                if (it.isEmpty()) {
+                    val newUuid = calculationsRepository.appendCalculation(
+                        Calculation(
+                            LocalDateTime.now(),
+                            LocalDateTime.now(),
+                            TextFieldValue(""),
+                            "0",
+                            "0"
+                        )
+                    )
+
+                    _focusedCalculationUuid.value = newUuid
+                }
+            }
+        }
+    }
+
+    fun submitCalculation() {
+        focusedCalculationUuid.value?.let {
+            submitCalculation(it)
+        }
+    }
+
     fun submitCalculation(uuid: UUID) {
         viewModelScope.launch {
             val newUuid = calculationsRepository.appendCalculation(
@@ -89,6 +117,27 @@ class CalculatorViewModel @Inject constructor(
     fun deleteCalculation(uuid: UUID) {
         viewModelScope.launch {
             calculationsRepository.deleteCalculation(uuid)
+        }
+    }
+
+    fun handleKeyAction(keyAction: KeyAction) {
+
+        when (keyAction) {
+            is KeyAction.InsertText -> insertText(keyAction.preCursorText, keyAction.postCursorText)
+            is KeyAction.Backspace -> removeChars(keyAction.nChars)
+            is KeyAction.Return -> submitCalculation()
+            is KeyAction.ClearAll -> clearAll()
+            is KeyAction.MoveCursor -> moveCursor(keyAction.chars)
+        }
+    }
+
+    fun moveCursor(chars: Int) {
+        focusedCalculationUuid.value?.let { uuid ->
+            calculations.value[uuid]?.input?.let { inputTextFieldValue ->
+                val newCursorPosition = inputTextFieldValue.selection.end + chars
+
+                updateCalculation(uuid, inputTextFieldValue.copy(selection = TextRange(newCursorPosition)))
+            }
         }
     }
 
@@ -122,6 +171,34 @@ class CalculatorViewModel @Inject constructor(
                 updateCalculation(uuid, TextFieldValue(
                     text = newText,
                     selection = TextRange(newCursorPosition)
+                ))
+            }
+        }
+    }
+
+    fun removeChars(nChars: Int) {
+        focusedCalculationUuid.value?.let { uuid ->
+            calculations.value[uuid]?.input?.let { inputTextFieldValue ->
+                val maxChars = inputTextFieldValue.text.length
+                val textBeforeSelection = inputTextFieldValue.getTextBeforeSelection(maxChars).dropLast(nChars)
+                val textAfterSelection = inputTextFieldValue.getTextAfterSelection(maxChars)
+                val newText = "$textBeforeSelection$textAfterSelection"
+                val newCursorPosition = textBeforeSelection.length
+
+                updateCalculation(uuid, TextFieldValue(
+                    text = newText,
+                    selection = TextRange(newCursorPosition)
+                ))
+            }
+        }
+    }
+
+    fun clearAll() {
+        focusedCalculationUuid.value?.let { uuid ->
+            calculations.value[uuid]?.input?.let {
+                updateCalculation(uuid, TextFieldValue(
+                    text = "",
+                    selection = TextRange(0)
                 ))
             }
         }

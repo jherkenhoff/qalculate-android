@@ -6,6 +6,7 @@ import com.jherkenhoff.libqalculate.PrintOptions
 
 fun UserPreferences.getQalculateParseOptions() : ParseOptions {
     var po = ParseOptions()
+    po.preserve_format = true
     return po
 }
 
