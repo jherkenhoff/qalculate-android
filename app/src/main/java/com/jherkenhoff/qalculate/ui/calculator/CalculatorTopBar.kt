@@ -40,6 +40,7 @@ fun CalculatorTopBar(
 ) {
     Surface(
         modifier,
+        color = MaterialTheme.colorScheme.surfaceContainer
     ) {
         Column(
         ) {

@@ -10,16 +10,12 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,7 +31,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -97,7 +92,7 @@ fun CalculationItem(
 
     Surface(
         color = color,
-        modifier = modifier
+        modifier = modifier.padding(vertical = 6.dp)
     ) {
         SharedTransitionLayout(
             Modifier.padding(top = 10.dp, bottom = 6.dp)
@@ -255,22 +250,22 @@ fun SharedTransitionScope.ExpandedCalculationItem(
                 }
             }
         }
-
-        AnimatedVisibility(autocompleteResult != null && autocompleteResult.items.isNotEmpty()) {
-            LazyRow(
-                modifier = Modifier.padding(horizontal = 8.dp).height(48.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                autocompleteResult?.let {
-                    items(it.items) {
-                        SuggestionChip(
-                            label = { Text(it.title) },
-                            onClick = { onAutocompleteClick(it) },
-                        )
-                    }
-                }
-            }
-        }
+//
+//        AnimatedVisibility(autocompleteResult != null && autocompleteResult.items.isNotEmpty()) {
+//            LazyRow(
+//                modifier = Modifier.padding(horizontal = 8.dp).height(48.dp),
+//                horizontalArrangement = Arrangement.spacedBy(8.dp),
+//            ) {
+//                autocompleteResult?.let {
+//                    items(it.items) {
+//                        SuggestionChip(
+//                            label = { Text(it.title) },
+//                            onClick = { onAutocompleteClick(it) },
+//                        )
+//                    }
+//                }
+//            }
+//        }
 
         HorizontalDivider()
 
@@ -326,7 +321,7 @@ fun InputTextField(
                 capitalization = KeyboardCapitalization.None,
                 autoCorrectEnabled = false,
                 imeAction = ImeAction.Send,
-                keyboardType = KeyboardType.Password
+                keyboardType = KeyboardType.Ascii
             ),
             keyboardActions = KeyboardActions(
                 onAny = { onSubmit() },
