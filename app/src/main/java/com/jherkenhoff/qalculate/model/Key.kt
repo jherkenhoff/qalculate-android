@@ -2,9 +2,15 @@ package com.jherkenhoff.qalculate.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.KeyboardBackspace
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.ui.graphics.vector.ImageVector
+import java.lang.Float.NEGATIVE_INFINITY
+import kotlin.Int.Companion.MAX_VALUE
+import kotlin.Int.Companion.MIN_VALUE
 
 
 sealed class KeyLabel {
@@ -69,8 +75,11 @@ object Keys {
     val keyClearAll = Key(KeyLabel.Text("AC"), KeyRole.SYSTEM, KeyAction.ClearAll())
     val keyBlank = Key(KeyLabel.Text(""), KeyRole.OPERATOR)
 
-    val keyLeft = Key(KeyLabel.Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, description = "Move cursor left"), KeyRole.SYSTEM, clickAction = KeyAction.MoveCursor(-1))
-    val keyRight = Key(KeyLabel.Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, description = "Move cursor right"), KeyRole.SYSTEM, clickAction = KeyAction.MoveCursor(1))
+    val keyLeft = Key(KeyLabel.Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, description = "Move cursor left"), KeyRole.SYSTEM, clickAction = KeyAction.MoveCursor(-1), longClickAction = KeyAction.MoveCursor(MIN_VALUE))
+    val keyRight = Key(KeyLabel.Icon(Icons.AutoMirrored.Default.KeyboardArrowRight, description = "Move cursor right"), KeyRole.SYSTEM, clickAction = KeyAction.MoveCursor(1), longClickAction = KeyAction.MoveCursor(MAX_VALUE))
+
+    val keyUndo = Key(KeyLabel.Icon(Icons.AutoMirrored.Default.Undo, description = "Undo last action"), KeyRole.SYSTEM, clickAction = null)
+    val keyRedo = Key(KeyLabel.Icon(Icons.AutoMirrored.Default.Redo, description = "Redo last action"), KeyRole.SYSTEM, clickAction = null)
 
 
     val keySin = Key(KeyLabel.Text("sin"), KeyRole.OPERATOR, KeyAction.InsertText("sin(", ")"))

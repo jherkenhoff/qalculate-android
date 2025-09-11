@@ -41,11 +41,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.InterceptPlatformTextInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -58,24 +61,24 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.jherkenhoff.qalculate.R
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
+import kotlinx.coroutines.awaitCancellation
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun InputSheet(
-    textFieldValue: () -> TextFieldValue,
-    parsed: String,
-    result: String,
-    isAltKeyboardOpen: Boolean,
-    onToggleAltKeyboard: () -> Unit,
+    textFieldValue: TextFieldValue,
+    parsedString: String,
+    resultString: String,
     onValueChange: (TextFieldValue) -> Unit,
     onSubmit: (String) -> Unit,
     modifier: Modifier = Modifier,
+    interceptKeyboard: Boolean = false,
     onClearAll: () -> Unit = {},
 ) {
-
     val focusRequester = remember { FocusRequester() }
     var lastFocusState by remember { mutableStateOf(false) }
-    val placeholdeVisible by remember { derivedStateOf { textFieldValue().text.isEmpty() && !lastFocusState } }
+    val placeholdeVisible by remember { derivedStateOf { textFieldValue.text.isEmpty() && !lastFocusState } }
 
     var angleUnitDialogOpen = remember { mutableStateOf(false) }
 
@@ -83,116 +86,81 @@ fun InputSheet(
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
+    Column(modifier = modifier.fillMaxWidth()) {
+        AutoSizeText(
+            text = mathExpressionFormatter(resultString),
+            alignment = Alignment.CenterEnd,
+            style = MaterialTheme.typography.displayMedium,
+            minTextSize = 14.sp,
+            maxTextSize = 50.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .defaultMinSize(minHeight = 60.dp)
+        )
 
-    Surface(
-        //shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
-        shape = RoundedCornerShape(0.dp, 0.dp, 30.dp, 30.dp),
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Column {
+        Box(
+            contentAlignment = Alignment.CenterStart,
+            modifier = Modifier.defaultMinSize(minHeight = 64.dp).padding(horizontal = 16.dp)
+        ) {
 
-            Spacer( Modifier.windowInsetsTopHeight(WindowInsets.safeContent))
-            Row(
-                modifier = Modifier.fillMaxWidth()
+            InterceptPlatformTextInput(
+                interceptor = { request, nextHandler ->
+                    if (interceptKeyboard) {
+                        awaitCancellation()
+                    } else {
+                        nextHandler.startInputMethod(request)
+                    }
+                }
             ) {
-                IconButton(onClick = {  }) {
-                    Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = "Open navigation menu"
-                    )
-                }
-                Spacer(Modifier.weight(1f))
-                AssistChip(onClick = { angleUnitDialogOpen.value = true }, label = { Text("Degrees") }, modifier = Modifier.padding(horizontal = 3.dp))
-                AssistChip(onClick = { /*TODO*/ }, label = { Text("Scientific") }, modifier = Modifier.padding(horizontal = 3.dp))
-                FilterChip(selected = true, onClick = { /*TODO*/ }, label = { Text("Exact") }, modifier = Modifier.padding(horizontal = 3.dp), colors = FilterChipDefaults.filterChipColors().copy(selectedContainerColor = MaterialTheme.colorScheme.secondary, selectedLabelColor = MaterialTheme.colorScheme.onSecondary))
-            }
-            AutoSizeText(
-                text = mathExpressionFormatter(result),
-                alignment = Alignment.CenterEnd,
-                style = MaterialTheme.typography.displayMedium,
-                minTextSize = 14.sp,
-                maxTextSize = 50.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .defaultMinSize(minHeight = 60.dp)
-            )
-
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.defaultMinSize(minHeight = 64.dp).padding(horizontal = 16.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    BasicTextField(
-                        value = textFieldValue(),
-                        onValueChange = onValueChange,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .focusRequester(focusRequester)
-                            .onFocusChanged { state -> lastFocusState = state.isFocused },
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.None,
-                            autoCorrectEnabled = false,
-                            imeAction = ImeAction.Send,
-                            keyboardType = KeyboardType.Password
-                        ),
-                        keyboardActions = KeyboardActions {
-                            if (textFieldValue().text.isNotBlank()) onSubmit(textFieldValue().text)
-                        },
-                        cursorBrush = SolidColor(LocalContentColor.current),
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-                    )
-
-
-                    //  && !lastFocusState
-                    if (placeholdeVisible) {
-                        Text(
-                            text = stringResource(R.string.textfield_hint),
-                            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)),
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                val acButtonVisible by remember {
-                    derivedStateOf {
-                        textFieldValue().text.isNotEmpty()
-                    }
-                }
-
-                AnimatedVisibility(visible = acButtonVisible) {
-                    IconButton(
-                        onClick = onClearAll,
-                    ) {
-                        Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.clear_input))
-                    }
-                }
+                BasicTextField(
+                    value = textFieldValue,
+                    onValueChange = onValueChange,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .focusRequester(focusRequester)
+                        .onFocusChanged { state -> lastFocusState = state.isFocused },
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrectEnabled = false,
+                        imeAction = ImeAction.Send,
+                        keyboardType = KeyboardType.Password
+                    ),
+                    keyboardActions = KeyboardActions {
+                        if (textFieldValue.text.isNotBlank()) onSubmit(textFieldValue.text)
+                    },
+                    cursorBrush = SolidColor(LocalContentColor.current),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                )
             }
 
-            HorizontalDivider(
-                modifier = Modifier
-                    .height(1.dp)
-                    .fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                mathExpressionFormatter(parsed, color=true),
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .defaultMinSize(minHeight = 24.dp)
-                    .wrapContentHeight(),
-            )
+            //  && !lastFocusState
+            if (placeholdeVisible) {
+                Text(
+                    text = stringResource(R.string.textfield_hint),
+                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)),
+                )
+            }
         }
+
+        HorizontalDivider(
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth(),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            mathExpressionFormatter(parsedString, color=true),
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .defaultMinSize(minHeight = 24.dp)
+                .wrapContentHeight(),
+        )
+        Spacer(Modifier.height(20.dp))
     }
 
     AnimatedVisibility(angleUnitDialogOpen.value) {
@@ -227,30 +195,26 @@ fun AngleUnitDialog(
 }
 
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
     InputSheet(
-        {TextFieldValue("c")},
+        TextFieldValue("c"),
         "SpeedOfLight",
         "299.792 458 Km/ms",
-        false,
         {},
         {},
-        {}
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun PlaceholderPreview() {
     InputSheet(
-        {TextFieldValue("")},
+        TextFieldValue(""),
         "",
         "0",
-        false,
         {},
         {},
-        {}
     )
 }

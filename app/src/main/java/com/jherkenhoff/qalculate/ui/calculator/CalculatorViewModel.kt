@@ -1,5 +1,8 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getTextAfterSelection
@@ -18,17 +21,26 @@ import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Calculation
 import com.jherkenhoff.qalculate.model.KeyAction
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
+
+data class CalculatorUiState (
+    val autocompleteList: List<AutocompleteItem> = emptyList(),
+)
 @HiltViewModel
 class CalculatorViewModel @Inject constructor(
     private val parseUseCase: ParseUseCase,
@@ -39,11 +51,41 @@ class CalculatorViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
-    private val _focusedCalculationUuid = MutableStateFlow<UUID?>(null)
-    val focusedCalculationUuid = _focusedCalculationUuid.asStateFlow()
+    private val _uiState = MutableStateFlow(CalculatorUiState())
+    val uiState: StateFlow<CalculatorUiState> = _uiState.asStateFlow()
 
-    private val _autocompleteResult = MutableStateFlow<AutocompleteResult?>(null)
-    val autocompleteResult = _autocompleteResult.asStateFlow()
+    private val _inputTextFieldValue = MutableStateFlow(TextFieldValue(""))
+    val inputTextFieldValue = _inputTextFieldValue.asStateFlow()
+
+    private var autocompleteJob: Job? = null
+    private var calculateJob: Job? = null
+
+    private var autocompleteDismissed = false
+
+    val parsedString = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
+        return@combine parseUseCase(inputTextFieldValue.text, userPreferences)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue = ""
+    )
+
+    val resultString = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
+        val mathStructure = calculateUseCase(inputTextFieldValue.text, userPreferences)
+        return@combine printUseCase(mathStructure, userPreferences)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue = ""
+    )
+
+    val autocompleteResult = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
+        autocompleteUseCase(inputTextFieldValue, userPreferences)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue = AutocompleteResult("", emptyList())
+    )
 
     val calculations = calculationsRepository
         .observeCalculations()
@@ -62,50 +104,18 @@ class CalculatorViewModel @Inject constructor(
     val altKeyboardOpen = userPreferencesRepository.userPreferencesFlow.map { it.altKeyboardOpen }
 
 
-    init {
-        viewModelScope.launch {
-            calculations.collect {
-                if (it.isEmpty()) {
-                    val newUuid = calculationsRepository.appendCalculation(
-                        Calculation(
-                            LocalDateTime.now(),
-                            LocalDateTime.now(),
-                            TextFieldValue(""),
-                            "0",
-                            "0"
-                        )
-                    )
-
-                    _focusedCalculationUuid.value = newUuid
-                }
-            }
-        }
-    }
-
     fun submitCalculation() {
-        focusedCalculationUuid.value?.let {
-            submitCalculation(it)
-        }
-    }
-
-    fun submitCalculation(uuid: UUID) {
         viewModelScope.launch {
-            val newUuid = calculationsRepository.appendCalculation(
+            calculationsRepository.appendCalculation(
                 Calculation(
                     LocalDateTime.now(),
                     LocalDateTime.now(),
-                    TextFieldValue(""),
-                    "0",
-                    "0"
+                    inputTextFieldValue.value,
+                    parsedString.value,
+                    resultString.value
                 )
             )
-
-            _focusedCalculationUuid.value = newUuid
         }
-    }
-
-    fun onCalculationFocusChange(uuid: UUID?) {
-        _focusedCalculationUuid.value = uuid
     }
 
     fun toggleAltKeyboard(newState: Boolean) {
@@ -121,87 +131,48 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun handleKeyAction(keyAction: KeyAction) {
-
         when (keyAction) {
             is KeyAction.InsertText -> insertText(keyAction.preCursorText, keyAction.postCursorText)
             is KeyAction.Backspace -> removeChars(keyAction.nChars)
             is KeyAction.Return -> submitCalculation()
-            is KeyAction.ClearAll -> clearAll()
+            is KeyAction.ClearAll -> clearInput()
             is KeyAction.MoveCursor -> moveCursor(keyAction.chars)
         }
     }
 
     fun moveCursor(chars: Int) {
-        focusedCalculationUuid.value?.let { uuid ->
-            calculations.value[uuid]?.input?.let { inputTextFieldValue ->
-                val newCursorPosition = inputTextFieldValue.selection.end + chars
-
-                updateCalculation(uuid, inputTextFieldValue.copy(selection = TextRange(newCursorPosition)))
-            }
-        }
+        val newCursorPosition = inputTextFieldValue.value.selection.end + chars
+        updateInput(inputTextFieldValue.value.copy(selection = TextRange(newCursorPosition)))
     }
 
-    fun updateCalculation(uuid: UUID, input: TextFieldValue) {
-        viewModelScope.launch {
-            _autocompleteResult.value = autocompleteUseCase(input, userPreferences.value)
+    fun updateInput(input: TextFieldValue) = _inputTextFieldValue.update { input }
+    fun clearInput() = _inputTextFieldValue.update { TextFieldValue("") }
 
-            val parsed = parseUseCase(input.text, userPreferences.value)
-            val mathStructure = calculateUseCase(input.text, userPreferences.value)
-            val result = printUseCase(mathStructure, userPreferences.value)
-
-            calculationsRepository.updateCalculation(uuid, Calculation(
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                input,
-                parsed,
-                result
-            ))
-        }
-    }
 
     fun insertText(preCursorText: String, postCursorText: String = "") {
-        focusedCalculationUuid.value?.let { uuid ->
-            calculations.value[uuid]?.input?.let { inputTextFieldValue ->
-                val maxChars = inputTextFieldValue.text.length
-                val textBeforeSelection = inputTextFieldValue.getTextBeforeSelection(maxChars)
-                val textAfterSelection = inputTextFieldValue.getTextAfterSelection(maxChars)
-                val newText = "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
-                val newCursorPosition = textBeforeSelection.length + preCursorText.length
+        val maxChars = inputTextFieldValue.value.text.length
+        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
+        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
+        val newText = "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
+        val newCursorPosition = textBeforeSelection.length + preCursorText.length
 
-                updateCalculation(uuid, TextFieldValue(
-                    text = newText,
-                    selection = TextRange(newCursorPosition)
-                ))
-            }
-        }
+        updateInput(TextFieldValue(
+            text = newText,
+            selection = TextRange(newCursorPosition)
+        ))
     }
 
     fun removeChars(nChars: Int) {
-        focusedCalculationUuid.value?.let { uuid ->
-            calculations.value[uuid]?.input?.let { inputTextFieldValue ->
-                val maxChars = inputTextFieldValue.text.length
-                val textBeforeSelection = inputTextFieldValue.getTextBeforeSelection(maxChars).dropLast(nChars)
-                val textAfterSelection = inputTextFieldValue.getTextAfterSelection(maxChars)
-                val newText = "$textBeforeSelection$textAfterSelection"
-                val newCursorPosition = textBeforeSelection.length
+        val maxChars = inputTextFieldValue.value.text.length
+        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars).dropLast(nChars)
+        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
+        val newText = "$textBeforeSelection$textAfterSelection"
+        val newCursorPosition = textBeforeSelection.length
 
-                updateCalculation(uuid, TextFieldValue(
-                    text = newText,
-                    selection = TextRange(newCursorPosition)
-                ))
-            }
-        }
-    }
-
-    fun clearAll() {
-        focusedCalculationUuid.value?.let { uuid ->
-            calculations.value[uuid]?.input?.let {
-                updateCalculation(uuid, TextFieldValue(
-                    text = "",
-                    selection = TextRange(0)
-                ))
-            }
-        }
+        updateInput(TextFieldValue(
+            text = newText,
+            selection = TextRange(newCursorPosition)
+        ))
     }
 
     fun acceptAutocomplete(autocompleteItem: AutocompleteItem) {
