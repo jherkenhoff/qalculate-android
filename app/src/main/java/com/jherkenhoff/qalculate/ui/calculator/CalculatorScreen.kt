@@ -81,7 +81,7 @@ fun CalculatorScreenContent(
     parsedString: String,
     resultString: String,
     calculationHistory: Map<UUID, Calculation> = emptyMap(),
-    autocompleteResult: AutocompleteResult? = null,
+    autocompleteResult: AutocompleteResult,
     onKeyAction: (KeyAction) -> Unit = { },
     onInputFieldValueChange: (TextFieldValue) -> Unit = { },
     onDeleteCalculation: (UUID) -> Unit = { },
@@ -136,6 +136,7 @@ fun CalculatorScreenContent(
                 inputTextFieldValue,
                 parsedString,
                 resultString,
+                autocompleteResult,
                 onInputFieldValueChange,
                 {},
                 interceptKeyboard = !keyboardInputEnabled,
@@ -170,9 +171,17 @@ fun CalculatorScreenContent(
                 ) {
 
                     AnimatedVisibility(!isImeVisible) {
-                        SecondaryKeypad(onKeyAction = onKeyAction)
+                        Keypad(
+                            secondaryKeypadKeys,
+                            onKeyAction = onKeyAction,
+                            compact = isImeVisible
+                        )
                     }
-                    PrimaryKeypad(onKeyAction = onKeyAction)
+                    Keypad(
+                        primaryKeypadKeys,
+                        onKeyAction = onKeyAction,
+                        compact = isImeVisible
+                    )
 
                     AuxiliaryBar(
                         autocompleteResult = autocompleteResult,
@@ -211,6 +220,7 @@ private fun DefaultPreview() {
         TextFieldValue("c"),
         "SpeedOfLight",
         "299.792 458 Km/ms",
+        autocompleteResult = AutocompleteResult()
     )
 }
 
@@ -220,6 +230,7 @@ private fun EmptyPreview() {
     CalculatorScreenContent(
         TextFieldValue(""),
         "",
-        ""
+        "",
+        autocompleteResult = AutocompleteResult()
     )
 }

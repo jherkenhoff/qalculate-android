@@ -84,7 +84,7 @@ class CalculatorViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        initialValue = AutocompleteResult("", emptyList())
+        initialValue = AutocompleteResult()
     )
 
     val calculations = calculationsRepository

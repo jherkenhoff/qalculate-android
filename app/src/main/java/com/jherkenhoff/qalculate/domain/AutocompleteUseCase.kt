@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.domain
 
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import com.jherkenhoff.qalculate.data.AutocompleteRepository
@@ -9,6 +10,7 @@ import javax.inject.Inject
 
 data class AutocompleteResult (
     val relevantText: String = "",
+    val contextRange: TextRange = TextRange(0),
     val items: List<AutocompleteItem> = emptyList()
 )
 
@@ -25,16 +27,14 @@ class AutocompleteUseCase @Inject constructor(
         val match = pattern.find(textBefore)
 
         if (match == null) {
-            return AutocompleteResult(
-                "",
-                emptyList()
-            )
+            return AutocompleteResult()
         }
 
         val relevantText = match.value
 
         return AutocompleteResult(
             relevantText,
+            TextRange(match.range.start, match.range.endInclusive+1),
             autocompleteRepository.getAutocompleteSuggestions(relevantText)
         )
     }

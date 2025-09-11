@@ -46,20 +46,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.jherkenhoff.qalculate.R
+import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 import kotlinx.coroutines.awaitCancellation
 
@@ -70,6 +77,7 @@ fun InputSheet(
     textFieldValue: TextFieldValue,
     parsedString: String,
     resultString: String,
+    autocompleteResult: AutocompleteResult,
     onValueChange: (TextFieldValue) -> Unit,
     onSubmit: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -81,6 +89,20 @@ fun InputSheet(
     val placeholdeVisible by remember { derivedStateOf { textFieldValue.text.isEmpty() && !lastFocusState } }
 
     var angleUnitDialogOpen = remember { mutableStateOf(false) }
+
+
+    val annotatedInputTextFieldValue = textFieldValue.copy(
+        annotatedString = buildAnnotatedString {
+            append(textFieldValue.text)
+            addStyle(
+                style = SpanStyle(
+                    textDecoration = TextDecoration.Underline
+                ),
+                start = autocompleteResult.contextRange.start, end = autocompleteResult.contextRange.end
+            )
+        }
+    )
+
 
     // Focus the input text field on app startup
     LaunchedEffect(Unit) {
@@ -116,7 +138,7 @@ fun InputSheet(
                 }
             ) {
                 BasicTextField(
-                    value = textFieldValue,
+                    value = annotatedInputTextFieldValue,
                     onValueChange = onValueChange,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -202,6 +224,20 @@ private fun DefaultPreview() {
         TextFieldValue("c"),
         "SpeedOfLight",
         "299.792 458 Km/ms",
+        AutocompleteResult(),
+        {},
+        {},
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AutocompleteContextPreview() {
+    InputSheet(
+        TextFieldValue("2 GHz × planck"),
+        "2 gigahertz × planck",
+        "1.325 214 03 yJ",
+        AutocompleteResult("planck", TextRange(8, 14)),
         {},
         {},
     )
@@ -212,8 +248,9 @@ private fun DefaultPreview() {
 private fun PlaceholderPreview() {
     InputSheet(
         TextFieldValue(""),
-        "",
         "0",
+        "0",
+        AutocompleteResult(),
         {},
         {},
     )
