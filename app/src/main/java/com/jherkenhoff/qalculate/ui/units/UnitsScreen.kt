@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
@@ -83,129 +85,145 @@ fun UnitsScreenContent(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(text = "Units")
+                    Text(text = "Units", style = MaterialTheme.typography.titleLarge)
                 },
                 navigationIcon = {
                     IconButton(onClick = openDrawer) {
                         Icon(
                             imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
+                            contentDescription = "Open navigation drawer"
                         )
                     }
-
                 },
                 actions = {
-                    IconButton(onClick = {   }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Sort,
                             contentDescription = "Sort icon"
                         )
                     }
                 }
-
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { /* do something */ },
                 containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
+                shape = MaterialTheme.shapes.large
             ) {
                 Icon(Icons.Filled.Add, "Add unit icon")
             }
         },
         modifier = Modifier.imePadding(),
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .padding(innerPadding)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
-
-            SearchBar(
-                query = searchString,
-                placeholder = { Text("search units") },
-                active = false,
-                trailingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search icon") },
-                onActiveChange = {  },
-                onQueryChange = onSearchInputUpdate,
-                onSearch = {},
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+            androidx.compose.material3.Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                colors = androidx.compose.material3.CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                elevation = androidx.compose.material3.CardDefaults.cardElevation(6.dp)
             ) {
-
-            }
-
-            Spacer(modifier = Modifier.size(8.dp))
-
-            Row(
-                modifier = Modifier
-                    .horizontalScroll(scrollState)
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-
-            ) {
-                Box(modifier = Modifier.wrapContentSize(Alignment.BottomStart)) {
-
-                    var expanded by remember { mutableStateOf(false) }
-
-                    FilterChip(
-                        selected = true,
-                        onClick = { expanded = true },
-                        label = { Text("Light") },
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.ArrowDropDown,
-                                contentDescription = "Unit system icon"
+                // All composable content must be inside the Card's content lambda
+                Column {
+                    SearchBar(
+                        query = searchString,
+                        onQueryChange = onSearchInputUpdate,
+                        onSearch = {},
+                        active = false,
+                        onActiveChange = {},
+                        placeholder = { Text("search units") },
+                        trailingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search icon") },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {}
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(scrollState)
+                            .padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Box(modifier = Modifier.wrapContentSize(Alignment.BottomStart)) {
+                            var expanded by remember { mutableStateOf(false) }
+                            FilterChip(
+                                selected = true,
+                                onClick = { expanded = true },
+                                label = { Text("Light") },
+                                trailingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Filled.ArrowDropDown,
+                                        contentDescription = "Unit system icon"
+                                    )
+                                },
+                                shape = MaterialTheme.shapes.medium
                             )
+                            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                                DropdownMenuItem(
+                                    text = { Text("Up") },
+                                    onClick = { /* Handle edit! */ },
+                                    leadingIcon = { Icon(Icons.AutoMirrored.Outlined.ArrowLeft, contentDescription = null) }
+                                )
+                                HorizontalDivider()
+                                DropdownMenuItem(
+                                    text = { Text("Settings") },
+                                    onClick = { /* Handle settings! */ },
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Radiance") },
+                                    onClick = { /* Handle send feedback! */ },
+                                )
+                            }
                         }
-                    )
-                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        DropdownMenuItem(
-                            text = { Text("Up") },
-                            onClick = { /* Handle edit! */ },
-                            leadingIcon = { Icon(Icons.AutoMirrored.Outlined.ArrowLeft, contentDescription = null) }
+                        FilterChip(
+                            selected = false,
+                            onClick = { /*TODO*/ },
+                            label = { Text("System") },
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowDropDown,
+                                    contentDescription = "Unit system icon"
+                                )
+                            },
+                            shape = MaterialTheme.shapes.medium
                         )
-                        HorizontalDivider()
-                        DropdownMenuItem(
-                            text = { Text("Settings") },
-                            onClick = { /* Handle settings! */ },
+                        FilterChip(
+                            selected = false,
+                            onClick = { /*TODO*/ },
+                            label = { Text("Favorite") },
+                            shape = MaterialTheme.shapes.medium
                         )
-                        DropdownMenuItem(
-                            text = { Text("Radiance") },
-                            onClick = { /* Handle send feedback! */ },
+                        FilterChip(
+                            selected = false,
+                            onClick = { /*TODO*/ },
+                            label = { Text("Custom") },
+                            shape = MaterialTheme.shapes.medium
                         )
                     }
                 }
-                FilterChip(
-                    selected = false,
-                    onClick = { /*TODO*/ },
-                    label = { Text("System") },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "Unit system icon"
-                        )
-                    }
-                )
-                FilterChip(
-                    selected = false,
-                    onClick = { /*TODO*/ },
-                    label = { Text("Favorite") }
-                )
-                FilterChip(
-                    selected = false,
-                    onClick = { /*TODO*/ },
-                    label = { Text("Custom") }
-                )
             }
-
-            LazyColumn {
-                for (unitDefinition in unitList) {
-                    item {
-                        ListItem(
-                            headlineContent = { Text(unitDefinition.title) },
-                            supportingContent = { Text(unitDefinition.abbreviation) },
-                        )
+            Spacer(modifier = Modifier.size(12.dp))
+            androidx.compose.material3.Card(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                shape = MaterialTheme.shapes.large,
+                colors = androidx.compose.material3.CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                ),
+                elevation = androidx.compose.material3.CardDefaults.cardElevation(4.dp)
+            ) {
+                LazyColumn(modifier = Modifier.padding(8.dp)) {
+                    for (unitDefinition in unitList) {
+                        item {
+                            ListItem(
+                                headlineContent = { Text(unitDefinition.title, style = MaterialTheme.typography.bodyLarge) },
+                                supportingContent = { Text(unitDefinition.abbreviation, style = MaterialTheme.typography.labelLarge) },
+                            )
+                        }
                     }
                 }
             }

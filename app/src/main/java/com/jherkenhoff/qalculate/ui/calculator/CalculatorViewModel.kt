@@ -16,7 +16,9 @@ import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants.TAG_TYPE_HTML
 import com.jherkenhoff.qalculate.data.AutocompleteRepository
 import com.jherkenhoff.qalculate.data.CalculationHistoryRepository
+import com.jherkenhoff.qalculate.data.PersistentCalculationHistoryRepository
 import com.jherkenhoff.qalculate.data.ScreenSettingsRepository
+import com.jherkenhoff.qalculate.data.ThemeSettingsRepository
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
@@ -44,10 +46,25 @@ class CalculatorViewModel @Inject constructor(
     private val calculator: Calculator,
     private val parseUseCase: ParseUseCase,
     private val calculateUseCase: CalculateUseCase,
-    private val calculationHistoryRepository: CalculationHistoryRepository,
+    application: android.app.Application,
     private val screenSettingsRepository: ScreenSettingsRepository,
-    private val autocompleteRepository: AutocompleteRepository
+    private val autocompleteRepository: AutocompleteRepository,
+    private val themeSettingsRepository: ThemeSettingsRepository
 ) : ViewModel() {
+
+    private val calculationHistoryRepository = PersistentCalculationHistoryRepository(application.applicationContext)
+
+    val darkThemeFlow = themeSettingsRepository.isDarkTheme.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        false
+    )
+
+    fun setDarkTheme(isDark: Boolean) {
+        viewModelScope.launch {
+            themeSettingsRepository.saveDarkTheme(isDark)
+        }
+    }
 
     private val _uiState = MutableStateFlow(CalculatorUiState())
     val uiState: StateFlow<CalculatorUiState> = _uiState.asStateFlow()
@@ -87,16 +104,17 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun submitCalculation() {
-        calculationHistoryRepository.appendCalculation(
-            CalculationHistoryItem(
-                LocalDateTime.now(),
-                inputTextFieldValue.text,
-                parsedString,
-                resultString
+        viewModelScope.launch {
+            calculationHistoryRepository.appendCalculation(
+                CalculationHistoryItem(
+                    java.time.LocalDateTime.now().toString(),
+                    inputTextFieldValue.text,
+                    parsedString,
+                    resultString
+                )
             )
-        )
-
-        updateInput(TextFieldValue(""))
+            updateInput(TextFieldValue(""))
+        }
     }
 
     fun toggleAltKeyboard(newState: Boolean) {

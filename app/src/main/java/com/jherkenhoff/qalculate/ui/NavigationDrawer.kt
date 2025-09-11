@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
@@ -53,73 +55,77 @@ fun NavigationDrawer(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 30.dp),
+                .padding(vertical = 36.dp),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(80.dp)
-                    .shadow(6.dp, shape = CircleShape)
+                    .size(96.dp)
+                    .shadow(10.dp, shape = CircleShape)
             )
         }
         NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_calculator)) },
+            label = { Text(text = stringResource(R.string.navigation_calculator), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface) },
             selected = calculatorActive,
             onClick = onCalculatorClick,
-            icon = { Icon(Icons.Filled.Calculate, contentDescription = null) },
+            icon = { Icon(Icons.Filled.Calculate, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         HorizontalDivider(
             Modifier
-                .padding(horizontal = 25.dp, vertical = 15.dp))
+                .padding(horizontal = 28.dp, vertical = 18.dp),
+            color = MaterialTheme.colorScheme.outline
+        )
         NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_functions), textDecoration = TextDecoration.LineThrough) },
+            label = { Text(text = stringResource(R.string.navigation_functions), textDecoration = TextDecoration.LineThrough, color = MaterialTheme.colorScheme.onSurfaceVariant) },
             selected = functionsActive,
             onClick = onFunctionsClick,
-            icon = { Icon(Icons.Outlined.Functions, contentDescription = null) },
+            icon = { Icon(Icons.Outlined.Functions, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_variables), textDecoration = TextDecoration.LineThrough) },
+            label = { Text(text = stringResource(R.string.navigation_variables), textDecoration = TextDecoration.LineThrough, color = MaterialTheme.colorScheme.onSurfaceVariant) },
             selected = variablesActive,
             onClick = onVariablesClick,
-            icon = { Icon(Icons.Outlined.Pin, contentDescription = null) },
+            icon = { Icon(Icons.Outlined.Pin, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_units)) },
+            label = { Text(text = stringResource(R.string.navigation_units), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface) },
             selected = unitsActive,
             onClick = onUnitsClick,
-            icon = { Icon(Icons.Outlined.Straighten, contentDescription = null) },
+            icon = { Icon(Icons.Outlined.Straighten, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_datasets), textDecoration = TextDecoration.LineThrough) },
+            label = { Text(text = stringResource(R.string.navigation_datasets), textDecoration = TextDecoration.LineThrough, color = MaterialTheme.colorScheme.onSurfaceVariant) },
             selected = datasetsActive,
             onClick = onDatasetsClick,
-            icon = { Icon(Icons.Outlined.Dataset, contentDescription = null) },
+            icon = { Icon(Icons.Outlined.Dataset, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
 
         Spacer(modifier = Modifier.weight(1f))
         HorizontalDivider(
             Modifier
-                .padding(horizontal = 25.dp)
-                .padding(top = 15.dp))
+                .padding(horizontal = 28.dp)
+                .padding(top = 18.dp),
+            color = MaterialTheme.colorScheme.outline
+        )
         NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_about)) },
+            label = { Text(text = stringResource(R.string.navigation_about), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface) },
             selected = false,
             onClick = onAboutClick,
-            icon = { Icon(Icons.Filled.Info, contentDescription = null) },
+            icon = { Icon(Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_settings), textDecoration = TextDecoration.LineThrough) },
+            label = { Text(text = stringResource(R.string.navigation_settings), textDecoration = TextDecoration.LineThrough, color = MaterialTheme.colorScheme.onSurfaceVariant) },
             selected = false,
             onClick = onSettingsClick,
-            icon = { Icon(Icons.Filled.Settings, contentDescription = null) },
+            icon = { Icon(Icons.Filled.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
     }

@@ -2,13 +2,32 @@ package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,6 +37,8 @@ import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
+import androidx.compose.ui.unit.sp
+// import removed: androidx.compose.ui.text.style.Shadow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,7 +46,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
+//
 import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,15 +61,14 @@ import java.time.LocalDateTime
 @Composable
 fun CalculatorScreen(
     viewModel: CalculatorViewModel = viewModel(),
-    openDrawer: () -> Unit = {}
+    onAboutClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     CalculatorScreenContent(
+        viewModel = viewModel,
         uiState = uiState,
         input = { viewModel.inputTextFieldValue },
-        altKeyboardVisible = viewModel.altKeyboardOpen.collectAsState(false).value,
         onInputChanged = viewModel::updateInput,
         onQuickKeyPressed = viewModel::insertText,
         onDelKeyPressed = viewModel::removeLastChar,
@@ -57,10 +77,10 @@ fun CalculatorScreen(
         parsedString = { viewModel.parsedString },
         resultString = { viewModel.resultString },
         onCalculationSubmit = viewModel::submitCalculation,
-        onAltKeyboardToggle = viewModel::toggleAltKeyboard,
         onAutocompleteClick = viewModel::acceptAutocomplete,
         onAutocompleteDismiss = viewModel::dismissAutocomplete,
-        openDrawer = openDrawer,
+        onAboutClick = onAboutClick,
+        onSettingsClick = onSettingsClick
     )
 }
 
@@ -69,9 +89,9 @@ fun CalculatorScreen(
 )
 @Composable
 fun CalculatorScreenContent(
+    viewModel: CalculatorViewModel?,
     uiState: CalculatorUiState,
     input: () -> TextFieldValue,
-    altKeyboardVisible: Boolean,
     onInputChanged: (TextFieldValue) -> Unit,
     onQuickKeyPressed: (String, String) -> Unit,
     onDelKeyPressed: () -> Unit,
@@ -80,10 +100,10 @@ fun CalculatorScreenContent(
     parsedString: () -> String,
     resultString: () -> String,
     onCalculationSubmit: () -> Unit = {},
-    onAltKeyboardToggle: (Boolean) -> Unit = {},
     onAutocompleteClick: (String, String) -> Unit = {_, _ ->},
     onAutocompleteDismiss: () -> Unit = {  },
-    openDrawer: () -> Unit = {  }
+    onAboutClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
 ) {
 
     //val screenSettingsRepository = ScreenSettingsRepository(LocalContext.current)
@@ -91,6 +111,7 @@ fun CalculatorScreenContent(
 
     var autocompleteDismissed by remember { mutableStateOf(false) }
 
+    var showInfo by remember { mutableStateOf(false) }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
@@ -100,109 +121,124 @@ fun CalculatorScreenContent(
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
-                },
-                navigationIcon = {
-                    IconButton(onClick = openDrawer) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
-                        )
-                    }
-
+                    Text(
+                        text = "Qalculate!",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 1
+                    )
                 },
                 actions = {
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("DEG") })
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exact") })
-                    SuggestionChip(onClick = { /*TODO*/ }, label = { Text("Exp.") })
+                    IconButton(onClick = { showInfo = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            contentDescription = "About"
+                        )
+                    }
                 }
-
             )
         },
         modifier = Modifier.imePadding(),
     ) { innerPadding ->
-
+        if (showInfo) {
+            androidx.compose.ui.window.Dialog(onDismissRequest = { showInfo = false }) {
+                com.jherkenhoff.qalculate.ui.AboutCard()
+            }
+        }
         Column(
             modifier = Modifier
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .padding(horizontal = 8.dp)
+                .fillMaxSize()
         ) {
-            HistroyList(
-                calculationHistory,
-                onTextToInput = { onQuickKeyPressed(it, "") },
-                modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            InterceptPlatformTextInput(
-                interceptor = { request, nextHandler ->
-
-                    if (!altKeyboardVisible) {
-                        nextHandler.startInputMethod(request)
-                    } else {
-                        awaitCancellation()
-                    }
-                },
-            ) {
-                InputSheet(
-                    textFieldValue = input,
-                    parsed = parsedString(),
-                    result = resultString(),
-                    isAltKeyboardOpen = altKeyboardVisible,
-                    onValueChange = onInputChanged,
-                    onSubmit = { onCalculationSubmit() },
-                    onToggleAltKeyboard = { onAltKeyboardToggle(!altKeyboardVisible) },
-                    onClearAll = onACKeyPressed,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+            androidx.compose.material3.Card(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                shape = MaterialTheme.shapes.large,
+                colors = androidx.compose.material3.CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                elevation = androidx.compose.material3.CardDefaults.cardElevation(2.dp)
+                    ) {
+                CalculationList(
+                    calculationHistory = calculationHistory,
+                    currentParsed = parsedString,
+                    currentResult = resultString,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            AnimatedContent(targetState = altKeyboardVisible) {
-                if (it) {
-                    AltKeyboard(
-                        onKey = { text -> onQuickKeyPressed(text, "") },
-                        onDel = onDelKeyPressed,
-                        onAC = onACKeyPressed,
-                        onSubmit = onCalculationSubmit,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
-                    )
-                } else {
-                    SupplementaryBar(
-                        onKey = onQuickKeyPressed,
-                        autocompleteItems = { uiState.autocompleteList },
-                        onAutocompleteClick = onAutocompleteClick,
-                        onAutocompleteDismiss = onAutocompleteDismiss
+            // Input field
+            androidx.compose.material3.Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                colors = androidx.compose.material3.CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                ),
+                elevation = androidx.compose.material3.CardDefaults.cardElevation(4.dp)
+            ) {
+                InterceptPlatformTextInput(
+                    interceptor = { request, nextHandler ->
+                        nextHandler.startInputMethod(request)
+                    },
+                ) {
+                    val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
+                    val lastFocusState = remember { mutableStateOf(false) }
+                    val placeholdeVisible = input().text.isEmpty()
+                    InputSheet(
+                        textFieldValue = input,
+                        parsed = parsedString(),
+                        result = resultString(),
+                        onValueChange = onInputChanged,
+                        onSubmit = { onCalculationSubmit() },
+                        onClearAll = onACKeyPressed,
+                        focusRequester = focusRequester,
+                        lastFocusState = lastFocusState,
+                        placeholdeVisible = placeholdeVisible,
+                        modifier = Modifier.padding(8.dp)
                     )
                 }
             }
+
+            // Supplementary bar
+            SupplementaryBar(
+                onKey = onQuickKeyPressed,
+                autocompleteItems = { uiState.autocompleteList },
+                onAutocompleteClick = onAutocompleteClick,
+                onAutocompleteDismiss = onAutocompleteDismiss
+            )
         }
     }
 }
 
 
-private val testCalculationHistory = listOf(
-    CalculationHistoryItem(
-        LocalDateTime.now().minusDays(10),
-        "1m + 1m",
-        "1 m + 1 m",
-        "2 m"
-    ),
-    CalculationHistoryItem(
-        LocalDateTime.now().minusDays(1),
-        "1m + 1m",
-        "1 m + 1 m",
-        "2 m"
+private val testCalculationHistory = run {
+    val now = java.time.LocalDateTime.now()
+    listOf(
+        CalculationHistoryItem(
+            now.minusDays(10).toString(),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        ),
+        CalculationHistoryItem(
+            now.minusDays(1).toString(),
+            "1m + 1m",
+            "1 m + 1 m",
+            "2 m"
+        )
     )
-)
+}
 
 @Preview
 @Composable
 private fun DefaultPreview() {
     CalculatorScreenContent(
+        viewModel = null,
         uiState = CalculatorUiState(),
         input = { TextFieldValue("1+1") },
-        altKeyboardVisible = false,
         onInputChanged = {},
         onQuickKeyPressed = {_, _ ->},
         onDelKeyPressed = {},
@@ -218,9 +254,9 @@ private fun DefaultPreview() {
 @Composable
 private fun EmptyPreview() {
     CalculatorScreenContent(
+        viewModel = null,
         uiState = CalculatorUiState(),
         input = { TextFieldValue("") },
-        altKeyboardVisible = false,
         onInputChanged = {},
         onQuickKeyPressed = {_, _ ->},
         onDelKeyPressed = {},
@@ -236,11 +272,10 @@ private fun EmptyPreview() {
 @Preview
 @Composable
 private fun AutocompletePreview() {
-
     CalculatorScreenContent(
+        viewModel = null,
         uiState = CalculatorUiState(),
         input = { TextFieldValue("1*t") },
-        altKeyboardVisible = false,
         onInputChanged = {},
         onQuickKeyPressed = {_, _ ->},
         onDelKeyPressed = {},

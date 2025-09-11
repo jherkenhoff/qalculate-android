@@ -80,7 +80,7 @@ android {
                 if (baseAbiCode != null) {
                     // Assigns the new version code to output.versionCode, which changes the version code
                     // for only the output APK, not for the variant itself.
-                    output.versionCode.set(10*(output.versionCode.get() ?: 0) + baseAbiCode)
+                    output.versionCode.set(10* output.versionCode.get() + baseAbiCode)
                 }
             }
         }

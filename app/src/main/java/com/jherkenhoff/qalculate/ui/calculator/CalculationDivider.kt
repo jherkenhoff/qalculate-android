@@ -20,27 +20,22 @@ fun CalculationDivider(
 ) {
     Row(
         modifier = modifier
-            .background(color = MaterialTheme.colorScheme.surface)
-            .padding(vertical = 6.dp)
-            .height(16.dp)
+            .padding(vertical = 12.dp, horizontal = 0.dp)
+            .height(32.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        HorizontalDivider(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-        HorizontalDivider(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
+        androidx.compose.material3.Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shape = MaterialTheme.shapes.large,
+            shadowElevation = 2.dp,
+            tonalElevation = 2.dp,
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp)
+            )
+        }
     }
 }

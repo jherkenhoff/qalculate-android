@@ -60,35 +60,43 @@ fun CalculationList(
         LazyColumn(
             verticalArrangement = Arrangement.Bottom,
             state = scrollState,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp), // Add horizontal padding to the whole list
         ) {
-            calculationHistory.groupBy { it.time.toLocalDate() }
-                .map { (id, list) ->
-                    stickyHeader{
-                        val dayString = when (id) {
-                            LocalDate.now() -> "Today"
-                            LocalDate.now().minusDays(1) -> "Yesterday"
-                            else -> id.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
-                        }
-                        CalculationDivider(text = dayString)
+            calculationHistory.groupBy {
+                try {
+                    java.time.LocalDateTime.parse(it.time).toLocalDate()
+                } catch (e: Exception) {
+                    java.time.LocalDate.MIN
+                }
+            }.map { (id, list) ->
+                stickyHeader {
+                    val dayString = when (id) {
+                        LocalDate.now() -> "Today"
+                        LocalDate.now().minusDays(1) -> "Yesterday"
+                        else -> id.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
                     }
-                    list.forEach {
-                        item() {
-                            CalculationListItem(
-                                it.parsed,
-                                it.result,
+                    CalculationDivider(text = dayString, modifier = Modifier.padding(vertical = 2.dp))
+                }
+                list.forEachIndexed { idx, item ->
+                    item {
+                        CalculationListItem(
+                            item.parsed,
+                            item.result,
+                            modifier = Modifier.padding(vertical = 6.dp) // Add vertical padding to each entry
+                        )
+                    }
+                    // Add divider between history entries, but not after the last one
+                    if (idx < list.lastIndex) {
+                        item {
+                            androidx.compose.material3.HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
                             )
                         }
                     }
                 }
-            item {
-                CalculationDivider(text = "Now")
-            }
-            item {
-                CalculationListItem(
-                    currentParsed(),
-                    currentResult()
-                )
             }
         }
 
@@ -145,27 +153,28 @@ private fun JumpToBottomButton(
 @Composable
 private fun DefaultPreview() {
 
+    val now = java.time.LocalDateTime.now()
     val testCalculationHistory = listOf(
         CalculationHistoryItem(
-            LocalDateTime.now().minusDays(10),
+            now.minusDays(10).toString(),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"
         ),
         CalculationHistoryItem(
-            LocalDateTime.now().minusDays(1),
+            now.minusDays(1).toString(),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"
         ),
         CalculationHistoryItem(
-            LocalDateTime.now().minusDays(1).minusHours(2),
+            now.minusDays(1).minusHours(2).toString(),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"
         ),
         CalculationHistoryItem(
-            LocalDateTime.now().minusMinutes(20),
+            now.minusMinutes(20).toString(),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"

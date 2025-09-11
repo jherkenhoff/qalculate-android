@@ -18,24 +18,29 @@ fun AutocompleteCard(
     item: AutocompleteItem,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        shape = RoundedCornerShape(6.dp),
-        modifier = modifier.padding(bottom=2.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerHighest
+    androidx.compose.material3.ElevatedCard(
+        shape = MaterialTheme.shapes.medium,
+        modifier = modifier.padding(bottom = 2.dp),
+        colors = androidx.compose.material3.CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+        ),
+        elevation = androidx.compose.material3.CardDefaults.elevatedCardElevation(6.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp, vertical = 18.dp)
         ) {
             Text(
                 item.name,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.labelMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.alpha(0.7f)
             )
             Text(
                 item.title,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

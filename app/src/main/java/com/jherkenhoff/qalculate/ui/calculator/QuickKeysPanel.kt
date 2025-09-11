@@ -1,13 +1,21 @@
+
 package com.jherkenhoff.qalculate.ui.calculator
+
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -26,47 +34,36 @@ fun QuickKeysPanel(
         onKeyAction(preCursorText, postCursorText)
     }
 
+    val row1Height = 56.dp
+    val row2Height = 56.dp
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.SpaceEvenly
+        modifier = modifier
+            .padding(horizontal = 4.dp, vertical = 4.dp)
+            .height(row1Height + row2Height + 24.dp), // 24.dp for spacing
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        // Row 1: arithmetic symbols
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            for (i in arrayOf("_", "=", "√", "^", "(", ")", "÷", "×", "-", "+")) {
-                TextButton(
-                    onClick = {onClick(i)},
-                    modifier = Modifier
-                        .weight(1f)
-                ) {
-                    Text(
-                        text = i,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
+            QuickKeyButton("(", buttonHeight = row1Height, fontSize = 26, onClick = { onClick("(") })
+            QuickKeyButton(")", buttonHeight = row1Height, fontSize = 26, onClick = { onClick(")") })
+            QuickKeyButton("÷", buttonHeight = row1Height, fontSize = 26, onClick = { onClick("÷") })
+            QuickKeyButton("×", buttonHeight = row1Height, fontSize = 26, onClick = { onClick("×") })
+            QuickKeyButton("-", buttonHeight = row1Height, fontSize = 26, onClick = { onClick("-") })
+            QuickKeyButton("+", buttonHeight = row1Height, fontSize = 26, onClick = { onClick("+") })
+            QuickKeyButton("=", buttonHeight = row1Height, fontSize = 26, onClick = { onClick("=") })
         }
-
+        // Row 2: numbers (full width, easier to tap)
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-
-            for (i in intArrayOf(1,2,3,4,5,6,7,8,9,0)) {
-                TextButton(
-                    onClick = {onClick(i.toString())},
-                    modifier = Modifier
-                        .weight(1f)
-                ) {
-                    Text(
-                        text = i.toString(),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+            for (i in 1..9) {
+                QuickKeyButton(i.toString(), buttonHeight = row2Height, fontSize = 24, onClick = { onClick(i.toString()) })
             }
+            QuickKeyButton("0", buttonHeight = row2Height, fontSize = 24, onClick = { onClick("0") })
         }
     }
 }
@@ -84,33 +81,38 @@ fun QuickKeysPanel2(
         onKeyAction(preCursorText, postCursorText)
     }
 
+    val row1Height = 56.dp
+    val row2Height = 56.dp
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.SpaceEvenly
+        modifier = modifier
+            .padding(horizontal = 6.dp, vertical = 6.dp)
+            .height(row1Height + row2Height + 24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        // Row 1: log and trig functions
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            QuickKeyButton("log", onClick = { onClick("log(", ")") })
-            QuickKeyButton("ln", onClick = { onClick("ln(", ")") })
-            QuickKeyButton("sin", onClick = { onClick("sin(", ")") })
-            QuickKeyButton("cos", onClick = { onClick("cos(", ")") })
-            QuickKeyButton("tan", onClick = { onClick("tan(", ")") })
+            QuickKeyButton("log", buttonHeight = row1Height, fontSize = 20, onClick = { onClick("log(", ")") })
+            QuickKeyButton("ln", buttonHeight = row1Height, fontSize = 20, onClick = { onClick("ln(", ")") })
+            QuickKeyButton("sin", buttonHeight = row1Height, fontSize = 20, onClick = { onClick("sin(", ")") })
+            QuickKeyButton("cos", buttonHeight = row1Height, fontSize = 20, onClick = { onClick("cos(", ")") })
+            QuickKeyButton("tan", buttonHeight = row1Height, fontSize = 20, onClick = { onClick("tan(", ")") })
         }
-
+        // Row 2: advanced symbols
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            QuickKeyButton("∞", onClick = { onClick("∞") })
-            QuickKeyButton("±", onClick = { onClick("±") })
-            QuickKeyButton("dx", onClick = { onClick("diff(", ")") })
-            QuickKeyButton("∫", onClick = { onClick("∫(", ")") })
-            QuickKeyButton("Σ", onClick = { onClick("Σ(", ")") })
-            QuickKeyButton("!", onClick = { onClick("!") })
-            QuickKeyButton("[", onClick = { onClick("[") })
-            QuickKeyButton("]", onClick = { onClick("]") })
+            QuickKeyButton("[", buttonHeight = row2Height, fontSize = 20, onClick = { onClick("[") })
+            QuickKeyButton("]", buttonHeight = row2Height, fontSize = 20, onClick = { onClick("]") })
+            QuickKeyButton("Σ", buttonHeight = row2Height, fontSize = 20, onClick = { onClick("Σ(", ")") })
+            QuickKeyButton("∫", buttonHeight = row2Height, fontSize = 20, onClick = { onClick("∫(", ")") })
+            QuickKeyButton("dx", buttonHeight = row2Height, fontSize = 20, onClick = { onClick("diff(", ")") })
+            QuickKeyButton("∞", buttonHeight = row2Height, fontSize = 20, onClick = { onClick("∞") })
+            QuickKeyButton("±", buttonHeight = row2Height, fontSize = 20, onClick = { onClick("±") })
+            QuickKeyButton("!", buttonHeight = row2Height, fontSize = 20, onClick = { onClick("!") })
         }
     }
 }
@@ -118,17 +120,30 @@ fun QuickKeysPanel2(
 @Composable
 fun RowScope.QuickKeyButton(
     text: String,
+    buttonHeight: androidx.compose.ui.unit.Dp = 52.dp,
+    fontSize: Int = 22,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
-    TextButton(
+    androidx.compose.material3.ElevatedButton(
         onClick = onClick,
-        modifier = modifier.weight(1f)
+        shape = MaterialTheme.shapes.medium,
+        modifier = modifier
+            .weight(1f)
+            .height(buttonHeight),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyLarge
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium.copy(fontSize = fontSize.sp),
+            maxLines = 1,
+            softWrap = false,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(androidx.compose.ui.Alignment.CenterVertically),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     }
 }

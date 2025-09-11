@@ -3,6 +3,8 @@ package com.jherkenhoff.qalculate.ui.calculator
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -29,26 +31,29 @@ fun SupplementaryBar(
     }
 
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        tonalElevation = 8.dp,
+        shadowElevation = 4.dp,
+        shape = MaterialTheme.shapes.large,
         modifier = modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(140.dp) // Increased to fit autocomplete with two lines
+            .padding(horizontal = 4.dp, vertical = 2.dp)
     ) {
-        AnimatedContent(targetState = autocompleteItems().isNotEmpty()) {autocompleteVisible ->
+        AnimatedContent(targetState = autocompleteItems().isNotEmpty()) { autocompleteVisible ->
             if (autocompleteVisible) {
                 AutocompleteBar(
                     entries = autocompleteItems,
                     onEntryClick = onAutocompleteClick,
-                    onDismiss = onAutocompleteDismiss
+                    onDismiss = onAutocompleteDismiss,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             } else {
                 QuickKeys(
                     onKey = onKey
                 )
             }
-            
         }
-
     }
 }
 

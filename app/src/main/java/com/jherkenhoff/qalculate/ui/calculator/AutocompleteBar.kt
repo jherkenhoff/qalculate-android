@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,19 +27,28 @@ fun AutocompleteBar(
     onDismiss: () -> Unit = {  },
     onEntryClick: (String, String) -> Unit = {_, _ ->},
 ) {
+    // Match the height of QuickKeysPanel: row1Height + row2Height + spacing = 56 + 56 + 24 = 136.dp
+    val barHeight = 136.dp
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
+            .padding(horizontal = 8.dp, vertical = 2.dp)
+            .height(barHeight)
     ) {
         IconButton(onClick = onDismiss) {
             Icon(Icons.Outlined.Close, contentDescription = "Close suggestions")
         }
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            contentPadding = PaddingValues(8.dp, 8.dp, 8.dp, 8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(18.dp)
         ) {
             items(entries()) {
-                AutocompleteCard(it, modifier = Modifier.clickable(onClick = {onEntryClick(it.typeBeforeCursor, it.typeAfterCursor)}))
+                AutocompleteCard(
+                    it,
+                    modifier = Modifier
+                        .clickable(onClick = { onEntryClick(it.typeBeforeCursor, it.typeAfterCursor) })
+                        .height(barHeight - 16.dp) // Fill most of the bar height, minus padding
+                )
             }
         }
     }

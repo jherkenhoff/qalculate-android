@@ -3,6 +3,8 @@ package com.jherkenhoff.qalculate.ui.calculator
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -46,31 +48,44 @@ fun HistoryItem(
         }
     }
 
-    Column(
-        horizontalAlignment = Alignment.End,
-        modifier = modifier.fillMaxWidth()
+    androidx.compose.material3.Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        colors = androidx.compose.material3.CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        elevation = androidx.compose.material3.CardDefaults.cardElevation(4.dp)
     ) {
-        SelectionContainer {
-            AutoSizeText(
-                text = mathExpressionFormatter(parsedText),
-                alignment = Alignment.CenterEnd,
-                style = MaterialTheme.typography.displayMedium,
-                minTextSize = 14.sp,
-                maxTextSize = 30.sp,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        SelectionContainer {
-            AutoSizeText(
-                text = mathExpressionFormatter(resultText),
-                alignment = Alignment.CenterEnd,
-                style = MaterialTheme.typography.displayMedium,
-                minTextSize = 14.sp,
-                maxTextSize = 20.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+        Column(
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+        ) {
+            SelectionContainer {
+                AutoSizeText(
+                    text = mathExpressionFormatter(parsedText),
+                    alignment = Alignment.CenterEnd,
+                    style = MaterialTheme.typography.bodyLarge,
+                    minTextSize = 14.sp,
+                    maxTextSize = 24.sp,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            SelectionContainer {
+                AutoSizeText(
+                    text = mathExpressionFormatter(resultText),
+                    alignment = Alignment.CenterEnd,
+                    style = MaterialTheme.typography.titleLarge,
+                    minTextSize = 14.sp,
+                    maxTextSize = 28.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 

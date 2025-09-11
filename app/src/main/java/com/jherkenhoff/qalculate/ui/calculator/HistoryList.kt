@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.data.model.CalculationHistoryItem
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.time.LocalDateTime
 
 
 private fun LazyListState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
@@ -61,9 +61,18 @@ fun HistroyList(
             state = scrollState,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            calculationHistory.groupBy { it.time.toLocalDate() }
+            calculationHistory
+                .groupBy {
+                    // Parse ISO string to LocalDate
+                    try {
+                        LocalDateTime.parse(it.time).toLocalDate()
+                    } catch (e: Exception) {
+                        LocalDate.MIN
+                    }
+                }
+                .toSortedMap(compareByDescending { it })
                 .map { (id, list) ->
-                    stickyHeader{
+                    stickyHeader {
                         val dayString = when (id) {
                             LocalDate.now() -> "Today"
                             LocalDate.now().minusDays(1) -> "Yesterday"
@@ -72,7 +81,7 @@ fun HistroyList(
                         CalculationDivider(text = dayString)
                     }
                     list.forEach {
-                        item() {
+                        item {
                             HistoryItem(
                                 inputText = it.input,
                                 parsedText = it.parsed,
@@ -137,34 +146,33 @@ private fun JumpToBottomButton(
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
-
+    val now = LocalDateTime.now()
     val testCalculationHistory = listOf(
         CalculationHistoryItem(
-            LocalDateTime.now().minusDays(10),
+            now.minusDays(10).toString(),
             "1 kilometer + 5 meter",
             "1.005 m",
             "2 m"
         ),
         CalculationHistoryItem(
-            LocalDateTime.now().minusDays(1),
+            now.minusDays(1).toString(),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"
         ),
         CalculationHistoryItem(
-            LocalDateTime.now().minusDays(1).minusHours(2),
+            now.minusDays(1).minusHours(2).toString(),
             "1m + 1m",
             "1 m + 1 m",
             "2 m"
         ),
         CalculationHistoryItem(
-            LocalDateTime.now().minusMinutes(20),
+            now.minusMinutes(20).toString(),
             "1km + 5m",
             "1 kilometer + 5 meter",
             "1.005 m",
         )
     )
-
     HistroyList(
         testCalculationHistory
     )

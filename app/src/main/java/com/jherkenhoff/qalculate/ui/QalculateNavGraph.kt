@@ -17,7 +17,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class NavDestinations{
     @Serializable data object Calculator
-    @Serializable data object Units
     @Serializable data object About
 }
 
@@ -26,7 +25,6 @@ sealed class NavDestinations{
 fun QalculateNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    openDrawer: () -> Unit = {},
     startDestination: NavDestinations.Calculator = NavDestinations.Calculator,
 ) {
     NavHost(
@@ -34,24 +32,15 @@ fun QalculateNavGraph(
         startDestination = startDestination,
         modifier = modifier
     ) {
-
         composable<NavDestinations.Calculator> {
             CalculatorScreen(
                 viewModel = hiltViewModel<CalculatorViewModel>(),
-                openDrawer = openDrawer,
+                onAboutClick = { navController.navigate(NavDestinations.About) },
+                onSettingsClick = { /* TODO: Implement settings if needed */ }
             )
         }
-
-        composable<NavDestinations.Units> {
-            UnitsScreen(
-                viewModel = hiltViewModel<UnitsViewModel>(),
-                openDrawer = openDrawer,
-            )
-        }
-
         dialog<NavDestinations.About> {
             AboutCard()
         }
-
     }
 }
