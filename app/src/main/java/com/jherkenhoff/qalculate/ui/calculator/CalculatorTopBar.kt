@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AssistChip
@@ -27,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,8 +45,7 @@ fun CalculatorTopBar(
         modifier,
         color = MaterialTheme.colorScheme.surfaceContainer
     ) {
-        Column(
-        ) {
+        Column() {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeContent))
             Row {
                 IconButton(onClick = onMenuClick) {
@@ -53,7 +55,8 @@ fun CalculatorTopBar(
                     )
                 }
                 Spacer(Modifier.weight(1f))
-                IconButton(onClick = { onSettingsClick() }) { Icon(Icons.AutoMirrored.Default.Sort, contentDescription = "Sort options") }
+
+                Spacer(Modifier.weight(1f))
                 IconButton(onClick = { onSettingsClick() }) { Icon(Icons.Default.Settings, contentDescription = "Open settings") }
             }
 
