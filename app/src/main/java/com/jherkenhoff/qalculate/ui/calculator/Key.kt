@@ -19,13 +19,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import androidx.core.view.HapticFeedbackConstantsCompat
 import com.jherkenhoff.qalculate.model.Key
 import com.jherkenhoff.qalculate.model.KeyLabel
 import com.jherkenhoff.qalculate.model.KeyRole
 import kotlinx.coroutines.delay
+
 
 @Composable
 fun Key(
@@ -53,12 +57,15 @@ fun Key(
         KeyRole.SYSTEM -> MaterialTheme.colorScheme.onSecondaryContainer
     }
 
+    val haptic = LocalHapticFeedback.current
+
     Box(
-        modifier = modifier
+        modifier = modifier.fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = { offset ->
                         showPopup = true
+                        haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
                         try {
                             awaitRelease()
                             onClick()
@@ -80,8 +87,7 @@ fun Key(
                         color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = CircleShape,
                         shadowElevation = 3.dp,
-                        modifier = Modifier
-                            .size(38.dp),
+                        modifier = Modifier.size(38.dp),
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -115,8 +121,7 @@ fun Key(
         Surface(
             shape = RoundedCornerShape(6.dp),
             color = containerColor,
-            //onClick = onClick,
-            modifier = modifier.fillMaxWidth().height(38.dp)
+            modifier = modifier.fillMaxSize()
         ) {
             Box(
                 contentAlignment = Alignment.Center
