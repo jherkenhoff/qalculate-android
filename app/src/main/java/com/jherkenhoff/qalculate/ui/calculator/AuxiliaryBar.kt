@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,13 +27,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.model.AutocompleteItem
+import com.jherkenhoff.qalculate.model.KeyAction
+import com.jherkenhoff.qalculate.model.KeyLabel
+import com.jherkenhoff.qalculate.model.Keys
+
+private val auxiliaryKeys = arrayOf(Keys.keyLeft, Keys.keyRight, Keys.keyUndo, Keys.keyRedo)
 
 @Composable
 fun AuxiliaryBar(
     autocompleteResult: AutocompleteResult?,
     onAutocompleteClick: (AutocompleteItem) -> Unit = {},
     keyboardEnable: Boolean,
-    onKeyboardEnableChange: (Boolean) -> Unit = {}
+    onKeyboardEnableChange: (Boolean) -> Unit = {},
+    onKeyAction: (KeyAction) -> Unit = {}
 ) {
 
     AnimatedContent(autocompleteResult != null && autocompleteResult.items.isNotEmpty()) {
@@ -57,17 +65,21 @@ fun AuxiliaryBar(
                 FilledIconToggleButton(keyboardEnable, onKeyboardEnableChange) {
                     Icon(Icons.Filled.Keyboard, null)
                 }
-                IconButton({}) {
-                    Icon(Icons.AutoMirrored.Default.KeyboardArrowLeft, null)
-                }
-                IconButton({}) {
-                    Icon(Icons.AutoMirrored.Default.KeyboardArrowRight, null)
-                }
-                IconButton({}) {
-                    Icon(Icons.AutoMirrored.Default.Undo, null)
-                }
-                IconButton({}) {
-                    Icon(Icons.AutoMirrored.Default.Redo, null)
+                for (key in auxiliaryKeys) {
+                    IconButton({ key.clickAction?.let { onKeyAction(it) } }) {
+                        when (val label = key.label) {
+                            is KeyLabel.Text -> Text(
+                                label.text,
+                                style = MaterialTheme.typography.labelLarge
+                            )
+
+                            is KeyLabel.Icon -> Icon(
+                                label.icon,
+                                label.description,
+                                modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
+                            )
+                        }
+                    }
                 }
                 IconButton({}) {
                     Icon(Icons.Default.MoreVert, null)
