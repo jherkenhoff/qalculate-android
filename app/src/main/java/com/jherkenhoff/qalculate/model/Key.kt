@@ -83,4 +83,6 @@ object Keys {
 
 
     val keySin = Key(KeyLabel.Text("sin"), KeyRole.OPERATOR, KeyAction.InsertText("sin(", ")"))
+    val keyCos = Key(KeyLabel.Text("cos"), KeyRole.OPERATOR, KeyAction.InsertText("cos(", ")"))
+    val keyTan = Key(KeyLabel.Text("tan"), KeyRole.OPERATOR, KeyAction.InsertText("tan(", ")"))
 }

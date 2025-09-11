@@ -23,7 +23,7 @@ val primaryKeypadKeys = arrayOf(
 
 
 val secondaryKeypadKeys = arrayOf(
-    arrayOf(Keys.keySin, Keys.keySin, Keys.keySin, Keys.keySin, Keys.keySin),
+    arrayOf(Keys.keySin, Keys.keyCos, Keys.keyTan, Keys.keySin, Keys.keySin),
 )
 
 @Composable
@@ -63,8 +63,16 @@ fun Keypad(
 
 @Preview(showBackground = true)
 @Composable
-private fun Preview() {
+private fun PrimaryKeypad() {
     Keypad(
         primaryKeypadKeys
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SecondaryKeypad() {
+    Keypad(
+        secondaryKeypadKeys
     )
 }

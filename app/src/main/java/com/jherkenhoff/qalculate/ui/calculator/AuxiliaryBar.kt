@@ -51,20 +51,15 @@ private val auxiliaryKeys = arrayOf(Keys.keyLeft, Keys.keyRight, Keys.keyUndo, K
 @Composable
 fun AuxiliaryBar(
     autocompleteResult: AutocompleteResult,
-    onAutocompleteClick: (AutocompleteItem) -> Unit = {},
+    onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     keyboardEnable: Boolean,
-    onKeyboardEnableChange: (Boolean) -> Unit = {},
-    onKeyAction: (KeyAction) -> Unit = {},
+    onKeyboardEnableChange: (Boolean) -> Unit = { },
+    onKeyAction: (KeyAction) -> Unit = { },
+    onAutocompleteDismiss: () -> Unit = { }
 ) {
     val fadeWidth = 40f
 
-    var autocompleteDismissed by remember{ mutableStateOf(false) }
-
-    if (autocompleteResult.relevantText.isEmpty()) {
-        autocompleteDismissed = false
-    }
-
-    AnimatedContent(!autocompleteDismissed && autocompleteResult.items.isNotEmpty()) {
+    AnimatedContent(autocompleteResult.items.isNotEmpty()) {
         if (it) {
             Row {
                 LazyRow(
@@ -78,20 +73,20 @@ fun AuxiliaryBar(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     item{
-                        Spacer(Modifier.width(fadeWidth.toDp()))
+                        Spacer(Modifier.width(fadeWidth.toDp()-8.dp))
                     }
                     items(autocompleteResult.items) { it ->
                         SuggestionChip(
-                            label = { Text(it.name) },
+                            label = { Text(it.title) },
                             onClick = { onAutocompleteClick(it) }
                         )
                     }
                     item{
-                        Spacer(Modifier.width(fadeWidth.toDp()))
+                        Spacer(Modifier.width(fadeWidth.toDp()-8.dp))
                     }
                 }
 
-                IconButton({ autocompleteDismissed = true }) {
+                IconButton(onAutocompleteDismiss) {
                     Icon(Icons.Default.Close, "Dismiss autocomplete suggestions")
                 }
             }

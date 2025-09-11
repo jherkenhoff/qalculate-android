@@ -37,10 +37,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
-
-data class CalculatorUiState (
-    val autocompleteList: List<AutocompleteItem> = emptyList(),
-)
 @HiltViewModel
 class CalculatorViewModel @Inject constructor(
     private val parseUseCase: ParseUseCase,
@@ -51,16 +47,8 @@ class CalculatorViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(CalculatorUiState())
-    val uiState: StateFlow<CalculatorUiState> = _uiState.asStateFlow()
-
     private val _inputTextFieldValue = MutableStateFlow(TextFieldValue(""))
     val inputTextFieldValue = _inputTextFieldValue.asStateFlow()
-
-    private var autocompleteJob: Job? = null
-    private var calculateJob: Job? = null
-
-    private var autocompleteDismissed = false
 
     val parsedString = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
         return@combine parseUseCase(inputTextFieldValue.text, userPreferences)
@@ -101,9 +89,6 @@ class CalculatorViewModel @Inject constructor(
         UserPreferences.getDefaultInstance()
     )
 
-    val altKeyboardOpen = userPreferencesRepository.userPreferencesFlow.map { it.altKeyboardOpen }
-
-
     fun submitCalculation() {
         viewModelScope.launch {
             calculationsRepository.appendCalculation(
@@ -115,12 +100,6 @@ class CalculatorViewModel @Inject constructor(
                     resultString.value
                 )
             )
-        }
-    }
-
-    fun toggleAltKeyboard(newState: Boolean) {
-        runBlocking {
-            userPreferencesRepository.setIsAltKeyboardOpen(newState)
         }
     }
 

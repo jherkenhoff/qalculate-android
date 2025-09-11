@@ -6,16 +6,27 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -90,17 +101,14 @@ fun CalculatorScreenContent(
     onMenuClick: () -> Unit = {  },
     onSettingsClick: () -> Unit = {  }
 ) {
-
     var keyboardInputEnabled by remember { mutableStateOf(true) }
 
     //val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     val imeHeight = WindowInsets.ime.getBottom(LocalDensity.current)
     var lastImeHeight by remember { mutableIntStateOf(0) }
 
-
     val isImeVisible = (imeHeight != 0) && (imeHeight >= lastImeHeight)
     lastImeHeight = imeHeight
-
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -117,6 +125,14 @@ fun CalculatorScreenContent(
 
         onDeleteCalculation(uuid)
     }
+
+    var autocompleteDismissed by remember { mutableStateOf(false) }
+
+    if (autocompleteResult.relevantText.isEmpty()) {
+        autocompleteDismissed = false
+    }
+
+    val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
 
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -136,12 +152,11 @@ fun CalculatorScreenContent(
                 inputTextFieldValue,
                 parsedString,
                 resultString,
-                autocompleteResult,
+                internalAutocompleteResult,
                 onInputFieldValueChange,
                 {},
                 interceptKeyboard = !keyboardInputEnabled,
             )
-
 
 //            Box(
 //                contentAlignment = Alignment.BottomCenter,
@@ -150,7 +165,7 @@ fun CalculatorScreenContent(
 //                CalculationList(
 //                    calculations,
 //                    focusedCalculationUuid,
-//                    autocompleteResult = autocompleteResult,
+//                    autocompleteResult = internalAutocompleteResult,
 //                    onInputFieldValueChange = onInputFieldValueChange,
 //                    onDeleteClick = { deleteCalculationWithSnackbar(it) },
 //                    onSubmit = onCalculationSubmit,
@@ -184,11 +199,12 @@ fun CalculatorScreenContent(
                     )
 
                     AuxiliaryBar(
-                        autocompleteResult = autocompleteResult,
+                        autocompleteResult = internalAutocompleteResult,
                         keyboardEnable = keyboardInputEnabled,
                         onAutocompleteClick = onAutocompleteClick,
                         onKeyboardEnableChange = {keyboardInputEnabled = it},
-                        onKeyAction = onKeyAction
+                        onKeyAction = onKeyAction,
+                        onAutocompleteDismiss = { autocompleteDismissed = true }
                     )
 
                     Spacer(Modifier.height(8.dp))
