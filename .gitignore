@@ -22,3 +22,8 @@ keystore.properties
 *.jks
 *.keystore
 release.kjs
+
+*.kjs
+*.jks
+*.keystore
+release.kjs

@@ -18,12 +18,12 @@ val abiFilterList = (properties["ABI_FILTERS"] as String).split(';')
 
 android {
     namespace = "com.jherkenhoff.qalculate"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.jherkenhoff.qalculate"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 3
         versionName = "0.1.2"
 
@@ -87,11 +87,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
     buildFeatures {
         compose = true
