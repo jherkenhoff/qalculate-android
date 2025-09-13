@@ -13,8 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.model.Key
 import com.jherkenhoff.qalculate.model.KeyAction
-import com.jherkenhoff.qalculate.model.KeyLabel
-import com.jherkenhoff.qalculate.model.KeyRole
 import com.jherkenhoff.qalculate.model.Keys
 
 val primaryKeypadKeys : Array<Array<Key>> = arrayOf(
@@ -24,21 +22,9 @@ val primaryKeypadKeys : Array<Array<Key>> = arrayOf(
     arrayOf(Keys.keyUnderscore, Keys.keyEqual, Keys.key0, Keys.keyDecimal, Keys.keyAns, Keys.keyReturn),
 )
 
-val meterUnitKey = Key.SelectorKey(
-    arrayOf(
-        KeyAction.InsertText(KeyLabel.Text("nm"), "nm"),
-        KeyAction.InsertText(KeyLabel.Text("um"), "um"),
-        KeyAction.InsertText(KeyLabel.Text("mm"), "mm"),
-        KeyAction.InsertText(KeyLabel.Text("cm"), "cm"),
-        KeyAction.InsertText(KeyLabel.Text("m"), "m"),
-        KeyAction.InsertText(KeyLabel.Text("km"), "km"),
-    ),
-    4,
-    role= KeyRole.OPERATOR
-)
-
 val secondaryKeypadKeys : Array<Array<Key>> = arrayOf(
-    arrayOf(Keys.keySin, Keys.keyCos, Keys.keyTan, meterUnitKey, Keys.keySin),
+    arrayOf(Keys.keySin, Keys.keyCos, Keys.keyTan, Keys.keyMeter, Keys.keySin),
+    arrayOf(Keys.keySin, Keys.keyCos, Keys.keyTan, Keys.keyMeter, Keys.keySin),
 )
 
 @Composable

@@ -69,7 +69,7 @@ object Keys {
 
     val keyDecimal = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("."), "."), role = KeyRole.NUMBER)
     val keyAns = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("ans"), "ans"), role = KeyRole.OPERATOR)
-    val keyBracketOpen = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("("), ")"), role = KeyRole.OPERATOR)
+    val keyBracketOpen = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("("), "("), role = KeyRole.OPERATOR)
     val keyBracketClose = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text(")"), ")"), role = KeyRole.OPERATOR)
     val keyPlus = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("+"), "+"), role = KeyRole.OPERATOR)
     val keyMinus = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("-"), "-"), role = KeyRole.OPERATOR)
@@ -119,6 +119,20 @@ object Keys {
         clickAction = KeyAction.InsertText(label = KeyLabel.Text("tan"), preCursorText = "tan(", postCursorText = ")"),
         longClickAction = KeyAction.InsertText(label = KeyLabel.Text("arctan"), preCursorText = "arctan(", postCursorText = ")"),
         role = KeyRole.OPERATOR
+    )
+
+
+    val keyMeter = Key.SelectorKey(
+        arrayOf(
+            KeyAction.InsertText(KeyLabel.Text("nm"), "nm"),
+            KeyAction.InsertText(KeyLabel.Text("um"), "um"),
+            KeyAction.InsertText(KeyLabel.Text("mm"), "mm"),
+            KeyAction.InsertText(KeyLabel.Text("cm"), "cm"),
+            KeyAction.InsertText(KeyLabel.Text("m"), "m"),
+            KeyAction.InsertText(KeyLabel.Text("km"), "km"),
+        ),
+        4,
+        role= KeyRole.OPERATOR
     )
 
 }

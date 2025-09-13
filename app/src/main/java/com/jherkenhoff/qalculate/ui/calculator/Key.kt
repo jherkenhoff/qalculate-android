@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +46,7 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,6 +55,7 @@ import com.jherkenhoff.qalculate.model.Key
 import com.jherkenhoff.qalculate.model.KeyAction
 import com.jherkenhoff.qalculate.model.KeyLabel
 import com.jherkenhoff.qalculate.model.KeyRole
+import com.jherkenhoff.qalculate.model.Keys
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -156,24 +159,43 @@ fun Key(
                     color = containerColor,
                     modifier = modifier.fillMaxSize()
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box {
                         when (val label = key.clickAction.label) {
                             is KeyLabel.Blank -> null
 
                             is KeyLabel.Text -> Text(
                                 label.text,
                                 color = labelColor,
-                                style = MaterialTheme.typography.labelLarge
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.align(Alignment.Center)
                             )
 
                             is KeyLabel.Icon -> Icon(
                                 label.icon,
                                 label.description,
                                 tint = labelColor,
-                                modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
+                                modifier = Modifier.align(Alignment.Center).size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
                             )
+                        }
+
+                        key.longClickAction?.let {
+                            when (val label = it.label) {
+                                is KeyLabel.Blank -> null
+
+                                is KeyLabel.Text -> Text(
+                                    label.text,
+                                    color = labelColor,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier.align(Alignment.TopCenter)
+                                )
+
+                                is KeyLabel.Icon -> Icon(
+                                    label.icon,
+                                    label.description,
+                                    tint = labelColor,
+                                    modifier = Modifier.align(Alignment.TopCenter).size(MaterialTheme.typography.labelSmall.lineHeight.toDp())
+                                )
+                            }
                         }
                     }
                 }
@@ -198,8 +220,6 @@ fun SelectorKey(
     val maxOffset = (nItems/2) * itemHeightPx
 
     var isSelecting by remember { mutableStateOf(false) }
-
-
 
     var dragOffset by remember { mutableFloatStateOf(0f) }
     var scrollOffset by remember { mutableFloatStateOf(0f) }
@@ -267,27 +287,35 @@ fun SelectorKey(
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    Icon(Icons.Default.KeyboardArrowUp, null, modifier = Modifier.size(12.dp))
-                    when (val label = selectedAction.label) {
-                        is KeyLabel.Blank -> null
+                Icon(
+                    Icons.Default.KeyboardArrowUp,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.align(Alignment.TopCenter).size(12.dp)
+                )
+                when (val label = selectedAction.label) {
+                    is KeyLabel.Blank -> null
 
-                        is KeyLabel.Text ->
-                            Text(
-                                text = label.text,
-                                style = MaterialTheme.typography.labelLarge
-                            )
-                        is KeyLabel.Icon -> Icon(
-                            label.icon,
-                            label.description,
-                            //tint = labelColor,
-                            modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
+                    is KeyLabel.Text ->
+                        Text(
+                            text = label.text,
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier.align(Alignment.Center)
                         )
-                    }
-                    Icon(Icons.Default.KeyboardArrowDown, null, modifier = Modifier.size(12.dp))
+                    is KeyLabel.Icon -> Icon(
+                        label.icon,
+                        label.description,
+                        modifier = Modifier.align(Alignment.Center).size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
+                    )
                 }
+                Icon(
+                    Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.align(Alignment.BottomCenter).size(12.dp)
+                )
+
             }
         }
 
@@ -350,5 +378,38 @@ fun SelectorKey(
                 }
             }
         }
+    }
+}
+
+
+@Preview
+@Composable
+private fun SingleActionDefaultKeyPreview() {
+    Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Key(Keys.key0, Modifier.weight(1f))
+        Key(Keys.key1, Modifier.weight(1f))
+        Key(Keys.key2, Modifier.weight(1f))
+    }
+}
+
+@Preview
+@Composable
+private fun DualActionDefaultKeyPreview() {
+    Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Key(Keys.keySin, Modifier.weight(1f))
+        Key(Keys.keyCos, Modifier.weight(1f))
+        Key(Keys.keyTan, Modifier.weight(1f))
+    }
+}
+
+
+
+@Preview
+@Composable
+private fun SelectionKeyPreview() {
+    Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Key(Keys.keyMeter, Modifier.weight(1f))
+        Key(Keys.keyMeter, Modifier.weight(1f))
+        Key(Keys.keyMeter, Modifier.weight(1f))
     }
 }
