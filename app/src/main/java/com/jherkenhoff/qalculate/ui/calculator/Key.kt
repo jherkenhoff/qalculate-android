@@ -1,7 +1,7 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import android.util.Log
 import android.view.ViewConfiguration
-import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -30,6 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -188,16 +189,18 @@ fun SelectorKey(
     modifier: Modifier = Modifier,
     onKeyAction: (KeyAction) -> Unit = {},
 ) {
+    val nItems = 5
+
     val itemHeight = 40.dp
     val itemHeightPx = with(LocalDensity.current) { itemHeight.toPx() }
-    val minOffset = -(key.initialSelectedIndex) * itemHeightPx
-    val maxOffset = (key.actions.lastIndex - key.initialSelectedIndex) * itemHeightPx
+    val minOffset = -(key.actions.size - nItems/2 - 1) * itemHeightPx
+    val maxOffset = (nItems/2) * itemHeightPx
 
     var isSelecting by remember { mutableStateOf(false) }
 
-    val scrollOffset = remember { Animatable(0f) }
+    var scrollOffset by remember { mutableFloatStateOf(0f) }
 
-    var selectedUnit by remember { mutableStateOf(key.actions[key.initialSelectedIndex]) }
+    var selectedAction by remember { mutableStateOf(key.actions[key.initialSelectedIndex]) }
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -207,9 +210,8 @@ fun SelectorKey(
                 awaitPointerEventScope {
                     while (true) {
                         val down = awaitFirstDown()
-                        coroutineScope.launch {
-                            scrollOffset.snapTo(0f)
-                        }
+                        scrollOffset = (key.actions.size/2 - key.initialSelectedIndex - 1) * itemHeightPx
+                        Log.d("Moni", scrollOffset.toString())
 
                         val touchSlop = viewConfiguration.touchSlop
                         val longPressTimeout = ViewConfiguration.getLongPressTimeout().toLong()
@@ -227,19 +229,17 @@ fun SelectorKey(
                                 isSelecting = true
                             }
 
-                            coroutineScope.launch {
-                                val newOffset = (scrollOffset.value + dragAmount).coerceIn(minOffset, maxOffset)
-                                scrollOffset.snapTo(newOffset)
-                                val snappedIndex = (newOffset / itemHeightPx - 0.5).roundToInt()
-                                val clampedSnappedIndex = (key.initialSelectedIndex + snappedIndex).coerceIn(0, key.actions.lastIndex)
-                                selectedUnit = key.actions[clampedSnappedIndex]
-                            }
+                            scrollOffset = (scrollOffset + dragAmount).coerceIn(minOffset, maxOffset)
+
+                            val snappedIndex = (nItems/2 - scrollOffset / itemHeightPx).roundToInt()
+                            val clampedSnappedIndex = snappedIndex.coerceIn(0, key.actions.lastIndex)
+                            selectedAction = key.actions[clampedSnappedIndex]
 
                             change.consume()
                         }
                         longPressDetectionJob.cancel()
 
-                        onKeyAction(selectedUnit)
+                        onKeyAction(selectedAction)
                         isSelecting = false
                     }
                 }
@@ -258,7 +258,7 @@ fun SelectorKey(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Icon(Icons.Default.KeyboardArrowUp, null, modifier = Modifier.size(12.dp))
-                    when (val label = selectedUnit.label) {
+                    when (val label = selectedAction.label) {
                         is KeyLabel.Blank -> null
 
                         is KeyLabel.Text ->
@@ -284,22 +284,22 @@ fun SelectorKey(
                 Box(
                     Modifier
                         .width(160.dp)
-                        .height(itemHeight * 5)
+                        .height(itemHeight * nItems)
                         .background(Color.Black.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
                         .clipToBounds()
                         .padding(vertical = 8.dp)
                 ) {
                     // Scrollable content
-                    val centerOffsetPx = itemHeightPx * 2 // center of 5-item list
+                    val centerOffsetPx = itemHeightPx * nItems/2
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .wrapContentSize(unbounded = true, align = Alignment.TopCenter)
-                            .offset(y = scrollOffset.value.toDp()),
+                            .offset(y = scrollOffset.toDp()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         for ((index, unit) in key.actions.withIndex()) {
-                            val distanceFromCenter = abs(index*itemHeightPx + scrollOffset.value - centerOffsetPx)/itemHeightPx
+                            val distanceFromCenter = abs(index*itemHeightPx + scrollOffset - centerOffsetPx + itemHeightPx/2)/itemHeightPx
                             val alpha = 1f - (distanceFromCenter * 0.3f)
                             val scale = 1f - (distanceFromCenter * 0.1f)
 
