@@ -130,10 +130,6 @@ fun CalculatorScreenContent(
 
             Spacer(Modifier.weight(1f))
 
-            UnitSelectorButton(
-                { }
-            )
-
             InputSheet(
                 inputTextFieldValue,
                 parsedString,
