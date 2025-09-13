@@ -1,8 +1,5 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getTextAfterSelection
@@ -21,18 +18,13 @@ import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Calculation
 import com.jherkenhoff.qalculate.model.KeyAction
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
@@ -116,6 +108,8 @@ class CalculatorViewModel @Inject constructor(
             is KeyAction.Return -> submitCalculation()
             is KeyAction.ClearAll -> clearInput()
             is KeyAction.MoveCursor -> moveCursor(keyAction.chars)
+            is KeyAction.Undo -> null
+            is KeyAction.Redo -> null
         }
     }
 
