@@ -1,7 +1,7 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.util.Log
 import android.view.ViewConfiguration
+import androidx.compose.animation.core.EaseInOutQuart
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -56,6 +56,7 @@ import com.jherkenhoff.qalculate.model.KeyRole
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.roundToInt
 
 
@@ -198,11 +199,15 @@ fun SelectorKey(
 
     var isSelecting by remember { mutableStateOf(false) }
 
+
+
+    var dragOffset by remember { mutableFloatStateOf(0f) }
     var scrollOffset by remember { mutableFloatStateOf(0f) }
 
     var selectedAction by remember { mutableStateOf(key.actions[key.initialSelectedIndex]) }
 
     val coroutineScope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
 
     Box(
         modifier = modifier
@@ -210,8 +215,8 @@ fun SelectorKey(
                 awaitPointerEventScope {
                     while (true) {
                         val down = awaitFirstDown()
-                        scrollOffset = (key.actions.size/2 - key.initialSelectedIndex - 1) * itemHeightPx
-                        Log.d("Moni", scrollOffset.toString())
+                        dragOffset = (key.actions.size/2 - key.initialSelectedIndex - 1) * itemHeightPx
+                        scrollOffset = dragOffset
 
                         val touchSlop = viewConfiguration.touchSlop
                         val longPressTimeout = ViewConfiguration.getLongPressTimeout().toLong()
@@ -229,11 +234,19 @@ fun SelectorKey(
                                 isSelecting = true
                             }
 
-                            scrollOffset = (scrollOffset + dragAmount).coerceIn(minOffset, maxOffset)
+                            if (isSelecting) {
+                                dragOffset = (dragOffset + dragAmount).coerceIn(minOffset, maxOffset)
 
-                            val snappedIndex = (nItems/2 - scrollOffset / itemHeightPx).roundToInt()
-                            val clampedSnappedIndex = snappedIndex.coerceIn(0, key.actions.lastIndex)
-                            selectedAction = key.actions[clampedSnappedIndex]
+                                // Translate drag offset to scroll offset and apply non-linear transfer function for snappy feeling
+                                val dragOffsetItemIndex = floor(dragOffset/itemHeightPx).toInt()
+                                val dragOffsetFractionalIndex = (dragOffset/itemHeightPx - floor(dragOffset/itemHeightPx))
+                                scrollOffset = dragOffsetItemIndex*itemHeightPx + EaseInOutQuart.transform(dragOffsetFractionalIndex)*itemHeightPx
+
+                                val selectedIndex = (nItems/2 - scrollOffset / itemHeightPx).roundToInt().coerceIn(0, key.actions.lastIndex)
+                                selectedAction = key.actions[selectedIndex]
+
+                                //haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                            }
 
                             change.consume()
                         }
