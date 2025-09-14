@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.AppSettingsAlt
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Keyboard
 import androidx.compose.material.icons.outlined.Numbers
@@ -29,12 +30,14 @@ import com.jherkenhoff.qalculate.R
 
 @Composable
 fun SettingsScreen(
+    onGeneralSettingsClick: () -> Unit = {},
     onCalculationSettingsClick: () -> Unit = {},
     onInputSettingsClick: () -> Unit = {},
     onOutputSettingsClick: () -> Unit = {},
     onNavigateUp: () -> Unit = {}
 ) {
     SettingsScreenContent(
+        onGeneralSettingsClick = onGeneralSettingsClick,
         onCalculationSettingsClick = onCalculationSettingsClick,
         onInputSettingsClick = onInputSettingsClick,
         onOutputSettingsClick = onOutputSettingsClick,
@@ -45,6 +48,7 @@ fun SettingsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreenContent(
+    onGeneralSettingsClick: () -> Unit = {},
     onCalculationSettingsClick: () -> Unit = {},
     onInputSettingsClick: () -> Unit = {},
     onOutputSettingsClick: () -> Unit = {},
@@ -78,6 +82,15 @@ fun SettingsScreenContent(
                 .padding(innerPadding),
         ) {
             LazyColumn {
+                item {
+                    ListItem(
+                        headlineContent = { Text("General") },
+                        supportingContent = { Text("Localization, UI")},
+                        leadingContent = { Icon(Icons.Outlined.AppSettingsAlt, contentDescription = null)},
+                        trailingContent = { Icon(Icons.Outlined.ChevronRight, contentDescription = null)},
+                        modifier = Modifier.clickable(onClick = onGeneralSettingsClick)
+                    )
+                }
                 item {
                     ListItem(
                         headlineContent = { Text("Calculation") },

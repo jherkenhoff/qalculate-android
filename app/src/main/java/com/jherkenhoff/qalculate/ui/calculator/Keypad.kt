@@ -10,18 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.model.Key
 import com.jherkenhoff.qalculate.model.KeyAction
-import com.jherkenhoff.qalculate.model.Keys
 
-val primaryKeypadKeys : Array<Array<Key>> = arrayOf(
-    arrayOf(Keys.keyPercent, Keys.keyPi, Keys.key7, Keys.key8, Keys.key9, Keys.keyBackspace, Keys.keyClearAll),
-    arrayOf(Keys.keySqrt, Keys.keyPower, Keys.key4, Keys.key5, Keys.key6, Keys.keyMultiply, Keys.keyDivide),
-    arrayOf(Keys.keyBracketOpen, Keys.keyBracketClose, Keys.key1, Keys.key2, Keys.key3, Keys.keyPlus, Keys.keyMinus),
-    arrayOf(Keys.keyUnderscore, Keys.keyEqual, Keys.key0, Keys.keyDecimal, Keys.keyExp, Keys.keyReturn),
-)
 
 @Composable
 fun Keypad(
@@ -66,12 +58,4 @@ fun Keypad(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PrimaryKeypad() {
-    Keypad(
-        primaryKeypadKeys
-    )
 }

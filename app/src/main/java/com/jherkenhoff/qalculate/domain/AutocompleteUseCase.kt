@@ -4,8 +4,8 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import com.jherkenhoff.qalculate.data.AutocompleteRepository
-import com.jherkenhoff.qalculate.data.model.UserPreferences
 import com.jherkenhoff.qalculate.model.AutocompleteItem
+import com.jherkenhoff.qalculate.model.UserPreferences
 import javax.inject.Inject
 
 data class AutocompleteResult (

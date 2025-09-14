@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jherkenhoff.qalculate.data.UserPreferencesRepository
 import com.jherkenhoff.qalculate.data.calculations.CalculationsRepository
-import com.jherkenhoff.qalculate.data.model.UserPreferences
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
@@ -17,6 +16,7 @@ import com.jherkenhoff.qalculate.domain.PrintUseCase
 import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Calculation
 import com.jherkenhoff.qalculate.model.KeyAction
+import com.jherkenhoff.qalculate.model.UserPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -78,7 +78,7 @@ class CalculatorViewModel @Inject constructor(
     val userPreferences = userPreferencesRepository.userPreferencesFlow.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        UserPreferences.getDefaultInstance()
+        UserPreferences()
     )
 
     fun submitCalculation() {

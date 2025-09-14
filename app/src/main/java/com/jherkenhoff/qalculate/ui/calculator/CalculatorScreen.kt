@@ -45,7 +45,10 @@ import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Calculation
 import com.jherkenhoff.qalculate.model.Key
 import com.jherkenhoff.qalculate.model.KeyAction
+import com.jherkenhoff.qalculate.model.KeyLabel
+import com.jherkenhoff.qalculate.model.KeyRole
 import com.jherkenhoff.qalculate.model.Keys
+import com.jherkenhoff.qalculate.model.UserPreferences
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -73,6 +76,8 @@ private val physicsSecondaryKeypad = SecondaryKeypadData(
 
 private val secondaryKeypads = arrayOf(basicSecondaryKeypad, physicsSecondaryKeypad)
 
+
+
 @Composable
 fun CalculatorScreen(
     viewModel: CalculatorViewModel = viewModel(),
@@ -85,6 +90,7 @@ fun CalculatorScreen(
         inputTextFieldValue = viewModel.inputTextFieldValue.collectAsStateWithLifecycle().value,
         parsedString = viewModel.parsedString.collectAsStateWithLifecycle().value,
         resultString = viewModel.resultString.collectAsStateWithLifecycle().value,
+        userPreferences = viewModel.userPreferences.collectAsStateWithLifecycle().value,
         onKeyAction = viewModel::handleKeyAction,
         calculationHistory = viewModel.calculations.collectAsState().value,
         autocompleteResult = viewModel.autocompleteResult.collectAsStateWithLifecycle().value,
@@ -105,6 +111,7 @@ fun CalculatorScreenContent(
     inputTextFieldValue: TextFieldValue,
     parsedString: String,
     resultString: String,
+    userPreferences: UserPreferences,
     calculationHistory: Map<UUID, Calculation> = emptyMap(),
     autocompleteResult: AutocompleteResult,
     onKeyAction: (KeyAction) -> Unit = { },
@@ -113,7 +120,7 @@ fun CalculatorScreenContent(
     onCalculationSubmit: () -> Unit = { },
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     onMenuClick: () -> Unit = {  },
-    onSettingsClick: () -> Unit = {  }
+    onSettingsClick: () -> Unit = {  },
 ) {
     var keyboardInputEnabled by remember { mutableStateOf(true) }
 
@@ -149,6 +156,26 @@ fun CalculatorScreenContent(
     val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
 
     var activeSecondaryKeypad by remember { mutableIntStateOf(0) }
+
+
+    val decimalChar = when (userPreferences.decimalSeparator) {
+        UserPreferences.DecimalSeparator.DOT -> "."
+        UserPreferences.DecimalSeparator.COMMA -> ","
+    }
+
+    val keyDecimal = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text(decimalChar), decimalChar),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text("␣"), " "),
+        bottomRightAction = KeyAction.InsertText(KeyLabel.Text(","), ","),
+        role = KeyRole.NUMBER
+    )
+
+    val primaryKeypadKeys : Array<Array<Key>> = arrayOf(
+        arrayOf(Keys.keyPercent, Keys.keyPi, Keys.key7, Keys.key8, Keys.key9, Keys.keyBackspace, Keys.keyClearAll),
+        arrayOf(Keys.keySqrt, Keys.keyPower, Keys.key4, Keys.key5, Keys.key6, Keys.keyMultiply, Keys.keyDivide),
+        arrayOf(Keys.keyBracketOpen, Keys.keyBracketClose, Keys.key1, Keys.key2, Keys.key3, Keys.keyPlus, Keys.keyMinus),
+        arrayOf(Keys.keyUnderscore, Keys.keyEqual, Keys.key0, keyDecimal, Keys.keyExp, Keys.keyReturn),
+    )
 
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -241,6 +268,7 @@ private fun DefaultPreview() {
         TextFieldValue("c"),
         "SpeedOfLight",
         "299.792 458 Km/ms",
+        userPreferences = UserPreferences(),
         autocompleteResult = AutocompleteResult()
     )
 }
@@ -252,6 +280,7 @@ private fun EmptyPreview() {
         TextFieldValue(""),
         "",
         "",
+        userPreferences = UserPreferences(),
         autocompleteResult = AutocompleteResult()
     )
 }

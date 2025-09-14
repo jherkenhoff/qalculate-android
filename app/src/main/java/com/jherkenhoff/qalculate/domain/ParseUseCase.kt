@@ -1,24 +1,58 @@
 package com.jherkenhoff.qalculate.domain
 
 import com.jherkenhoff.libqalculate.Calculator
+import com.jherkenhoff.libqalculate.DigitGrouping
+import com.jherkenhoff.libqalculate.ExpDisplay
+import com.jherkenhoff.libqalculate.IntervalDisplay
+import com.jherkenhoff.libqalculate.MultiplicationSign
+import com.jherkenhoff.libqalculate.NumberFractionFormat
+import com.jherkenhoff.libqalculate.ParseOptions
+import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants
-import com.jherkenhoff.qalculate.data.model.UserPreferences
-import com.jherkenhoff.qalculate.data.model.getQalculateParseOptions
-import com.jherkenhoff.qalculate.data.model.getQalculatePrintOptions
+import com.jherkenhoff.qalculate.model.UserPreferences
 import javax.inject.Inject
 
 class ParseUseCase @Inject constructor(
-    private val calc: Calculator
+   private val calc: Calculator
 ) {
     suspend operator fun invoke(input: String, userPreferences: UserPreferences): String {
 
-        val parseOptions = userPreferences.getQalculateParseOptions()
-        val printOptions = userPreferences.getQalculatePrintOptions()
+        var printOptions = PrintOptions()
 
+        printOptions.negative_exponents = false
+        printOptions.abbreviate_names   = true
+        printOptions.spacious           = true
+        printOptions.interval_display   = IntervalDisplay.INTERVAL_DISPLAY_CONCISE
+        printOptions.number_fraction_format = NumberFractionFormat.FRACTION_DECIMAL
+        printOptions.digit_grouping = DigitGrouping.DIGIT_GROUPING_NONE
+        printOptions.min_exp = 4
+        printOptions.exp_display = ExpDisplay.EXP_POWER_OF_10
+        printOptions.multiplication_sign = MultiplicationSign.MULTIPLICATION_SIGN_ASTERISK
+        printOptions.use_unicode_signs = 1
         printOptions.place_units_separately = false
 
+
+        val parseOptions = ParseOptions()
+        parseOptions.preserve_format = true
+        //parseOptions.comma_as_separator = true
+        //parseOptions.dot_as_separator = true
+
+        when (userPreferences.decimalSeparator) {
+            UserPreferences.DecimalSeparator.DOT -> {
+                printOptions.decimalpoint_sign = "."
+                calc.useDecimalPoint()
+            }
+
+            UserPreferences.DecimalSeparator.COMMA -> {
+                printOptions.decimalpoint_sign = ","
+                calc.useDecimalComma()
+            }
+        }
+
+        val unlocalizedInput = calc.unlocalizeExpression(input, parseOptions)
+
         // TODO: Implement proper conversion handling
-        val toExpressions = input.split(" to ")
+        val toExpressions = unlocalizedInput.split(" to ")
         if (toExpressions.size == 2) {
             val beforeToExpression = calc.parse(toExpressions.first(), parseOptions)
             val afterToExpression = calc.parse(toExpressions.last(), parseOptions)
@@ -28,7 +62,7 @@ class ParseUseCase @Inject constructor(
 
             return "$beforeToString to $afterToString"
         } else {
-            val parsedExpression = calc.parse(input, parseOptions)
+            val parsedExpression = calc.parse(unlocalizedInput, parseOptions)
             return calc.print(parsedExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
         }
     }
