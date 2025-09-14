@@ -90,8 +90,6 @@ fun AuxiliaryBar(
                 for (key in auxiliaryKeys) {
                     IconButton({ key.clickAction?.let { onKeyAction(it) } }) {
                         when (val label = key.clickAction.label) {
-                            is KeyLabel.Blank -> null
-
                             is KeyLabel.Text -> Text(
                                 label.text,
                                 style = MaterialTheme.typography.labelLarge
@@ -102,6 +100,8 @@ fun AuxiliaryBar(
                                 label.description,
                                 modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
                             )
+
+                            null -> null
                         }
                     }
                 }

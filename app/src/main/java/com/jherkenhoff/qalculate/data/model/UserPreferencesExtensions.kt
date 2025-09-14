@@ -8,6 +8,8 @@ import com.jherkenhoff.libqalculate.PrintOptions
 fun UserPreferences.getQalculateParseOptions() : ParseOptions {
     var po = ParseOptions()
     po.preserve_format = true
+    po.comma_as_separator = true
+    po.dot_as_separator = true
     return po
 }
 
@@ -17,6 +19,7 @@ fun UserPreferences.getQalculatePrintOptions() : PrintOptions {
     po.abbreviate_names   = abbreviateNames
     po.spacious           = spacious
     po.interval_display   = IntervalDisplay.INTERVAL_DISPLAY_CONCISE
+    po.decimalpoint_sign  = "."
     return po
 }
 
