@@ -42,7 +42,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
@@ -67,10 +69,15 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 
 
+object KeyDefaults {
+    val Shape = RoundedCornerShape(6.dp)
+}
+
 @Composable
 fun Key(
     key: Key,
     modifier: Modifier = Modifier,
+    shape: Shape = KeyDefaults.Shape,
     onKeyAction: (KeyAction) -> Unit = {}
 ) {
 
@@ -86,15 +93,32 @@ fun Key(
         KeyRole.SYSTEM -> MaterialTheme.colorScheme.onSecondaryContainer
     }
 
-
     when (key) {
         is Key.DefaultKey -> DefaultKey(
             key,
             onKeyAction = onKeyAction,
             labelColor = labelColor,
             containerColor = containerColor,
-            modifier = modifier)
-        is Key.SelectorKey -> SelectorKey(key, onKeyAction = onKeyAction, modifier = modifier)
+            shape = shape,
+            modifier = modifier
+        )
+        is Key.SelectorKey -> SelectorKey(
+            key,
+            onKeyAction = onKeyAction,
+            labelColor = labelColor,
+            containerColor = containerColor,
+            shape = shape,
+            modifier = modifier
+        )
+
+        is Key.CornerDragKey -> CornerDragKey(
+            key,
+            onKeyAction = onKeyAction,
+            labelColor = labelColor,
+            containerColor = containerColor,
+            shape = shape,
+            modifier = modifier
+        )
     }
 }
 
@@ -102,6 +126,7 @@ fun Key(
 fun DefaultKey(
     key: Key.DefaultKey,
     modifier: Modifier = Modifier,
+    shape: Shape = KeyDefaults.Shape,
     onKeyAction: (KeyAction) -> Unit = {},
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
@@ -155,12 +180,7 @@ fun DefaultKey(
             }
     ) {
 
-        val popupEnabled = when(key.role) {
-            KeyRole.SYSTEM -> false
-            else -> true
-        }
-
-        if (showPopup && popupEnabled) {
+        if (showPopup) {
             Layout(
                 content = {
                     Surface(
@@ -195,7 +215,7 @@ fun DefaultKey(
         }
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
+            shape = shape,
             color = containerColor,
             modifier = modifier.fillMaxSize().align(Alignment.Center)
         ) {
@@ -208,9 +228,149 @@ fun DefaultKey(
                 key.longClickAction?.let {
                     KeyLabel(
                         label = it.label,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = labelColor.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.align(if (it.label != null) Alignment.TopCenter else Alignment.TopEnd)
+                        modifier = Modifier.align(if (it.label != null) Alignment.TopEnd else Alignment.TopEnd)
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+
+@Composable
+fun CornerDragKey(
+    key: Key.CornerDragKey,
+    modifier: Modifier = Modifier,
+    shape: Shape = KeyDefaults.Shape,
+    onKeyAction: (KeyAction) -> Unit = {},
+    labelColor: Color = MaterialTheme.colorScheme.onSurface,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
+) {
+    val haptic = LocalHapticFeedback.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val dragThreshold = (10.dp).toFloatPx()
+
+    var dragOffset by remember { mutableStateOf(Offset(0f, 0f)) }
+
+    var selectedAction by remember { mutableStateOf<KeyAction?>(null) }
+
+    Box(
+        modifier = modifier.pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val down = awaitFirstDown()
+                    selectedAction = key.centerAction
+                    dragOffset = Offset(0f, 0f)
+
+                    drag(down.id) { change ->
+                        dragOffset += change.positionChange()
+
+                        var newSelectedAction : KeyAction = key.centerAction
+
+                        if (dragOffset.getDistance() >= dragThreshold) {
+                            if (dragOffset.x > 0 && dragOffset.y < 0 && key.topRightAction != null) {
+                                newSelectedAction = key.topRightAction
+                            } else if (dragOffset.x < 0 && dragOffset.y < 0 && key.topLeftAction != null) {
+                                newSelectedAction = key.topLeftAction
+                            } else if (dragOffset.x > 0 && dragOffset.y > 0 && key.bottomRightAction != null) {
+                                newSelectedAction = key.bottomRightAction
+                            } else if (dragOffset.x < 0 && dragOffset.y > 0 && key.bottomLeftAction != null) {
+                                newSelectedAction = key.bottomLeftAction
+                            }
+                        }
+
+                        if (newSelectedAction != selectedAction) {
+                            haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                        }
+                        selectedAction = newSelectedAction
+
+                        change.consume()
+                    }
+
+                    haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
+                    selectedAction?.let(onKeyAction)
+                    selectedAction = null
+                }
+            }
+        }
+    ) {
+
+        selectedAction?.let {
+            Layout(
+                content = {
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = CircleShape,
+                        shadowElevation = 3.dp,
+                        modifier = Modifier.defaultMinSize(32.dp, 32.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier.wrapContentSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            AnimatedContent(it) {
+                                KeyLabel(
+                                    label = it.popupLabel,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 8.dp)
+                                )
+                            }
+                        }
+                    }
+                },
+            ) { measurables, constraints ->
+                val placeable = measurables.first().measure(constraints)
+                layout(width = 0, height = 0) {
+                    placeable.placeRelative(x = (constraints.maxWidth / 2 - placeable.width / 2), y = -placeable.height - 8.dp.roundToPx())
+                }
+            }
+        }
+
+        Surface(
+            shape = shape,
+            color = containerColor,
+            modifier = modifier.fillMaxSize().align(Alignment.Center)
+        ) {
+            Box {
+                KeyLabel(
+                    label = key.centerAction.label,
+                    color = labelColor,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+                key.topLeftAction?.let {
+                    KeyLabel(
+                        label = it.label,
+                        color = labelColor.copy(alpha = 0.6f),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.align(Alignment.TopStart)
+                    )
+                }
+                key.topRightAction?.let {
+                    KeyLabel(
+                        label = it.label,
+                        color = labelColor.copy(alpha = 0.6f),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    )
+                }
+                key.bottomLeftAction?.let {
+                    KeyLabel(
+                        label = it.label,
+                        color = labelColor.copy(alpha = 0.6f),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.align(Alignment.BottomStart)
+                    )
+                }
+                key.bottomRightAction?.let {
+                    KeyLabel(
+                        label = it.label,
+                        color = labelColor.copy(alpha = 0.6f),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.align(Alignment.BottomEnd)
                     )
                 }
             }
@@ -222,7 +382,10 @@ fun DefaultKey(
 fun SelectorKey(
     key: Key.SelectorKey,
     modifier: Modifier = Modifier,
+    shape: Shape = KeyDefaults.Shape,
     onKeyAction: (KeyAction) -> Unit = {},
+    labelColor: Color = MaterialTheme.colorScheme.onSurface,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
     val nItems = 5
 
@@ -298,8 +461,8 @@ fun SelectorKey(
     ) {
         // The actual button
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shape = shape,
+            color = containerColor,
             modifier = modifier.fillMaxSize()
         ) {
             Box(
@@ -308,17 +471,18 @@ fun SelectorKey(
                 Icon(
                     Icons.Default.KeyboardArrowUp,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = labelColor.copy(alpha = 0.6f),
                     modifier = Modifier.align(Alignment.TopCenter).size(12.dp)
                 )
                 KeyLabel(
                     selectedAction.label,
+                    color = labelColor,
                     modifier = Modifier.align(Alignment.Center)
                 )
                 Icon(
                     Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = labelColor.copy(alpha = 0.6f),
                     modifier = Modifier.align(Alignment.BottomCenter).size(12.dp)
                 )
 
@@ -387,7 +551,7 @@ fun KeyLabel(
                 modifier
                     .padding(2.dp)
                     .size(3.dp)
-                    .background(MaterialTheme.colorScheme.outlineVariant, CircleShape)
+                    .background(MaterialTheme.colorScheme.secondary, CircleShape)
             )
 
         is KeyLabel.Text ->
@@ -395,7 +559,7 @@ fun KeyLabel(
                 text = label.text,
                 color = color,
                 style = style,
-                modifier = modifier
+                modifier = modifier.padding(4.dp, 0.dp)
             )
 
         is KeyLabel.Icon ->
@@ -403,7 +567,7 @@ fun KeyLabel(
                 label.icon,
                 label.description,
                 tint = color,
-                modifier = modifier.size(style.fontSize.toDp())
+                modifier = modifier.padding(2.dp).size(style.fontSize.toDp())
             )
     }
 }
@@ -435,8 +599,8 @@ private fun DualActionDefaultKeyPreview() {
 @Composable
 private fun SelectionKeyPreview() {
     Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Key(Keys.keyMeter, Modifier.weight(1f))
-        Key(Keys.keyMeter, Modifier.weight(1f))
-        Key(Keys.keyMeter, Modifier.weight(1f))
+        Key(Keys.keySiLength, Modifier.weight(1f))
+        Key(Keys.keyImperialLength, Modifier.weight(1f))
+        Key(Keys.keySiLength, Modifier.weight(1f))
     }
 }

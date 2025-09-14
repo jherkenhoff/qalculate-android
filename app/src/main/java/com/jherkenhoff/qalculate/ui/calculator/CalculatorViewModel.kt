@@ -110,6 +110,7 @@ class CalculatorViewModel @Inject constructor(
             is KeyAction.MoveCursor -> moveCursor(keyAction.chars)
             is KeyAction.Undo -> null
             is KeyAction.Redo -> null
+            is KeyAction.StoreAsVariable -> null
         }
     }
 
