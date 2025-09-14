@@ -81,7 +81,7 @@ fun AboutCard(
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 20.dp))
-                Text(text = "Copyright © 2023 - 2024 Jost Herkenhoff")
+                Text(text = "Copyright © 2023 - 2025 Jost Herkenhoff")
                 Spacer(modifier = Modifier.height(6.dp))
                 LicenseText()
             }

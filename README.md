@@ -18,8 +18,11 @@ Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> 
 <br/>
 <br/>
 <p align="center">
-  <a href="readme/screenshot.png">
-    <img src="readme/screenshot.png" width="250">
+  <a href="readme/screenshot_keypad.png">
+    <img src="readme/screenshot_keypad.png" width="250">
+  </a>
+  <a href="readme/screenshot_keyboard.png">
+    <img src="readme/screenshot_keyboard.png" width="250">
   </a>
 </p>
 
