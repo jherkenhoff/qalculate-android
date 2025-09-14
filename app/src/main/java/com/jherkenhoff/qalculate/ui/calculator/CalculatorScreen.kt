@@ -1,22 +1,27 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,9 +43,35 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Calculation
+import com.jherkenhoff.qalculate.model.Key
 import com.jherkenhoff.qalculate.model.KeyAction
+import com.jherkenhoff.qalculate.model.Keys
 import kotlinx.coroutines.launch
 import java.util.UUID
+
+
+private data class SecondaryKeypadData(
+    val title: String,
+    val keys: Array<Array<Key>>
+)
+
+private val basicSecondaryKeypad = SecondaryKeypadData(
+    title = "Basic",
+    keys = arrayOf(
+        arrayOf(Keys.keySiLength, Keys.keyImperialLength, Keys.keyImperialWeight, Keys.keySiWeight, Keys.keyConversion),
+        arrayOf(Keys.keyIntegral, Keys.keyDifferential, Keys.keySum, Keys.keyX, Keys.keyInfinity),
+        arrayOf(Keys.keySin, Keys.keyCos, Keys.keyTan, Keys.keyLn, Keys.keyImaginary)
+    )
+)
+
+private val physicsSecondaryKeypad = SecondaryKeypadData(
+    title = "Physics",
+    keys = arrayOf(
+        arrayOf(Keys.keySiLength, Keys.keyImperialLength, Keys.keyImperialWeight, Keys.keySiWeight, Keys.keyConversion),
+    )
+)
+
+private val secondaryKeypads = arrayOf(basicSecondaryKeypad, physicsSecondaryKeypad)
 
 @Composable
 fun CalculatorScreen(
@@ -116,6 +148,8 @@ fun CalculatorScreenContent(
 
     val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
 
+    var activeSecondaryKeypad by remember { mutableIntStateOf(0) }
+
     Surface(
         color = MaterialTheme.colorScheme.surface,
     ) {
@@ -140,72 +174,61 @@ fun CalculatorScreenContent(
                 interceptKeyboard = !keyboardInputEnabled,
             )
 
-//            Box(
-//                contentAlignment = Alignment.BottomCenter,
-//                modifier = Modifier.weight(1f)
-//            ) {
-//                CalculationList(
-//                    calculations,
-//                    focusedCalculationUuid,
-//                    autocompleteResult = internalAutocompleteResult,
-//                    onInputFieldValueChange = onInputFieldValueChange,
-//                    onDeleteClick = { deleteCalculationWithSnackbar(it) },
-//                    onSubmit = onCalculationSubmit,
-//                    onCalculationFocusChange = onCalculationFocusChange,
-//                    onAutocompleteClick = onAutocompleteClick,
-//                    modifier = Modifier.fillMaxHeight()
-//                )
-//                SnackbarHost(snackbarHostState)
-//            }
-
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp),
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.background(
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp)
+                    )
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
 
-                    AnimatedVisibility(!isImeVisible) {
-                        Keypad(
-                            secondaryKeypadKeys,
-                            onKeyAction = onKeyAction,
-                            compact = isImeVisible
-                        )
+                AnimatedVisibility(!isImeVisible) {
+                    Column {
+                        PrimaryTabRow(
+                            activeSecondaryKeypad,
+                            containerColor = Color.Transparent,
+                            divider = { Spacer(Modifier.height(4.dp)) }
+                        ) {
+                            for ((i, keypad) in secondaryKeypads.withIndex()) {
+                                Tab(
+                                    selected = true,
+                                    onClick = { activeSecondaryKeypad = i},
+                                    text = {
+                                        Text(keypad.title)
+                                    }
+                                )
+                            }
+                        }
+
+                        AnimatedContent(activeSecondaryKeypad) {
+                            Keypad(
+                                secondaryKeypads[it].keys,
+                                onKeyAction = onKeyAction,
+                                compact = isImeVisible
+                            )
+                        }
                     }
-                    Keypad(
-                        primaryKeypadKeys,
-                        onKeyAction = onKeyAction,
-                        compact = isImeVisible
-                    )
-
-                    AuxiliaryBar(
-                        autocompleteResult = internalAutocompleteResult,
-                        keyboardEnable = keyboardInputEnabled,
-                        onAutocompleteClick = onAutocompleteClick,
-                        onKeyboardEnableChange = {keyboardInputEnabled = it},
-                        onKeyAction = onKeyAction,
-                        onAutocompleteDismiss = { autocompleteDismissed = true }
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.safeContent))
                 }
+                Keypad(
+                    primaryKeypadKeys,
+                    onKeyAction = onKeyAction,
+                    compact = isImeVisible,
+                    topKeyCornerSize = if (isImeVisible) CornerSize(21.dp) else KeyDefaults.Shape.topStart
+                )
+
+                AuxiliaryBar(
+                    autocompleteResult = internalAutocompleteResult,
+                    keyboardEnable = keyboardInputEnabled,
+                    onAutocompleteClick = onAutocompleteClick,
+                    onKeyboardEnableChange = {keyboardInputEnabled = it},
+                    onKeyAction = onKeyAction,
+                    onAutocompleteDismiss = { autocompleteDismissed = true }
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.safeContent))
             }
-
-//
-//            AnimatedVisibility(focusedCalculationUuid != null) {
-//                Toolbar(Modifier.padding(bottom = 16.dp))
-//            }
-//
-//
-//            AnimatedVisibility(WindowInsets.isImeVisible && focusedCalculationUuid != null) {
-//                QuickKeys(onKey = onQuickKeyPressed)
-//            }
-
-
         }
     }
 }
