@@ -29,7 +29,6 @@ fun SettingsListItem(
     }
 }
 
-
 @Composable
 inline fun <reified T : Enum<T>> SingleEnumSelectSettingsListItem(
     title: String,

@@ -179,20 +179,10 @@ fun CalculatorScreenContent(
         role = KeyRole.NUMBER
     )
 
-    val multiplicationChar = when (userPreferences.multiplicationSign) {
-        UserPreferences.MultiplicationSign.DOT -> "·"
-        UserPreferences.MultiplicationSign.X -> "×"
-        UserPreferences.MultiplicationSign.ASTERISK -> "*"
-        UserPreferences.MultiplicationSign.ALTDOT -> "."
-    }
+    val multiplicationChar = userPreferences.getMultiplicationSignString()
     val keyMultiply = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text(multiplicationChar), multiplicationChar), role = KeyRole.OPERATOR)
 
-
-    val divisionChar = when (userPreferences.divisionSign) {
-        UserPreferences.DivisionSign.DIVISION -> "÷"
-        UserPreferences.DivisionSign.DIVISION_SLASH -> "∕"
-        UserPreferences.DivisionSign.SLASH -> "/"
-    }
+    val divisionChar = userPreferences.getDivisionSignString()
     val keyDivision = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text(divisionChar), divisionChar), role = KeyRole.OPERATOR)
 
     val primaryKeypadKeys : Array<Array<Key>> = arrayOf(

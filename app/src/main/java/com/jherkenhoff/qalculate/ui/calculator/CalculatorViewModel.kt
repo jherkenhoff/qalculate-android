@@ -12,7 +12,6 @@ import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
-import com.jherkenhoff.qalculate.domain.PrintUseCase
 import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Calculation
 import com.jherkenhoff.qalculate.model.KeyAction
@@ -33,7 +32,6 @@ import javax.inject.Inject
 class CalculatorViewModel @Inject constructor(
     private val parseUseCase: ParseUseCase,
     private val calculateUseCase: CalculateUseCase,
-    private val printUseCase: PrintUseCase,
     private val autocompleteUseCase: AutocompleteUseCase,
     private val calculationsRepository: CalculationsRepository,
     private val userPreferencesRepository: UserPreferencesRepository
@@ -51,8 +49,7 @@ class CalculatorViewModel @Inject constructor(
     )
 
     val resultString = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
-        val mathStructure = calculateUseCase(inputTextFieldValue.text, userPreferences)
-        return@combine printUseCase(mathStructure, userPreferences)
+        return@combine calculateUseCase(inputTextFieldValue.text, userPreferences)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),

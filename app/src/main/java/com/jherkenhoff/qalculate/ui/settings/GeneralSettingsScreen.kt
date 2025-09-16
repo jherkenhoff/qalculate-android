@@ -2,9 +2,6 @@ package com.jherkenhoff.qalculate.ui.settings
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,38 +33,34 @@ fun GeneralSettingsScreenContent(
         onNavigateUp = onNavigateUp
     ) {
         ListItem(
-            headlineContent = { Text("Decimal separator") },
+            headlineContent = { Text("Negative exponents") },
+            supportingContent = { Text("Print A${userPreferences.getMultiplicationSignString()}B⁻¹ instead of A${userPreferences.getDivisionSignString()}B")},
             trailingContent = {
-
-                SingleChoiceSegmentedButtonRow {
-                    SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
-                        onClick = { onUserPreferenceChange(userPreferences.copy(decimalSeparator = UserPreferences.DecimalSeparator.DOT)) },
-                        selected = userPreferences.decimalSeparator == UserPreferences.DecimalSeparator.DOT,
-                        label = { Text("Dot") }
-                    )
-                    SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
-                        onClick = { onUserPreferenceChange(userPreferences.copy(decimalSeparator = UserPreferences.DecimalSeparator.COMMA)) },
-                        selected = userPreferences.decimalSeparator == UserPreferences.DecimalSeparator.COMMA,
-                        label = { Text("Comma") }
-                    )
-                }
+                Switch(
+                    checked = userPreferences.negativeExponents,
+                    onCheckedChange = { onUserPreferenceChange(userPreferences.copy(negativeExponents = it)) }
+                )
             }
         )
         ListItem(
-            headlineContent = { Text("Multiplication sign") },
-            supportingContent = { Text("Dot") }
-        )
-        ListItem(
-            headlineContent = { Text("Negative exponents") },
-            supportingContent = { Text("Use m^-1 instead of 1/m")},
-            trailingContent = { Switch(checked = false, onCheckedChange = {  }) }
+            headlineContent = { Text("Abbreviate names") },
+            supportingContent = { Text("Print m instead of meter")},
+            trailingContent = {
+                Switch(
+                    checked = userPreferences.abbreviateNames,
+                    onCheckedChange = { onUserPreferenceChange(userPreferences.copy(abbreviateNames = it)) }
+                )
+            }
         )
         ListItem(
             headlineContent = { Text("Spacious output") },
-            supportingContent = { Text("Description")},
-            trailingContent = { Switch(checked = false, onCheckedChange = {  })  }
+            supportingContent = { Text("Use more spaces to improve readability")},
+            trailingContent = {
+                Switch(
+                    checked = userPreferences.spaciousOutput,
+                    onCheckedChange = { onUserPreferenceChange(userPreferences.copy(spaciousOutput = it)) }
+                )
+            }
         )
 
         SingleEnumSelectSettingsListItem<UserPreferences.DecimalSeparator>(
@@ -94,6 +87,20 @@ fun GeneralSettingsScreenContent(
             },
             currentSelection = userPreferences.multiplicationSign,
             onSelect = { onUserPreferenceChange(userPreferences.copy(multiplicationSign = it)) }
+        )
+
+
+        SingleEnumSelectSettingsListItem<UserPreferences.DivisionSign>(
+            "Division sign",
+            enumLabelMap = {
+                when (it) {
+                    UserPreferences.DivisionSign.DIVISION_SLASH -> "Division slash"
+                    UserPreferences.DivisionSign.SLASH -> "Slash"
+                    UserPreferences.DivisionSign.DIVISION -> "Division"
+                }
+            },
+            currentSelection = userPreferences.divisionSign,
+            onSelect = { onUserPreferenceChange(userPreferences.copy(divisionSign = it)) }
         )
     }
 }
