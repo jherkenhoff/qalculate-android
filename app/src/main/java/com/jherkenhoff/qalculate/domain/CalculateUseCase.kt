@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.domain
 
+import com.jherkenhoff.libqalculate.AngleUnit
 import com.jherkenhoff.libqalculate.ApproximationMode
 import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.EvaluationOptions
@@ -29,10 +30,17 @@ class CalculateUseCase @Inject constructor(
 
         val parseOptions = ParseOptions()
         parseOptions.preserve_format = true
+        parseOptions.angle_unit = when (userPreferences.angleUnit) {
+            UserPreferences.AngleUnit.RADIANS -> AngleUnit.ANGLE_UNIT_RADIANS
+            UserPreferences.AngleUnit.DEGREES -> AngleUnit.ANGLE_UNIT_DEGREES
+            UserPreferences.AngleUnit.GRADIANS -> AngleUnit.ANGLE_UNIT_GRADIANS
+        }
 
         val unlocalizedInput = calc.unlocalizeExpression(input, parseOptions)
 
-        val result = calc.calculate(unlocalizedInput, eo)
+        val ms = calc.parse(unlocalizedInput, parseOptions)
+
+        val result = calc.calculate(ms, eo)
 
         return result
     }

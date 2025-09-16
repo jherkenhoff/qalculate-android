@@ -69,6 +69,32 @@ fun GeneralSettingsScreenContent(
             supportingContent = { Text("Description")},
             trailingContent = { Switch(checked = false, onCheckedChange = {  })  }
         )
+
+        SingleEnumSelectSettingsListItem<UserPreferences.DecimalSeparator>(
+            "Decimal separator",
+            enumLabelMap = {
+                when (it) {
+                    UserPreferences.DecimalSeparator.DOT -> "Dot"
+                    UserPreferences.DecimalSeparator.COMMA -> "Comma"
+                }
+            },
+            currentSelection = userPreferences.decimalSeparator,
+            onSelect = { onUserPreferenceChange(userPreferences.copy(decimalSeparator = it)) }
+        )
+
+        SingleEnumSelectSettingsListItem<UserPreferences.MultiplicationSign>(
+            "Multiplication sign",
+            enumLabelMap = {
+                when (it) {
+                    UserPreferences.MultiplicationSign.DOT -> "Dot"
+                    UserPreferences.MultiplicationSign.X -> "Times"
+                    UserPreferences.MultiplicationSign.ASTERISK -> "Asterisk"
+                    UserPreferences.MultiplicationSign.ALTDOT -> "Alt. dot"
+                }
+            },
+            currentSelection = userPreferences.multiplicationSign,
+            onSelect = { onUserPreferenceChange(userPreferences.copy(multiplicationSign = it)) }
+        )
     }
 }
 

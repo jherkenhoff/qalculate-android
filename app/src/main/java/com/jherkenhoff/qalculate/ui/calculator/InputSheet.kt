@@ -1,37 +1,19 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,15 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.InterceptPlatformTextInput
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -64,7 +43,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.jherkenhoff.qalculate.R
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
@@ -88,9 +66,6 @@ fun InputSheet(
     var lastFocusState by remember { mutableStateOf(false) }
     val placeholdeVisible by remember { derivedStateOf { textFieldValue.text.isEmpty() && !lastFocusState } }
 
-    var angleUnitDialogOpen = remember { mutableStateOf(false) }
-
-
     val annotatedInputTextFieldValue = textFieldValue.copy(
         annotatedString = buildAnnotatedString {
             append(textFieldValue.text)
@@ -102,7 +77,6 @@ fun InputSheet(
             )
         }
     )
-
 
     // Focus the input text field on app startup
     LaunchedEffect(Unit) {
@@ -183,36 +157,6 @@ fun InputSheet(
                 .wrapContentHeight(),
         )
         Spacer(Modifier.height(20.dp))
-    }
-
-    AnimatedVisibility(angleUnitDialogOpen.value) {
-        AngleUnitDialog(onDismissRequest = { angleUnitDialogOpen.value = false })
-    }
-}
-
-@Composable
-fun AngleUnitDialog(
-    onDismissRequest: () -> Unit = {  }
-) {
-    Dialog(onDismissRequest = onDismissRequest) {
-        Surface(
-            modifier = Modifier
-                .wrapContentWidth()
-                .wrapContentHeight(),
-            shape = MaterialTheme.shapes.large,
-            tonalElevation = AlertDialogDefaults.TonalElevation
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Angle unit", style = MaterialTheme.typography.headlineSmall)
-                RadioButtonRow(text = "Degrees", selected = false, onClick = {  })
-                RadioButtonRow(text = "Radians", selected = true, onClick = {  })
-                RadioButtonRow(text = "Gradians", selected = false, onClick = {  })
-                HorizontalDivider()
-                RadioButtonRow(text = "Arcminute", selected = false, onClick = {  })
-                RadioButtonRow(text = "Arcsecond", selected = false, onClick = {  })
-                RadioButtonRow(text = "Turn", selected = false, onClick = {  })
-            }
-        }
     }
 }
 

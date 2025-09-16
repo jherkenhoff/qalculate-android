@@ -2,6 +2,7 @@ package com.jherkenhoff.qalculate.domain
 
 import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.DigitGrouping
+import com.jherkenhoff.libqalculate.DivisionSign
 import com.jherkenhoff.libqalculate.ExpDisplay
 import com.jherkenhoff.libqalculate.IntervalDisplay
 import com.jherkenhoff.libqalculate.MathStructure
@@ -34,7 +35,17 @@ class PrintUseCase @Inject constructor(
             printOptions.digit_grouping = DigitGrouping.DIGIT_GROUPING_NONE
             printOptions.min_exp = 4
             printOptions.exp_display = ExpDisplay.EXP_POWER_OF_10
-            printOptions.multiplication_sign = MultiplicationSign.MULTIPLICATION_SIGN_ASTERISK
+            printOptions.multiplication_sign = when (userPreferences.multiplicationSign) {
+                UserPreferences.MultiplicationSign.DOT -> MultiplicationSign.MULTIPLICATION_SIGN_DOT
+                UserPreferences.MultiplicationSign.X -> MultiplicationSign.MULTIPLICATION_SIGN_X
+                UserPreferences.MultiplicationSign.ASTERISK -> MultiplicationSign.MULTIPLICATION_SIGN_ASTERISK
+                UserPreferences.MultiplicationSign.ALTDOT -> MultiplicationSign.MULTIPLICATION_SIGN_ALTDOT
+            }
+            printOptions.division_sign = when (userPreferences.divisionSign) {
+                UserPreferences.DivisionSign.DIVISION_SLASH -> DivisionSign.DIVISION_SIGN_DIVISION_SLASH
+                UserPreferences.DivisionSign.DIVISION -> DivisionSign.DIVISION_SIGN_DIVISION
+                UserPreferences.DivisionSign.SLASH -> DivisionSign.DIVISION_SIGN_SLASH
+            }
             printOptions.use_unicode_signs = 1
             printOptions.place_units_separately = true
 

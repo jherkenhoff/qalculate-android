@@ -81,6 +81,12 @@ class CalculatorViewModel @Inject constructor(
         UserPreferences()
     )
 
+    fun updateUserPreferences(userPreferences: UserPreferences) {
+        viewModelScope.launch {
+            userPreferencesRepository.updateUserPreferences(userPreferences)
+        }
+    }
+
     fun submitCalculation() {
         viewModelScope.launch {
             calculationsRepository.appendCalculation(

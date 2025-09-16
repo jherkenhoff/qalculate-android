@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.domain
 
+import com.jherkenhoff.libqalculate.AngleUnit
 import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.DigitGrouping
 import com.jherkenhoff.libqalculate.ExpDisplay
@@ -20,20 +21,25 @@ class ParseUseCase @Inject constructor(
         var printOptions = PrintOptions()
 
         printOptions.negative_exponents = false
-        printOptions.abbreviate_names   = true
+        printOptions.abbreviate_names   = false
         printOptions.spacious           = true
         printOptions.interval_display   = IntervalDisplay.INTERVAL_DISPLAY_CONCISE
         printOptions.number_fraction_format = NumberFractionFormat.FRACTION_DECIMAL
         printOptions.digit_grouping = DigitGrouping.DIGIT_GROUPING_NONE
         printOptions.min_exp = 4
         printOptions.exp_display = ExpDisplay.EXP_POWER_OF_10
-        printOptions.multiplication_sign = MultiplicationSign.MULTIPLICATION_SIGN_ASTERISK
+        printOptions.multiplication_sign = MultiplicationSign.MULTIPLICATION_SIGN_DOT
         printOptions.use_unicode_signs = 1
         printOptions.place_units_separately = false
 
 
         val parseOptions = ParseOptions()
         parseOptions.preserve_format = true
+        parseOptions.angle_unit = when (userPreferences.angleUnit) {
+            UserPreferences.AngleUnit.RADIANS -> AngleUnit.ANGLE_UNIT_RADIANS
+            UserPreferences.AngleUnit.DEGREES -> AngleUnit.ANGLE_UNIT_DEGREES
+            UserPreferences.AngleUnit.GRADIANS -> AngleUnit.ANGLE_UNIT_GRADIANS
+        }
         //parseOptions.comma_as_separator = true
         //parseOptions.dot_as_separator = true
 

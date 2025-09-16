@@ -91,6 +91,7 @@ fun CalculatorScreen(
         parsedString = viewModel.parsedString.collectAsStateWithLifecycle().value,
         resultString = viewModel.resultString.collectAsStateWithLifecycle().value,
         userPreferences = viewModel.userPreferences.collectAsStateWithLifecycle().value,
+        onUserPreferencesChanged = viewModel::updateUserPreferences,
         onKeyAction = viewModel::handleKeyAction,
         calculationHistory = viewModel.calculations.collectAsState().value,
         autocompleteResult = viewModel.autocompleteResult.collectAsStateWithLifecycle().value,
@@ -112,6 +113,7 @@ fun CalculatorScreenContent(
     parsedString: String,
     resultString: String,
     userPreferences: UserPreferences,
+    onUserPreferencesChanged : (UserPreferences) -> Unit,
     calculationHistory: Map<UUID, Calculation> = emptyMap(),
     autocompleteResult: AutocompleteResult,
     onKeyAction: (KeyAction) -> Unit = { },
@@ -129,6 +131,8 @@ fun CalculatorScreenContent(
     var lastImeHeight by remember { mutableIntStateOf(0) }
 
     val isImeVisible = (imeHeight != 0) && (imeHeight >= lastImeHeight)
+
+    @Suppress("AssignedValueIsNeverRead")
     lastImeHeight = imeHeight
 
     val scope = rememberCoroutineScope()
@@ -162,17 +166,38 @@ fun CalculatorScreenContent(
         UserPreferences.DecimalSeparator.DOT -> "."
         UserPreferences.DecimalSeparator.COMMA -> ","
     }
+    val otherChar = when (userPreferences.decimalSeparator) {
+        UserPreferences.DecimalSeparator.DOT -> ","
+        UserPreferences.DecimalSeparator.COMMA -> "."
+    }
 
     val keyDecimal = Key.CornerDragKey(
         centerAction = KeyAction.InsertText(KeyLabel.Text(decimalChar), decimalChar),
         topRightAction = KeyAction.InsertText(KeyLabel.Text("␣"), " "),
-        bottomRightAction = KeyAction.InsertText(KeyLabel.Text(","), ","),
+        bottomRightAction = KeyAction.InsertText(KeyLabel.Text(otherChar), otherChar),
+        bottomLeftAction = KeyAction.InsertText(KeyLabel.Text(";"), ";"),
         role = KeyRole.NUMBER
     )
 
+    val multiplicationChar = when (userPreferences.multiplicationSign) {
+        UserPreferences.MultiplicationSign.DOT -> "·"
+        UserPreferences.MultiplicationSign.X -> "×"
+        UserPreferences.MultiplicationSign.ASTERISK -> "*"
+        UserPreferences.MultiplicationSign.ALTDOT -> "."
+    }
+    val keyMultiply = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text(multiplicationChar), multiplicationChar), role = KeyRole.OPERATOR)
+
+
+    val divisionChar = when (userPreferences.divisionSign) {
+        UserPreferences.DivisionSign.DIVISION -> "÷"
+        UserPreferences.DivisionSign.DIVISION_SLASH -> "∕"
+        UserPreferences.DivisionSign.SLASH -> "/"
+    }
+    val keyDivision = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text(divisionChar), divisionChar), role = KeyRole.OPERATOR)
+
     val primaryKeypadKeys : Array<Array<Key>> = arrayOf(
         arrayOf(Keys.keyPercent, Keys.keyPi, Keys.key7, Keys.key8, Keys.key9, Keys.keyBackspace, Keys.keyClearAll),
-        arrayOf(Keys.keySqrt, Keys.keyPower, Keys.key4, Keys.key5, Keys.key6, Keys.keyMultiply, Keys.keyDivide),
+        arrayOf(Keys.keySqrt, Keys.keyPower, Keys.key4, Keys.key5, Keys.key6, keyMultiply, keyDivision),
         arrayOf(Keys.keyBracketOpen, Keys.keyBracketClose, Keys.key1, Keys.key2, Keys.key3, Keys.keyPlus, Keys.keyMinus),
         arrayOf(Keys.keyUnderscore, Keys.keyEqual, Keys.key0, keyDecimal, Keys.keyExp, Keys.keyReturn),
     )
@@ -185,6 +210,8 @@ fun CalculatorScreenContent(
         ) {
 
             CalculatorTopBar(
+                userPreferences = userPreferences,
+                onUserPreferencesChanged = onUserPreferencesChanged,
                 onMenuClick = onMenuClick,
                 onSettingsClick = onSettingsClick
             )
@@ -269,6 +296,7 @@ private fun DefaultPreview() {
         "SpeedOfLight",
         "299.792 458 Km/ms",
         userPreferences = UserPreferences(),
+        onUserPreferencesChanged = {},
         autocompleteResult = AutocompleteResult()
     )
 }
@@ -281,6 +309,7 @@ private fun EmptyPreview() {
         "",
         "",
         userPreferences = UserPreferences(),
+        onUserPreferencesChanged = {},
         autocompleteResult = AutocompleteResult()
     )
 }
