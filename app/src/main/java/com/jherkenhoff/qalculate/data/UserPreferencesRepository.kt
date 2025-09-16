@@ -21,6 +21,8 @@ class UserPreferencesRepository @Inject constructor(
         val ABBREVIATE_NAMES_KEY = booleanPreferencesKey("abbreviate_names")
         val NEGATIVE_EXPONENTS_KEY = booleanPreferencesKey("negative_exponents")
         val SPACIEOUS_OUTPUT_KEY = booleanPreferencesKey("spacious_output")
+        val APPROXIMATION_MODE_KEY = stringPreferencesKey("approximation_mode")
+        val NUMERICAL_DISPLAY_MODE_KEY = stringPreferencesKey("numerical_display_mode")
     }
 
     inline fun <reified T : Enum<T>> String?.toEnum() : T? {
@@ -37,6 +39,8 @@ class UserPreferencesRepository @Inject constructor(
             abbreviateNames = preferences[ABBREVIATE_NAMES_KEY] ?: UserPreferences.Default.abbreviateNames,
             negativeExponents = preferences[NEGATIVE_EXPONENTS_KEY] ?: UserPreferences.Default.negativeExponents,
             spaciousOutput = preferences[SPACIEOUS_OUTPUT_KEY] ?: UserPreferences.Default.spaciousOutput,
+            approximationMode = preferences[APPROXIMATION_MODE_KEY].toEnum<UserPreferences.ApproximationMode>() ?: UserPreferences.Default.approximationMode,
+            numericalDisplayMode = preferences[NUMERICAL_DISPLAY_MODE_KEY].toEnum<UserPreferences.NumericalDisplayMode>() ?: UserPreferences.Default.numericalDisplayMode,
         )
     }
 
@@ -49,6 +53,8 @@ class UserPreferencesRepository @Inject constructor(
             it[ABBREVIATE_NAMES_KEY] = userPreferences.abbreviateNames
             it[NEGATIVE_EXPONENTS_KEY] = userPreferences.negativeExponents
             it[SPACIEOUS_OUTPUT_KEY] = userPreferences.spaciousOutput
+            it[APPROXIMATION_MODE_KEY] = userPreferences.approximationMode.name
+            it[NUMERICAL_DISPLAY_MODE_KEY] = userPreferences.numericalDisplayMode.name
         }
     }
 }

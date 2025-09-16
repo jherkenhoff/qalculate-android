@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +40,8 @@ fun CalculatorTopBar(
 ) {
 
     var angleUnitDialogOpen by remember { mutableStateOf(false) }
+    var approximationModeDialogOpen by remember { mutableStateOf(false) }
+    var numericalDisplayModeDialogOpen by remember { mutableStateOf(false) }
 
     Surface(
         modifier,
@@ -73,6 +76,31 @@ fun CalculatorTopBar(
                     ) },
                     modifier = Modifier.padding(horizontal = 3.dp)
                 )
+                FilterChip(
+                    selected = userPreferences.approximationMode == UserPreferences.ApproximationMode.EXACT,
+                    onClick = { approximationModeDialogOpen = true },
+                    label = { Text(
+                        when (userPreferences.approximationMode) {
+                            UserPreferences.ApproximationMode.EXACT -> "EXACT"
+                            UserPreferences.ApproximationMode.TRY_EXACT -> "EXACT"
+                            UserPreferences.ApproximationMode.APPROXIMATE -> "APPROX"
+                        }
+
+                    ) },
+                    modifier = Modifier.padding(horizontal = 3.dp)
+                )
+                AssistChip(
+                    onClick = { numericalDisplayModeDialogOpen = true },
+                    label = { Text(
+                        when (userPreferences.numericalDisplayMode) {
+                            UserPreferences.NumericalDisplayMode.NORMAL -> "NORM"
+                            UserPreferences.NumericalDisplayMode.SCIENTIFIC -> "SCI"
+                            UserPreferences.NumericalDisplayMode.ENGINEERING -> "ENG"
+                        }
+
+                    ) },
+                    modifier = Modifier.padding(horizontal = 3.dp)
+                )
             }
         }
     }
@@ -88,6 +116,34 @@ fun CalculatorTopBar(
             currentSelection = userPreferences.angleUnit,
             onSelect = { onUserPreferencesChanged(userPreferences.copy(angleUnit = it)) },
             onDismissRequest = { angleUnitDialogOpen = false }
+        )
+    }
+
+    if (approximationModeDialogOpen) {
+        SingleEnumSelectDialog<UserPreferences.ApproximationMode>(
+            "Approximation mode",
+            enumLabelMap = { when (it) {
+                UserPreferences.ApproximationMode.EXACT -> "Always exact"
+                UserPreferences.ApproximationMode.TRY_EXACT -> "Try exact"
+                UserPreferences.ApproximationMode.APPROXIMATE -> "Approximate"
+            }},
+            currentSelection = userPreferences.approximationMode,
+            onSelect = { onUserPreferencesChanged(userPreferences.copy(approximationMode = it)) },
+            onDismissRequest = { approximationModeDialogOpen = false }
+        )
+    }
+
+    if (numericalDisplayModeDialogOpen) {
+        SingleEnumSelectDialog<UserPreferences.NumericalDisplayMode>(
+            "Numerical display",
+            enumLabelMap = { when (it) {
+                UserPreferences.NumericalDisplayMode.NORMAL -> "Normal"
+                UserPreferences.NumericalDisplayMode.SCIENTIFIC -> "Scientific"
+                UserPreferences.NumericalDisplayMode.ENGINEERING -> "Engineering"
+            }},
+            currentSelection = userPreferences.numericalDisplayMode,
+            onSelect = { onUserPreferencesChanged(userPreferences.copy(numericalDisplayMode = it)) },
+            onDismissRequest = { numericalDisplayModeDialogOpen = false }
         )
     }
 }

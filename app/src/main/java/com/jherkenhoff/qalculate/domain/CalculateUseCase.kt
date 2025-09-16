@@ -33,11 +33,12 @@ class CalculateUseCase @Inject constructor(
 
         var eo = EvaluationOptions()
         eo.sync_units = true
-        eo.approximation = ApproximationMode.APPROXIMATION_TRY_EXACT
+        eo.approximation = when (userPreferences.approximationMode) {
+            UserPreferences.ApproximationMode.TRY_EXACT -> ApproximationMode.APPROXIMATION_TRY_EXACT
+            UserPreferences.ApproximationMode.EXACT -> ApproximationMode.APPROXIMATION_EXACT
+            UserPreferences.ApproximationMode.APPROXIMATE -> ApproximationMode.APPROXIMATION_APPROXIMATE
+        }
         eo.parse_options = parseOptions
-
-
-
 
         var printOptions = PrintOptions()
 
@@ -51,7 +52,11 @@ class CalculateUseCase @Inject constructor(
         }
         printOptions.number_fraction_format = NumberFractionFormat.FRACTION_DECIMAL
         printOptions.digit_grouping = DigitGrouping.DIGIT_GROUPING_NONE
-        printOptions.min_exp = 4
+        printOptions.min_exp = when (userPreferences.numericalDisplayMode) {
+            UserPreferences.NumericalDisplayMode.NORMAL -> -1
+            UserPreferences.NumericalDisplayMode.SCIENTIFIC -> 3
+            UserPreferences.NumericalDisplayMode.ENGINEERING -> -3
+        }
         printOptions.exp_display = ExpDisplay.EXP_POWER_OF_10
         printOptions.multiplication_sign = when (userPreferences.multiplicationSign) {
             UserPreferences.MultiplicationSign.DOT -> MultiplicationSign.MULTIPLICATION_SIGN_DOT

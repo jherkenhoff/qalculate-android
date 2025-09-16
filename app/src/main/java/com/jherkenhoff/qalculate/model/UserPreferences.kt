@@ -7,7 +7,9 @@ data class UserPreferences(
     val divisionSign: DivisionSign = DivisionSign.SLASH,
     val abbreviateNames: Boolean = true,
     val negativeExponents: Boolean = true,
-    val spaciousOutput: Boolean = true
+    val spaciousOutput: Boolean = true,
+    val approximationMode: ApproximationMode = ApproximationMode.TRY_EXACT,
+    val numericalDisplayMode: NumericalDisplayMode = NumericalDisplayMode.ENGINEERING
 ) {
     companion object {
         val Default = UserPreferences()
@@ -17,6 +19,8 @@ data class UserPreferences(
     enum class AngleUnit {DEGREES, RADIANS, GRADIANS}
     enum class MultiplicationSign {DOT, X, ASTERISK, ALTDOT}
     enum class DivisionSign {DIVISION, SLASH, DIVISION_SLASH}
+    enum class ApproximationMode {EXACT, TRY_EXACT, APPROXIMATE}
+    enum class NumericalDisplayMode {NORMAL, SCIENTIFIC, ENGINEERING}
 
     fun getDivisionSignString(): String {
         return when (this.divisionSign) {
