@@ -79,6 +79,9 @@ _For more details about the syntax, and available functions, units, and variable
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Poussinou"><img src="https://avatars.githubusercontent.com/u/19646549?v=4?s=100" width="100px;" alt="Poussinou"/><br /><sub><b>Poussinou</b></sub></a><br /><a href="#doc-Poussinou" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://squ1dd13.ink"><img src="https://avatars.githubusercontent.com/u/31861012?v=4?s=100" width="100px;" alt="Alex"/><br /><sub><b>Alex</b></sub></a><br /><a href="#code-squ1dd13" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Maimas2"><img src="https://avatars.githubusercontent.com/u/77930865?v=4?s=100" width="100px;" alt="Maimas2"/><br /><sub><b>Maimas2</b></sub></a><br /><a href="#code-Maimas2" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
