@@ -30,61 +30,61 @@ private fun superscriptSymbol(base: String, superscript: String) : AnnotatedStri
 }
 
 object Keys {
-    val key0 = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("0"), "0"),
-        longClickAction = KeyAction.InsertText(KeyLabel.Text(superscriptSymbol("x", "0")), "⁰"),
+    val key0 = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("0"), "0"),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text(superscriptSymbol("x", "0")), "⁰"),
         role = KeyRole.NUMBER
     )
-    val key1 = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("1"), "1"),
-        longClickAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "1")), "¹"),
-        role = KeyRole.NUMBER
-    )
-
-    val key2 = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("2"), "2"),
-        longClickAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "2")), "²"),
+    val key1 = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("1"), "1"),
+        topRightAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "1")), "¹"),
         role = KeyRole.NUMBER
     )
 
-    val key3 = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("3"), "3"),
-        longClickAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "3")), "³"),
+    val key2 = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("2"), "2"),
+        topRightAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "2")), "²"),
         role = KeyRole.NUMBER
     )
 
-    val key4 = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("4"), "4"),
-        longClickAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "4")), "⁴"),
+    val key3 = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("3"), "3"),
+        topRightAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "3")), "³"),
         role = KeyRole.NUMBER
     )
 
-    val key5 = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("5"), "5"),
-        longClickAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "5")), "⁵"),
+    val key4 = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("4"), "4"),
+        topRightAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "4")), "⁴"),
         role = KeyRole.NUMBER
     )
 
-    val key6 = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("6"), "6"),
-        longClickAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "6")), "⁶"),
+    val key5 = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("5"), "5"),
+        topRightAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "5")), "⁵"),
         role = KeyRole.NUMBER
     )
 
-    val key7 = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("7"), "7"),
-        longClickAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "7")), "⁷"),
-        role = KeyRole.NUMBER
-    )
-    val key8 = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("8"), "8"),
-        longClickAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "8")), "⁸"),
+    val key6 = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("6"), "6"),
+        topRightAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "6")), "⁶"),
         role = KeyRole.NUMBER
     )
 
-    val key9 = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("9"), "9"),
-        longClickAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "9")), "⁹"),
+    val key7 = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("7"), "7"),
+        topRightAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "7")), "⁷"),
+        role = KeyRole.NUMBER
+    )
+    val key8 = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("8"), "8"),
+        topRightAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "8")), "⁸"),
+        role = KeyRole.NUMBER
+    )
+
+    val key9 = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("9"), "9"),
+        topRightAction = KeyAction.InsertText( KeyLabel.Text(superscriptSymbol("x", "9")), "⁹"),
         role = KeyRole.NUMBER
     )
 
