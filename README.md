@@ -44,7 +44,7 @@ cd qalculate-android
 ```
 
 ## Features
-Features specific to qalculate-android:
+Features specific to Qalculate! for Android:
 
 * Platform-native graphical user interface
 * Simple default view
