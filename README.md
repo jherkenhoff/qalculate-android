@@ -1,19 +1,19 @@
 
 <p align="center"><a href="https://github.com/jherkenhoff/qalculate-android"><img src="graphics/logo_shadow.svg" width="150"></a></p> 
 <h1 align="center">
-  Qalculate! for android
+  Qalculate! for Android
 </h1>
 <!-- description -->
 <p align="center">
-  <strong>~ Powerful and versatile multi-purpose calculator for the Android platform ~</strong>
+  <strong>Powerful and versatile multi-purpose calculator for the Android platform</strong>
   <br/>
   :warning: <i>This project is in very early development state</i>
     <br />
-    <a href="https://github.com/mr-kenhoff/qalculate-android/issues/new">Report Bug</a>
+    <a href="https://github.com/mr-kenhoff/qalculate-android/issues/new">Report bug</a>
     ·
-    <a href="https://github.com/mr-kenhoff/qalculate-android/issues/new">Request Feature</a>
+    <a href="https://github.com/mr-kenhoff/qalculate-android/issues/new">Request feature</a>
 </p>
-Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation). Features include a large library of customizable functions, unit calculations and conversion, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface.
+Android user interface of the <a href="https://qalculate.github.io">Qalculate!</a> calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation). Features include a large library of customizable functions, unit calculations and conversion, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface.
 
 <br/>
 <br/>
@@ -31,7 +31,7 @@ Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> 
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/com.jherkenhoff.qalculate/)
 
-Or download the latest APK from the [Releases Section](https://github.com/jherkenhoff/qalculate-android/releases/latest).
+Or download the latest APK from the [Releases section](https://github.com/jherkenhoff/qalculate-android/releases/latest).
 
 ## Compiling
 You need to have the Android `NDK` installed. For building the native binaries, you also need `swig`.
@@ -46,7 +46,7 @@ cd qalculate-android
 ## Features
 Features specific to qalculate-android:
 
-* Platform-Native Graphical user interface
+* Platform-native graphical user interface
 * Simple default view
 * Optional calculate-as-you-type mode
 
