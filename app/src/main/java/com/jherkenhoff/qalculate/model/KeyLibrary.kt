@@ -101,33 +101,33 @@ object Keys {
         role = KeyRole.OPERATOR
     )
 
-    val keyAns = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("ans"), "ans"), role = KeyRole.OPERATOR)
-    val keyBracketOpen = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("("), "("),
-        longClickAction = KeyAction.InsertText(KeyLabel.Text("["), "["),
+    val keyAns = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("ans"), "ans"), role = KeyRole.OPERATOR)
+    val keyBracketOpen = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("("), "("),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text("["), "["),
         role = KeyRole.OPERATOR
     )
-    val keyBracketClose = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text(")"), ")"),
-        longClickAction = KeyAction.InsertText(KeyLabel.Text("]"), "]"),
+    val keyBracketClose = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text(")"), ")"),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text("]"), "]"),
         role = KeyRole.OPERATOR
     )
-    val keyPlus = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("+"), "+"), role = KeyRole.OPERATOR)
-    val keyMinus = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("-"), "-"), role = KeyRole.OPERATOR)
-    val keyMultiply = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("×"), "×"), role = KeyRole.OPERATOR)
-    val keyDivide = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("÷"), "÷"), role = KeyRole.OPERATOR)
-    val keyPower = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text(superscriptSymbol("x", "y")), "^"),
-        longClickAction = KeyAction.InsertText(KeyLabel.Text("E"), "E"),
+    val keyPlus = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("+"), "+"), role = KeyRole.OPERATOR)
+    val keyMinus = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("-"), "-"), role = KeyRole.OPERATOR)
+    val keyMultiply = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("×"), "×"), role = KeyRole.OPERATOR)
+    val keyDivide = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("÷"), "÷"), role = KeyRole.OPERATOR)
+    val keyPower = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text(superscriptSymbol("x", "y")), "^"),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text("E"), "E"),
         role = KeyRole.OPERATOR
     )
-    val keySqrt = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("√"), "sqrt(", ")"),
-        longClickAction = KeyAction.InsertText(KeyLabel.Text("∛"), "cbrt(", ")"),
+    val keySqrt = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("√"), "sqrt(", ")"),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text("∛"), "cbrt(", ")"),
         role = KeyRole.OPERATOR
     )
-    val keyUnderscore = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("_"), "_"), role = KeyRole.OPERATOR)
-    val keyEqual = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("="), "="), role = KeyRole.OPERATOR)
+    val keyUnderscore = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("_"), "_"), role = KeyRole.OPERATOR)
+    val keyEqual = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("="), "="), role = KeyRole.OPERATOR)
     val keyPi = Key.CornerDragKey(
         centerAction = KeyAction.InsertText(KeyLabel.Text("π"), "π"),
         topRightAction = KeyAction.InsertText(KeyLabel.Text("e"), "e"),
@@ -140,24 +140,24 @@ object Keys {
         bottomRightAction = KeyAction.InsertText(KeyLabel.Text(","), ","),
         role = KeyRole.OPERATOR
     )
-    val keyEuler = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("e"), "e"), role = KeyRole.OPERATOR)
-    val keyReturn = Key.DefaultKey(
-        clickAction = KeyAction.Return(KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardReturn, "Return")),
-        longClickAction = KeyAction.InsertText(KeyLabel.Text("ans"), "ans"),
+    val keyEuler = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("e"), "e"), role = KeyRole.OPERATOR)
+    val keyReturn = Key.CornerDragKey(
+        centerAction = KeyAction.Return(KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardReturn, "Return")),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text("ans"), "ans"),
         role = KeyRole.SYSTEM,
         width = 2
     )
-    val keyBackspace = Key.DefaultKey(clickAction = KeyAction.Backspace(KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardBackspace, "Backspace")), role = KeyRole.SYSTEM)
-    val keyClearAll = Key.DefaultKey(clickAction = KeyAction.ClearAll(KeyLabel.Text("AC")), role = KeyRole.SYSTEM)
+    val keyBackspace = Key.CornerDragKey(centerAction = KeyAction.Backspace(KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardBackspace, "Backspace")), role = KeyRole.SYSTEM)
+    val keyClearAll = Key.CornerDragKey(centerAction = KeyAction.ClearAll(KeyLabel.Text("AC")), role = KeyRole.SYSTEM)
 
-    val keyIntegral = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("∫"), "integral(", ")"), role = KeyRole.OPERATOR)
-    val keyDifferential = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("dx"), "diff(", ")"), role = KeyRole.OPERATOR)
-    val keySum = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("Σ"), "sum(", ")"),
-        longClickAction = KeyAction.InsertText(KeyLabel.Text("Π"), "product(", ")"),
+    val keyIntegral = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("∫"), "integral(", ")"), role = KeyRole.OPERATOR)
+    val keyDifferential = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("dx"), "diff(", ")"), role = KeyRole.OPERATOR)
+    val keySum = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("Σ"), "sum(", ")"),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text("Π"), "product(", ")"),
         role = KeyRole.OPERATOR
     )
-    val keyInfinity = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("∞"), "∞"), role = KeyRole.OPERATOR)
+    val keyInfinity = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("∞"), "∞"), role = KeyRole.OPERATOR)
     val keyImaginary = Key.CornerDragKey(
         centerAction = KeyAction.InsertText(KeyLabel.Text("i"), "i"),
         topLeftAction = KeyAction.InsertText(KeyLabel.Text("Re"), popupLabel = KeyLabel.Text("Real"), "re(", ")"),
@@ -180,42 +180,42 @@ object Keys {
         role= KeyRole.OPERATOR
     )
 
-    val keyY = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("Y"), "y"),
-        longClickAction = KeyAction.StoreAsVariable(null, KeyLabel.Text("→Y"), "x"),
+    val keyY = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("Y"), "y"),
+        topRightAction = KeyAction.StoreAsVariable(null, KeyLabel.Text("→Y"), "x"),
         role = KeyRole.OPERATOR
     )
-    val keyZ = Key.DefaultKey(
-        clickAction = KeyAction.InsertText(KeyLabel.Text("Z"), "z"),
-        longClickAction = KeyAction.StoreAsVariable(null, KeyLabel.Text("→Z"), "z"),
+    val keyZ = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("Z"), "z"),
+        topRightAction = KeyAction.StoreAsVariable(null, KeyLabel.Text("→Z"), "z"),
         role = KeyRole.OPERATOR
     )
-    val keyExp = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text("E"), "E"), role = KeyRole.OPERATOR)
-    val keyConversion = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Icon(Icons.AutoMirrored.Filled.ArrowRightAlt, null), "→"), role = KeyRole.OPERATOR)
+    val keyExp = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("E"), "E"), role = KeyRole.OPERATOR)
+    val keyConversion = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Icon(Icons.AutoMirrored.Filled.ArrowRightAlt, null), "→"), role = KeyRole.OPERATOR)
 
 
-    val keyLeft = Key.DefaultKey(
-        clickAction = KeyAction.MoveCursor(label = KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move cursor left"), chars = -1),
-        longClickAction = KeyAction.MoveCursor(label = null, popupLabel = KeyLabel.Icon(Icons.AutoMirrored.Filled.ArrowLeft, "Move cursor to start"), chars = MIN_VALUE),
+    val keyLeft = Key.CornerDragKey(
+        centerAction = KeyAction.MoveCursor(label = KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move cursor left"), chars = -1),
+        topRightAction = KeyAction.MoveCursor(label = null, popupLabel = KeyLabel.Icon(Icons.AutoMirrored.Filled.ArrowLeft, "Move cursor to start"), chars = MIN_VALUE),
         role = KeyRole.OPERATOR
     )
-    val keyRight = Key.DefaultKey(
-        clickAction = KeyAction.MoveCursor(label = KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Move cursor right"), chars = 1),
-        longClickAction = KeyAction.MoveCursor(label = null, popupLabel = KeyLabel.Icon(Icons.AutoMirrored.Filled.ArrowRight, "Move cursor to end"), chars = MAX_VALUE),
+    val keyRight = Key.CornerDragKey(
+        centerAction = KeyAction.MoveCursor(label = KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Move cursor right"), chars = 1),
+        topRightAction = KeyAction.MoveCursor(label = null, popupLabel = KeyLabel.Icon(Icons.AutoMirrored.Filled.ArrowRight, "Move cursor to end"), chars = MAX_VALUE),
         role = KeyRole.SYSTEM
     )
-    val keyUndo = Key.DefaultKey(
-        clickAction = KeyAction.Undo(label = KeyLabel.Icon(Icons.AutoMirrored.Default.Undo, "Undo")),
+    val keyUndo = Key.CornerDragKey(
+        centerAction = KeyAction.Undo(label = KeyLabel.Icon(Icons.AutoMirrored.Default.Undo, "Undo")),
         role = KeyRole.SYSTEM
     )
-    val keyRedo = Key.DefaultKey(
-        clickAction = KeyAction.Redo(label = KeyLabel.Icon(Icons.AutoMirrored.Default.Redo, "Redo")),
+    val keyRedo = Key.CornerDragKey(
+        centerAction = KeyAction.Redo(label = KeyLabel.Icon(Icons.AutoMirrored.Default.Redo, "Redo")),
         role = KeyRole.SYSTEM
     )
 
-    //    val keySin = Key.DefaultKey(
-//        clickAction = KeyAction.InsertText(label = KeyLabel.Text("sin"), preCursorText = "sin(", postCursorText = ")"),
-//        longClickAction = KeyAction.InsertText(label = KeyLabel.Text("sin⁻¹"), preCursorText = "arcsin(", postCursorText = ")"),
+    //    val keySin = Key.CornerDragKey(
+//        centerAction = KeyAction.InsertText(label = KeyLabel.Text("sin"), preCursorText = "sin(", postCursorText = ")"),
+//        topRightAction = KeyAction.InsertText(label = KeyLabel.Text("sin⁻¹"), preCursorText = "arcsin(", postCursorText = ")"),
 //        role = KeyRole.OPERATOR
 //    )
     val keySin = Key.CornerDragKey(

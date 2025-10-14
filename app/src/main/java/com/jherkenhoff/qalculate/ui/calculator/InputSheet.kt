@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -60,7 +61,6 @@ fun InputSheet(
     onSubmit: (String) -> Unit,
     modifier: Modifier = Modifier,
     interceptKeyboard: Boolean = false,
-    onClearAll: () -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
     var lastFocusState by remember { mutableStateOf(false) }
@@ -82,7 +82,10 @@ fun InputSheet(
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Bottom
+    ) {
         AutoSizeText(
             text = mathExpressionFormatter(resultString),
             alignment = Alignment.CenterEnd,
