@@ -28,7 +28,9 @@ inline fun <reified T : Enum<T>> SingleEnumSelectDialog(
     crossinline onSelect: (T) -> Unit,
     noinline onDismissRequest: () -> Unit
 ) {
-    Dialog(onDismissRequest = onDismissRequest) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+    ) {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column {
                 Text(

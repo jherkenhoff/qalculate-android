@@ -10,12 +10,12 @@ androidxHiltNavigationCompose = "1.2.0"
 androidxNavigation = "2.8.1"
 androidxLifecycle = "2.8.6"
 androidxDataStore = "1.1.1"
-androidxRoom = "2.7.1"
+androidxRoom = "2.8.0"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.10.1"
-composeBom = "2025.07.00"
+composeBom = "2025.09.01"
 ksp = "2.0.20-1.0.25"
 qalculate = "5.2.0-1"
 
@@ -57,3 +57,4 @@ compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+androidx-room = { id = "androidx.room", version.ref = "androidxRoom" }

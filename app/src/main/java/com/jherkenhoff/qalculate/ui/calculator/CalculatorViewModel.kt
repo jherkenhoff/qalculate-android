@@ -7,13 +7,13 @@ import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jherkenhoff.qalculate.data.UserPreferencesRepository
-import com.jherkenhoff.qalculate.data.calculations.CalculationsRepository
+import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
+import com.jherkenhoff.qalculate.data.repository.CalculationHistoryStore
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
 import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.Calculation
 import com.jherkenhoff.qalculate.model.KeyAction
 import com.jherkenhoff.qalculate.model.UserPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,10 +32,9 @@ class CalculatorViewModel @Inject constructor(
     private val parseUseCase: ParseUseCase,
     private val calculateUseCase: CalculateUseCase,
     private val autocompleteUseCase: AutocompleteUseCase,
-    private val calculationsRepository: CalculationsRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val calculationHistoryStore: CalculationHistoryStore
 ) : ViewModel() {
-
     private val _inputTextFieldValue = MutableStateFlow(TextFieldValue(""))
     val inputTextFieldValue = _inputTextFieldValue.asStateFlow()
 
@@ -64,19 +62,20 @@ class CalculatorViewModel @Inject constructor(
         initialValue = AutocompleteResult()
     )
 
-    val calculations = calculationsRepository
-        .observeCalculations()
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyMap()
-        )
-
     val userPreferences = userPreferencesRepository.userPreferencesFlow.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         UserPreferences()
     )
+
+    val calculationHistory = calculationHistoryStore.allItems().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    private val _autocompleteDismissed = MutableStateFlow(false)
+    val autocompleteDismissed = _autocompleteDismissed.asStateFlow()
 
     fun updateUserPreferences(userPreferences: UserPreferences) {
         viewModelScope.launch {
@@ -86,21 +85,20 @@ class CalculatorViewModel @Inject constructor(
 
     fun submitCalculation() {
         viewModelScope.launch {
-            calculationsRepository.appendCalculation(
-                Calculation(
-                    LocalDateTime.now(),
-                    LocalDateTime.now(),
-                    inputTextFieldValue.value,
-                    parsedString.value,
-                    resultString.value
+            calculationHistoryStore.addItem(
+                CalculationHistoryItemData(
+                    input = inputTextFieldValue.value.text,
+                    parsed = parsedString.value,
+                    result = resultString.value,
+                    created = LocalDateTime.now()
                 )
             )
         }
     }
 
-    fun deleteCalculation(uuid: UUID) {
+    fun deleteCalculation(item: CalculationHistoryItemData) {
         viewModelScope.launch {
-            calculationsRepository.deleteCalculation(uuid)
+            calculationHistoryStore.deleteItem(item)
         }
     }
 

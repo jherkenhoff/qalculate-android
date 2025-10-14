@@ -2,8 +2,10 @@ package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,73 +42,79 @@ private val auxiliaryKeys = arrayOf(Keys.keyLeft, Keys.keyRight, Keys.keyUndo, K
 @Composable
 fun AuxiliaryBar(
     autocompleteResult: AutocompleteResult,
-    onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     keyboardEnable: Boolean,
+    modifier: Modifier = Modifier,
+    onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     onKeyboardEnableChange: (Boolean) -> Unit = { },
     onKeyAction: (KeyAction) -> Unit = { },
-    onAutocompleteDismiss: () -> Unit = { }
+    onAutocompleteDismiss: () -> Unit = { },
 ) {
     val fadeWidth = 40f
 
-    AnimatedContent(autocompleteResult.items.isNotEmpty()) {
-        if (it) {
-            Row {
-                LazyRow(
-                    modifier = Modifier.height(48.dp).weight(1f)
-                        .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
-                        .drawWithContent {
-                            drawContent()
-                            drawRect(brush = Brush.horizontalGradient(0f to Color.White, 1f to Color.Transparent, startX = this.size.width-fadeWidth, endX = this.size.width), blendMode = BlendMode.DstIn)
-                            drawRect(brush = Brush.horizontalGradient(0f to Color.Transparent, 1f to Color.White, startX = 0f, endX = fadeWidth), blendMode = BlendMode.DstIn)
-                        },
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    item{
-                        Spacer(Modifier.width(fadeWidth.toDp()-8.dp))
-                    }
-                    items(autocompleteResult.items) { it ->
-                        SuggestionChip(
-                            label = { Text(it.title) },
-                            onClick = { onAutocompleteClick(it) }
-                        )
-                    }
-                    item{
-                        Spacer(Modifier.width(fadeWidth.toDp()-8.dp))
-                    }
-                }
-
-                IconButton(onAutocompleteDismiss) {
-                    Icon(Icons.Default.Close, "Dismiss autocomplete suggestions")
-                }
-            }
-        } else {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                FilledIconToggleButton(keyboardEnable, onKeyboardEnableChange) {
-                    Icon(Icons.Filled.Keyboard, null)
-                }
-                for (key in auxiliaryKeys) {
-                    IconButton({ key.clickAction?.let { onKeyAction(it) } }) {
-                        when (val label = key.clickAction.label) {
-                            is KeyLabel.Text -> Text(
-                                label.text,
-                                style = MaterialTheme.typography.labelLarge
+    Box(
+        modifier.height(48.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        AnimatedContent(autocompleteResult.items.isNotEmpty()) {
+            if (it) {
+                Row {
+                    LazyRow(
+                        modifier = Modifier.fillMaxHeight().weight(1f)
+                            .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+                            .drawWithContent {
+                                drawContent()
+                                drawRect(brush = Brush.horizontalGradient(0f to Color.White, 1f to Color.Transparent, startX = this.size.width-fadeWidth, endX = this.size.width), blendMode = BlendMode.DstIn)
+                                drawRect(brush = Brush.horizontalGradient(0f to Color.Transparent, 1f to Color.White, startX = 0f, endX = fadeWidth), blendMode = BlendMode.DstIn)
+                            },
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        item{
+                            Spacer(Modifier.width(fadeWidth.toDp()-8.dp))
+                        }
+                        items(autocompleteResult.items) { it ->
+                            SuggestionChip(
+                                label = { Text(it.title) },
+                                onClick = { onAutocompleteClick(it) }
                             )
-
-                            is KeyLabel.Icon -> Icon(
-                                label.icon,
-                                label.description,
-                                modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
-                            )
-
-                            null -> null
+                        }
+                        item{
+                            Spacer(Modifier.width(fadeWidth.toDp()-8.dp))
                         }
                     }
+
+                    IconButton(onAutocompleteDismiss) {
+                        Icon(Icons.Default.Close, "Dismiss autocomplete suggestions")
+                    }
                 }
-                IconButton({}) {
-                    Icon(Icons.Default.MoreVert, null)
+            } else {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    FilledIconToggleButton(keyboardEnable, onKeyboardEnableChange) {
+                        Icon(Icons.Filled.Keyboard, null)
+                    }
+                    for (key in auxiliaryKeys) {
+                        IconButton({ onKeyAction(key.centerAction) }) {
+                            when (val label = key.centerAction.label) {
+                                is KeyLabel.Text -> Text(
+                                    label.text,
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+
+                                is KeyLabel.Icon -> Icon(
+                                    label.icon,
+                                    label.description,
+                                    modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
+                                )
+
+                                null -> null
+                            }
+                        }
+                    }
+                    IconButton({}) {
+                        Icon(Icons.Default.MoreVert, null)
+                    }
                 }
             }
         }

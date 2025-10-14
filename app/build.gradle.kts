@@ -131,6 +131,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+
     ksp(libs.hilt.compiler)
     ksp(libs.androidx.room.compiler)
 
