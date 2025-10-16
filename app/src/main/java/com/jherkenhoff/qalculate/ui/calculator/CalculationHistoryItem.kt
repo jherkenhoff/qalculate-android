@@ -2,6 +2,7 @@ package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
@@ -19,8 +20,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 import kotlin.math.max
 
@@ -39,26 +42,31 @@ fun CalculationHistoryItem(
 
         val inputPlaceable = subcompose("input") {
             Text(
-                input
+                input,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
             )
-        }[0].measure(constraints.copy(maxWidth = (constraints.maxWidth*overflowFraction).toInt()))
+        }[0].measure(constraints.copyMaxDimensions().copy(maxWidth = (constraints.maxWidth*overflowFraction).toInt()))
+
+        inputPlaceable[FirstBaseline]
 
         val resultSectionPlaceable = subcompose("resultSection") {
             ResultSection(
                 result,
                 onDeleteClick = onDeleteClick,
             )
-        }[0].measure(constraints.copy(maxWidth = (constraints.maxWidth*overflowFraction).toInt()))
+        }[0].measure(constraints.copyMaxDimensions().copy(maxWidth = (constraints.maxWidth*overflowFraction).toInt()))
 
         val overflow =  inputPlaceable.width + resultSectionPlaceable.width > constraints.maxWidth
 
         val totalHeight = if (overflow) inputPlaceable.height + resultSectionPlaceable.height else max(inputPlaceable.height, resultSectionPlaceable.height)
 
         layout(constraints.maxWidth, totalHeight) {
-            inputPlaceable.place(0, 0)
             if (overflow) {
+                inputPlaceable.place(0, 0)
                 resultSectionPlaceable.place(constraints.maxWidth-resultSectionPlaceable.width, inputPlaceable.height)
             } else {
+                inputPlaceable.place(0, (resultSectionPlaceable.height-inputPlaceable.height)/2)
                 resultSectionPlaceable.place(constraints.maxWidth-resultSectionPlaceable.width, 0)
             }
         }
