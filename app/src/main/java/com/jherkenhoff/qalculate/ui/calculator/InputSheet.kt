@@ -86,25 +86,25 @@ fun InputSheet(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Bottom
     ) {
+
         AutoSizeText(
             text = mathExpressionFormatter(resultString),
             alignment = Alignment.CenterEnd,
             style = MaterialTheme.typography.displayMedium,
             minTextSize = 14.sp,
-            maxTextSize = 50.sp,
+            maxTextSize = 40.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .align(Alignment.End)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
                 .defaultMinSize(minHeight = 60.dp)
         )
 
         Box(
             contentAlignment = Alignment.CenterStart,
-            modifier = Modifier.defaultMinSize(minHeight = 64.dp).padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
-
             InterceptPlatformTextInput(
                 interceptor = { request, nextHandler ->
                     if (interceptKeyboard) {
@@ -163,7 +163,6 @@ fun InputSheet(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
@@ -173,7 +172,7 @@ private fun DefaultPreview() {
         "299.792 458 Km/ms",
         AutocompleteResult(),
         {},
-        {},
+        {}
     )
 }
 
@@ -186,7 +185,7 @@ private fun AutocompleteContextPreview() {
         "1.325 214 03 yJ",
         AutocompleteResult("planck", TextRange(8, 14)),
         {},
-        {},
+        {}
     )
 }
 
@@ -199,6 +198,6 @@ private fun PlaceholderPreview() {
         "0",
         AutocompleteResult(),
         {},
-        {},
+        {}
     )
 }

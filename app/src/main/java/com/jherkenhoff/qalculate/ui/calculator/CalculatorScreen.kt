@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -24,10 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.SnackbarHostState
@@ -50,6 +46,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.TextFieldValue
@@ -57,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastRoundToInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
@@ -217,7 +215,7 @@ fun CalculatorScreenContent(
 
     val historyListState = rememberLazyListState()
 
-    var secondaryKeypadVisible = !isImeVisible
+    var secondaryKeypadVisible = true //!isImeVisible
 
     var maxOffset by remember { mutableFloatStateOf(0f) }
     val offsetY = remember { Animatable(0f) }
@@ -226,7 +224,6 @@ fun CalculatorScreenContent(
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                return Offset(0f, 0f)
                 scope.launch {
                     val newOffset = (offsetY.value + available.y).coerceIn(0f, maxOffset)
                     offsetY.snapTo(newOffset)
@@ -276,23 +273,11 @@ fun CalculatorScreenContent(
 
             SubcomposeLayout(
                 Modifier
-                    .imeNestedScroll()
-                    //.nestedScroll(nestedScrollConnection)
                     .clipToBounds()
                     .scrollable(rememberScrollState(), Orientation.Vertical)
                     .weight(1f)
             ) { constraints ->
                 var remainingHeight = constraints.maxHeight
-
-                val gutterPlaceable = subcompose("gutter") {
-                    Box(
-                        Modifier.fillMaxWidth().height(20.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.ArrowDropDown, null)
-                    }
-                }[0].measure(constraints.copyMaxDimensions())
-
 
                 val bottomBarPlaceable = subcompose("bottom_bar") {
                     Box(
@@ -314,7 +299,7 @@ fun CalculatorScreenContent(
                 }[0].measure(constraints.copyMaxDimensions())
 
 
-                remainingHeight = remainingHeight - gutterPlaceable.height - bottomBarPlaceable.height
+                remainingHeight = remainingHeight - bottomBarPlaceable.height
 
                 val keypadPlaceable = subcompose("keypad") {
                     Column {
@@ -358,15 +343,16 @@ fun CalculatorScreenContent(
                 remainingHeight = remainingHeight - keypadPlaceable.height
 
                 val bottomSheetBackgroundPlaceable = subcompose("bottom_sheet_background") {
-                    Box(
-                        modifier = Modifier.fillMaxSize().background(
-                            color = MaterialTheme.colorScheme.surfaceContainer,
-                            shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp)
-                        )
-                    )
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp),
+                    ) {
+
+                    }
                 }[0].measure(constraints.copyMaxDimensions().copy(maxHeight = bottomBarPlaceable.height + keypadPlaceable.height))
 
-                maxOffset = constraints.maxHeight - gutterPlaceable.height.toFloat() - bottomBarPlaceable.height
+                maxOffset = keypadPlaceable.height.toFloat()
 
                 val inputSectionPlaceable = subcompose("input") {
                     InputSheet(
@@ -376,26 +362,26 @@ fun CalculatorScreenContent(
                         internalAutocompleteResult,
                         onInputFieldValueChange,
                         {},
-                        interceptKeyboard = false //!keyboardEnabled
+                        interceptKeyboard = false, //!keyboardEnabled
                     )
-                }[0].measure(constraints.copy(minWidth = constraints.maxWidth, minHeight = 0, maxHeight = remainingHeight))
+                }[0].measure(constraints.copyMaxDimensions())
 
-                val historyHeight = constraints.maxHeight - keypadPlaceable.height + offsetY.value - inputSectionPlaceable.height
+                val historyHeight = constraints.maxHeight - keypadPlaceable.height - inputSectionPlaceable.height - bottomBarPlaceable.height + offsetY.value.fastRoundToInt()
 
                 val historyPlaceable = subcompose("history") {
                     CalculationHistoryList(
                         calculationHistory,
                         onDeleteClick = onDeleteCalculation,
                         scrollState = historyListState,
+                        modifier = Modifier.nestedScroll(nestedScrollConnection)
                     )
-                }[0].measure(constraints.copy(minWidth = constraints.maxWidth, minHeight = offsetY.value.roundToInt(), maxHeight = offsetY.value.roundToInt()))
+                }[0].measure(constraints.copy(minHeight = historyHeight, maxHeight = historyHeight))
 
                 layout(constraints.maxWidth, constraints.maxHeight) {
+                    inputSectionPlaceable.place(0, constraints.maxHeight - keypadPlaceable.height - bottomBarPlaceable.height - inputSectionPlaceable.height + offsetY.value.roundToInt())
                     bottomSheetBackgroundPlaceable.place(0, (constraints.maxHeight - bottomSheetBackgroundPlaceable.height + offsetY.value.roundToInt()))
                     keypadPlaceable.place(0, constraints.maxHeight - keypadPlaceable.height - bottomBarPlaceable.height + offsetY.value.roundToInt())
-                    inputSectionPlaceable.place(0, constraints.maxHeight - keypadPlaceable.height - bottomBarPlaceable.height - inputSectionPlaceable.height + offsetY.value.roundToInt())
                     historyPlaceable.place(0, 0)
-                    gutterPlaceable.place(0, offsetY.value.roundToInt())
                     bottomBarPlaceable.place(0, constraints.maxHeight - bottomBarPlaceable.height)
                 }
             }
@@ -419,9 +405,76 @@ private fun DefaultPreview() {
             CalculationHistoryItemData(
                 0, "1+1", "1+1", "2", LocalDateTime.now()
             ),
+//            CalculationHistoryItemData(
+//                1, "2+2", "2+2", "4", LocalDateTime.now()
+//            ),
+//            CalculationHistoryItemData(
+//                2, "2+2", "2+2", "4", LocalDateTime.now()
+//            ),
+//            CalculationHistoryItemData(
+//                3, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
+//            )
+        )
+    )
+}
+
+
+@Preview(showSystemUi = true, device = Devices.PIXEL_9_PRO)
+@Composable
+private fun ManyHistoryItemsPreview() {
+
+    CalculatorScreenContent(
+        TextFieldValue("c"),
+        "SpeedOfLight",
+        "299.792 458 Km/ms",
+        userPreferences = UserPreferences(),
+        onUserPreferencesChanged = {},
+        autocompleteResult = AutocompleteResult(),
+        calculationHistory = listOf(
+            CalculationHistoryItemData(
+                0, "1+1", "1+1", "2", LocalDateTime.now()
+            ),
             CalculationHistoryItemData(
                 1, "2+2", "2+2", "4", LocalDateTime.now()
+            ),
+            CalculationHistoryItemData(
+                2, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
+            ),
+            CalculationHistoryItemData(
+                3, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
+            ),
+            CalculationHistoryItemData(
+                4, "2+2", "2+2", "4", LocalDateTime.now().minusDays(2)
+            ),
+            CalculationHistoryItemData(
+                5, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+            ),
+            CalculationHistoryItemData(
+                6, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+            ),
+            CalculationHistoryItemData(
+                7, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+            ),
+            CalculationHistoryItemData(
+                8, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+            ),
+            CalculationHistoryItemData(
+                9, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
             )
         )
+    )
+}
+
+@Preview(showSystemUi = true, device = Devices.PIXEL_9_PRO)
+@Composable
+private fun EmptyHistoryPreview() {
+    CalculatorScreenContent(
+        TextFieldValue("c"),
+        "SpeedOfLight",
+        "299.792 458 Km/ms",
+        userPreferences = UserPreferences(),
+        onUserPreferencesChanged = {},
+        autocompleteResult = AutocompleteResult(),
+        calculationHistory = emptyList()
     )
 }

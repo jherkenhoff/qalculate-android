@@ -34,7 +34,7 @@ fun CalculatorTopBar(
         modifier,
         color = MaterialTheme.colorScheme.surfaceContainer
     ) {
-        Column() {
+        Column {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeContent))
             Row {
                 IconButton(onClick = onMenuClick) {
@@ -48,7 +48,6 @@ fun CalculatorTopBar(
                 Spacer(Modifier.weight(1f))
                 IconButton(onClick = { onSettingsClick() }) { Icon(Icons.Default.Settings, contentDescription = "Open settings") }
             }
-
             Row(Modifier.padding(horizontal = 8.dp)) {
                 Spacer(Modifier.weight(1f))
                 CalculatorChips(
