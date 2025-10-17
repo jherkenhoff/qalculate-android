@@ -4,18 +4,16 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -24,9 +22,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -47,14 +45,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastRoundToInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
@@ -68,7 +66,7 @@ import com.jherkenhoff.qalculate.model.Keys
 import com.jherkenhoff.qalculate.model.UserPreferences
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import kotlin.math.roundToInt
+import kotlin.math.max
 
 
 data class SecondaryKeypadData(
@@ -119,6 +117,18 @@ fun CalculatorScreen(
     )
 }
 
+fun Modifier.shrinkHeightAbsolute(shrinkPx: Int): Modifier = this.then(
+    Modifier.layout { measurable, constraints ->
+        val placeable = measurable.measure(constraints)
+        val height = (placeable.height - shrinkPx).coerceAtLeast(0)
+        layout(placeable.width, height) {
+            // Place at top; clip the bottom part
+            placeable.place(0, 0)
+        }
+    }
+)
+
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
     ExperimentalSharedTransitionApi::class, ExperimentalLayoutApi::class
 )
@@ -142,39 +152,12 @@ fun CalculatorScreenContent(
 
     //val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     val imeHeight = WindowInsets.ime.getBottom(LocalDensity.current)
-    var lastImeHeight by remember { mutableIntStateOf(0) }
 
-    val isImeVisible = true //(imeHeight != 0) && (imeHeight >= lastImeHeight)
-
-    val isImeFullyClosed = imeHeight == 0
-
-//    LaunchedEffect(isImeFullyClosed) {
-//        if (isImeFullyClosed) {
-//            keyboardEnabled = false
-//        }
-//    }
-
-    @Suppress("AssignedValueIsNeverRead")
-    lastImeHeight = imeHeight
+    val imeFullyHidden = imeHeight == 0
 
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-//    fun deleteCalculationWithSnackbar(uuid: UUID) {
-//        scope.launch {
-//            snackbarHostState.showSnackbar(
-//                "Deleted calculation " + calculationHistoryItemHistory[uuid]?.input,
-//                actionLabel = "Undo",
-//                withDismissAction = true,
-//                duration = SnackbarDuration.Short
-//            )
-//        }
-//
-//        onDeleteCalculation(uuid)
-//    }
 
     var autocompleteDismissed by remember { mutableStateOf(false) }
-
     if (autocompleteResult.relevantText.isEmpty()) {
         autocompleteDismissed = false
     }
@@ -215,8 +198,6 @@ fun CalculatorScreenContent(
 
     val historyListState = rememberLazyListState()
 
-    var secondaryKeypadVisible = true //!isImeVisible
-
     var maxOffset by remember { mutableFloatStateOf(0f) }
     val offsetY = remember { Animatable(0f) }
 
@@ -224,37 +205,33 @@ fun CalculatorScreenContent(
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                scope.launch {
-                    val newOffset = (offsetY.value + available.y).coerceIn(0f, maxOffset)
-                    offsetY.snapTo(newOffset)
+                if (historyListState.canScrollBackward) {
+                    return Offset.Zero
                 }
-                return Offset(0f, available.y) // Consume the scroll
-            }
-
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
+                val newOffset = (offsetY.value + available.y)
+                val clippedNewOffset = newOffset.coerceIn(0f, maxOffset)
                 scope.launch {
-                    val newOffset = (offsetY.value + available.y).coerceIn(0f, maxOffset)
-                    offsetY.snapTo(newOffset)
+                    offsetY.snapTo(clippedNewOffset)
                 }
-                return Offset.Zero
+                return Offset(0f, available.y - (newOffset - clippedNewOffset))
             }
 
             override suspend fun onPreFling(available: Velocity): Velocity {
-                available.y
+                if (historyListState.canScrollBackward) {
+                    return Velocity.Zero
+                }
+
                 // Handle fling gesture: decide whether to open or close
-                if (offsetY.value > 100f) {
+                if (offsetY.value > maxOffset/2) {
                     offsetY.animateTo(maxOffset)
                 } else {
                     offsetY.animateTo(0f)
                 }
-                return Velocity.Zero
+                return available
             }
         }
     }
+
 
 
     Surface(
@@ -263,7 +240,6 @@ fun CalculatorScreenContent(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             CalculatorTopBar(
                 userPreferences = userPreferences,
                 onUserPreferencesChanged = onUserPreferencesChanged,
@@ -271,39 +247,46 @@ fun CalculatorScreenContent(
                 onSettingsClick = onSettingsClick
             )
 
-            SubcomposeLayout(
-                Modifier
-                    .clipToBounds()
-                    .scrollable(rememberScrollState(), Orientation.Vertical)
-                    .weight(1f)
-            ) { constraints ->
-                var remainingHeight = constraints.maxHeight
+            Column(
+                Modifier.weight(1f).imeNestedScroll().nestedScroll(nestedScrollConnection)
+            ) {
+                CalculationHistoryList(
+                    calculationHistory,
+                    onDeleteClick = onDeleteCalculation,
+                    scrollState = historyListState,
+                    modifier = Modifier.weight(1f)
+                )
 
-                val bottomBarPlaceable = subcompose("bottom_bar") {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().background(
-                            color = MaterialTheme.colorScheme.surfaceContainer,
-                            shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp)
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                )
+
+                InputSheet(
+                    inputTextFieldValue,
+                    parsedString,
+                    resultString,
+                    internalAutocompleteResult,
+                    onInputFieldValueChange,
+                    {},
+                    interceptKeyboard = !keyboardEnabled,
+                    modifier = Modifier.scrollable(
+                        rememberScrollState(),
+                        orientation = Orientation.Vertical
                         )
-                    ){
-                        AuxiliaryBar(
-                            autocompleteResult = internalAutocompleteResult,
-                            keyboardEnable = keyboardEnabled,
-                            onAutocompleteClick = onAutocompleteClick,
-                            onKeyboardEnableChange = {keyboardEnabled = it},
-                            onKeyAction = onKeyAction,
-                            onAutocompleteDismiss = { autocompleteDismissed = true },
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).navigationBarsPadding().imePadding()
-                        )
-                    }
-                }[0].measure(constraints.copyMaxDimensions())
+                )
+            }
 
-
-                remainingHeight = remainingHeight - bottomBarPlaceable.height
-
-                val keypadPlaceable = subcompose("keypad") {
-                    Column {
-                        AnimatedVisibility(secondaryKeypadVisible) {
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp),
+            ) {
+                Column {
+                    Column(
+                        Modifier.clipToBounds().shrinkHeightAbsolute(offsetY.value.toInt()).onGloballyPositioned{
+                            maxOffset = it.size.height.toFloat()
+                        }
+                    ) {
+                        AnimatedVisibility(imeFullyHidden) {
                             Column {
                                 PrimaryTabRow(
                                     activeSecondaryKeypad,
@@ -325,7 +308,7 @@ fun CalculatorScreenContent(
                                     Keypad(
                                         secondaryKeypads[it].keys,
                                         onKeyAction = onKeyAction,
-                                        compact = !secondaryKeypadVisible
+                                        compact = keyboardEnabled
                                     )
                                 }
                             }
@@ -333,56 +316,21 @@ fun CalculatorScreenContent(
                         Keypad(
                             primaryKeypadKeys,
                             onKeyAction = onKeyAction,
-                            compact = !secondaryKeypadVisible,
-                            topKeyCornerSize = if (!secondaryKeypadVisible) CornerSize(21.dp) else KeyDefaults.Shape.topStart,
+                            compact = keyboardEnabled,
+                            topKeyCornerSize = if (!imeFullyHidden) CornerSize(21.dp) else KeyDefaults.Shape.topStart,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                }[0].measure(constraints.copyMaxDimensions().copy(maxHeight = remainingHeight))
 
-                remainingHeight = remainingHeight - keypadPlaceable.height
-
-                val bottomSheetBackgroundPlaceable = subcompose("bottom_sheet_background") {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                        shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp),
-                    ) {
-
-                    }
-                }[0].measure(constraints.copyMaxDimensions().copy(maxHeight = bottomBarPlaceable.height + keypadPlaceable.height))
-
-                maxOffset = keypadPlaceable.height.toFloat()
-
-                val inputSectionPlaceable = subcompose("input") {
-                    InputSheet(
-                        inputTextFieldValue,
-                        parsedString,
-                        resultString,
-                        internalAutocompleteResult,
-                        onInputFieldValueChange,
-                        {},
-                        interceptKeyboard = false, //!keyboardEnabled
+                    AuxiliaryBar(
+                        autocompleteResult = internalAutocompleteResult,
+                        keyboardEnable = keyboardEnabled,
+                        onAutocompleteClick = onAutocompleteClick,
+                        onKeyboardEnableChange = {keyboardEnabled = it},
+                        onKeyAction = onKeyAction,
+                        onAutocompleteDismiss = { autocompleteDismissed = true },
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).navigationBarsPadding().imePadding()
                     )
-                }[0].measure(constraints.copyMaxDimensions())
-
-                val historyHeight = constraints.maxHeight - keypadPlaceable.height - inputSectionPlaceable.height - bottomBarPlaceable.height + offsetY.value.fastRoundToInt()
-
-                val historyPlaceable = subcompose("history") {
-                    CalculationHistoryList(
-                        calculationHistory,
-                        onDeleteClick = onDeleteCalculation,
-                        scrollState = historyListState,
-                        modifier = Modifier.nestedScroll(nestedScrollConnection)
-                    )
-                }[0].measure(constraints.copy(minHeight = historyHeight, maxHeight = historyHeight))
-
-                layout(constraints.maxWidth, constraints.maxHeight) {
-                    inputSectionPlaceable.place(0, constraints.maxHeight - keypadPlaceable.height - bottomBarPlaceable.height - inputSectionPlaceable.height + offsetY.value.roundToInt())
-                    bottomSheetBackgroundPlaceable.place(0, (constraints.maxHeight - bottomSheetBackgroundPlaceable.height + offsetY.value.roundToInt()))
-                    keypadPlaceable.place(0, constraints.maxHeight - keypadPlaceable.height - bottomBarPlaceable.height + offsetY.value.roundToInt())
-                    historyPlaceable.place(0, 0)
-                    bottomBarPlaceable.place(0, constraints.maxHeight - bottomBarPlaceable.height)
                 }
             }
         }
@@ -390,7 +338,7 @@ fun CalculatorScreenContent(
 }
 
 
-@Preview(showSystemUi = true, device = Devices.PIXEL_9_PRO)
+@Preview(showSystemUi = true, device = Devices.DEFAULT)
 @Composable
 private fun DefaultPreview() {
 
@@ -419,7 +367,7 @@ private fun DefaultPreview() {
 }
 
 
-@Preview(showSystemUi = true, device = Devices.PIXEL_9_PRO)
+@Preview(showSystemUi = true, device = Devices.DEFAULT)
 @Composable
 private fun ManyHistoryItemsPreview() {
 
@@ -465,7 +413,7 @@ private fun ManyHistoryItemsPreview() {
     )
 }
 
-@Preview(showSystemUi = true, device = Devices.PIXEL_9_PRO)
+@Preview(showSystemUi = true, device = Devices.DEFAULT)
 @Composable
 private fun EmptyHistoryPreview() {
     CalculatorScreenContent(

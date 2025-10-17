@@ -32,7 +32,8 @@ fun CalculatorTopBar(
 ) {
     Surface(
         modifier,
-        color = MaterialTheme.colorScheme.surfaceContainer
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shadowElevation = 6.dp
     ) {
         Column {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeContent))

@@ -1,8 +1,12 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,22 +44,17 @@ fun CalculationHistoryList(
     scrollState: LazyListState = rememberLazyListState(),
     onDeleteClick: (CalculationHistoryItemData) -> Unit = {},
 ) {
-    val fadeWidth = 100f
-    LazyColumn(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        state = scrollState,
+    Box(
+        contentAlignment = Alignment.BottomCenter,
         modifier = modifier,
-        verticalArrangement = Arrangement.Top,
-        reverseLayout = true,
     ) {
-        item {
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-            )
-        }
-
-        calculations.groupBy { it.created.toLocalDate() }
-            .map { (id, list) ->
+        LazyColumn(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            state = scrollState,
+            verticalArrangement = Arrangement.Top,
+            reverseLayout = true,
+        ) {
+            calculations.groupBy { it.created.toLocalDate() }.map { (id, list) ->
                 list.reversed().forEach { entry ->
                     item(key = entry.id) {
                         CalculationHistoryItem(
@@ -75,6 +74,17 @@ fun CalculationHistoryList(
                     CalculationDivider(text = dayString)
                 }
             }
+        }
+        AnimatedVisibility(
+            visible = scrollState.canScrollBackward,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            JumpToBottomButton(
+                onClick = {},
+                modifier = Modifier.padding(12.dp)
+            )
+        }
     }
 }
 
@@ -98,34 +108,6 @@ fun CalculationDivider(
             text = text,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-        HorizontalDivider(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-    }
-}
-@Composable
-fun CalculationDivider(
-    icon: ImageVector,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .padding(vertical = 6.dp)
-            .height(16.dp)
-    ) {
-        HorizontalDivider(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-        )
-        Icon(icon, null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
         HorizontalDivider(
@@ -162,6 +144,30 @@ private fun DefaultPreview() {
         ),
         CalculationHistoryItemData(
             1, "2+2", "2+2", "4", LocalDateTime.now()
+        ),
+        CalculationHistoryItemData(
+            2, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
+        ),
+        CalculationHistoryItemData(
+            3, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
+        ),
+        CalculationHistoryItemData(
+            4, "2+2", "2+2", "4", LocalDateTime.now().minusDays(2)
+        ),
+        CalculationHistoryItemData(
+            5, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+        ),
+        CalculationHistoryItemData(
+            6, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+        ),
+        CalculationHistoryItemData(
+            7, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+        ),
+        CalculationHistoryItemData(
+            8, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+        ),
+        CalculationHistoryItemData(
+            9, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
         )
     )
 
