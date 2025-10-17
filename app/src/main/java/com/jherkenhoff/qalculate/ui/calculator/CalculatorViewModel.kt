@@ -2,6 +2,7 @@ package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
@@ -94,6 +95,9 @@ class CalculatorViewModel @Inject constructor(
                 )
             )
         }
+        updateInput(
+            inputTextFieldValue.value.copy(selection = TextRange(0, inputTextFieldValue.value.text.length))
+        )
     }
 
     fun deleteCalculation(item: CalculationHistoryItemData) {
@@ -104,7 +108,7 @@ class CalculatorViewModel @Inject constructor(
 
     fun handleKeyAction(keyAction: KeyAction) {
         when (keyAction) {
-            is KeyAction.InsertText -> insertText(keyAction.preCursorText, keyAction.postCursorText)
+            is KeyAction.InsertText -> insertText(keyAction)
             is KeyAction.Backspace -> removeChars(keyAction.nChars)
             is KeyAction.Return -> submitCalculation()
             is KeyAction.ClearAll -> clearInput()
@@ -116,13 +120,46 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun moveCursor(chars: Int) {
-        val newCursorPosition = inputTextFieldValue.value.selection.end + chars
+        val newCursorPosition = (inputTextFieldValue.value.selection.end + chars).coerceIn(0, inputTextFieldValue.value.text.length)
         updateInput(inputTextFieldValue.value.copy(selection = TextRange(newCursorPosition)))
     }
 
     fun updateInput(input: TextFieldValue) = _inputTextFieldValue.update { input }
     fun clearInput() = _inputTextFieldValue.update { TextFieldValue("") }
 
+
+    fun insertText(keyAction: KeyAction.InsertText) {
+        val maxChars = inputTextFieldValue.value.text.length
+        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
+        val selectedText = inputTextFieldValue.value.getSelectedText()
+        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
+
+        with(keyAction) {
+            if (selectedText.isNotEmpty()) {
+                    val newText = when (selectionPolicy) {
+                        KeyAction.InsertText.SelectionPolicy.REPLACE -> "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
+                        KeyAction.InsertText.SelectionPolicy.SURROUND -> "$textBeforeSelection$preCursorText$selectedText$postCursorText$textAfterSelection"
+                        KeyAction.InsertText.SelectionPolicy.PARENTHESES -> "$textBeforeSelection($selectedText)$preCursorText$postCursorText$textAfterSelection"
+                    }
+
+                    val newSelection = when (selectionPolicy) {
+                        KeyAction.InsertText.SelectionPolicy.REPLACE -> TextRange(textBeforeSelection.length + preCursorText.length)
+                        KeyAction.InsertText.SelectionPolicy.SURROUND -> TextRange(textBeforeSelection.length, newText.length - textAfterSelection.length)
+                        KeyAction.InsertText.SelectionPolicy.PARENTHESES -> TextRange(newText.length - postCursorText.length - textAfterSelection.length)
+                    }
+
+                    updateInput(TextFieldValue(
+                        text = newText,
+                        selection = newSelection
+                    ))
+            } else {
+                updateInput(TextFieldValue(
+                    text = "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection",
+                    selection = TextRange(textBeforeSelection.length + preCursorText.length)
+                ))
+            }
+        }
+    }
 
     fun insertText(preCursorText: String, postCursorText: String = "") {
         val maxChars = inputTextFieldValue.value.text.length

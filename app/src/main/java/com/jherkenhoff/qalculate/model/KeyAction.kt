@@ -15,9 +15,22 @@ sealed class KeyAction {
     abstract val label: KeyLabel?
     abstract val popupLabel: KeyLabel?
 
-    data class InsertText(override val label: KeyLabel?, override val popupLabel: KeyLabel?, val preCursorText: String, val postCursorText: String = "") : KeyAction() {
-        constructor(label: KeyLabel, preCursorText: String, postCursorText: String = "") : this(label, label, preCursorText, postCursorText)
+    data class InsertText(
+        override val label: KeyLabel?,
+        override val popupLabel: KeyLabel?,
+        val preCursorText: String,
+        val postCursorText: String = "",
+        val selectionPolicy: SelectionPolicy = SelectionPolicy.REPLACE
+    ) : KeyAction() {
+        enum class SelectionPolicy{REPLACE, SURROUND, PARENTHESES}
+        constructor(label: KeyLabel, preCursorText: String, postCursorText: String = "", selectionPolicy: SelectionPolicy = SelectionPolicy.REPLACE) : this(label, label, preCursorText, postCursorText, selectionPolicy)
+
+        companion object {
+            fun function(label: KeyLabel, function: String): InsertText = InsertText(label, label, preCursorText = "$function(", postCursorText = ")", selectionPolicy = SelectionPolicy.SURROUND)
+            fun operator(label: KeyLabel, operator: String): InsertText = InsertText(label, label, preCursorText = operator, selectionPolicy = SelectionPolicy.PARENTHESES)
+        }
     }
+
     data class Backspace(override val label: KeyLabel?, override val popupLabel: KeyLabel?, val nChars: Int = 1): KeyAction() {
         constructor(label: KeyLabel) : this(label, label)
     }

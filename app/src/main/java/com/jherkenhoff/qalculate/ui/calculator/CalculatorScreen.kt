@@ -184,10 +184,10 @@ fun CalculatorScreenContent(
     )
 
     val multiplicationChar = userPreferences.getMultiplicationSignString()
-    val keyMultiply = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text(multiplicationChar), multiplicationChar), role = KeyRole.OPERATOR)
+    val keyMultiply = Key.DefaultKey(clickAction = KeyAction.InsertText.operator(KeyLabel.Text(multiplicationChar), multiplicationChar), role = KeyRole.OPERATOR)
 
     val divisionChar = userPreferences.getDivisionSignString()
-    val keyDivision = Key.DefaultKey(clickAction = KeyAction.InsertText(KeyLabel.Text(divisionChar), divisionChar), role = KeyRole.OPERATOR)
+    val keyDivision = Key.DefaultKey(clickAction = KeyAction.InsertText.operator(KeyLabel.Text(divisionChar), divisionChar), role = KeyRole.OPERATOR)
 
     val primaryKeypadKeys : Array<Array<Key>> = arrayOf(
         arrayOf(Keys.keyPercent, Keys.keyPi, Keys.key7, Keys.key8, Keys.key9, Keys.keyBackspace, Keys.keyClearAll),
