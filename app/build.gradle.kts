@@ -96,7 +96,6 @@ android {
     buildFeatures {
         compose = true
         // Disable unused AGP features
-        buildConfig = true
         aidl = false
         renderScript = false
         shaders = false
@@ -107,7 +106,6 @@ android {
         }
     }
 }
-
 
 dependencies {
     implementation(libs.androidx.core.ktx)

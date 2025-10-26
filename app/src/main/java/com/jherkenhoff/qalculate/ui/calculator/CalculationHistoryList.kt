@@ -21,12 +21,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -44,6 +47,8 @@ fun CalculationHistoryList(
     scrollState: LazyListState = rememberLazyListState(),
     onDeleteClick: (CalculationHistoryItemData) -> Unit = {},
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = modifier,
@@ -81,7 +86,11 @@ fun CalculationHistoryList(
             exit = fadeOut()
         ) {
             JumpToBottomButton(
-                onClick = {},
+                onClick = {
+                    coroutineScope.launch {
+                        scrollState.animateScrollToItem(0)
+                    }
+                },
                 modifier = Modifier.padding(12.dp)
             )
         }

@@ -1,9 +1,11 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
@@ -148,14 +150,13 @@ fun CalculatorScreenContent(
     onMenuClick: () -> Unit = {  },
     onSettingsClick: () -> Unit = {  },
 ) {
+    val scope = rememberCoroutineScope()
+    val localDensity = LocalDensity.current
+
     var keyboardEnabled by remember { mutableStateOf(false) }
 
-    //val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-    val imeHeight = WindowInsets.ime.getBottom(LocalDensity.current)
-
+    val imeHeight = WindowInsets.ime.getBottom(localDensity)
     val imeFullyHidden = imeHeight == 0
-
-    val scope = rememberCoroutineScope()
 
     var autocompleteDismissed by remember { mutableStateOf(false) }
     if (autocompleteResult.relevantText.isEmpty()) {
@@ -201,10 +202,11 @@ fun CalculatorScreenContent(
     var maxOffset by remember { mutableFloatStateOf(0f) }
     val offsetY = remember { Animatable(0f) }
 
-    // Custom nested scroll connection
+
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                Log.d("Moin", "Pre Scroll with ${available.y.toString()}")
                 if (historyListState.canScrollBackward) {
                     return Offset.Zero
                 }
@@ -221,12 +223,18 @@ fun CalculatorScreenContent(
                     return Velocity.Zero
                 }
 
-                // Handle fling gesture: decide whether to open or close
-                if (offsetY.value > maxOffset/2) {
-                    offsetY.animateTo(maxOffset)
-                } else {
-                    offsetY.animateTo(0f)
+                val velocityThreshold = with(localDensity) { 1000.dp.toPx() }
+
+                val targetOffset = when {
+                    available.y > velocityThreshold -> maxOffset
+                    available.y < -velocityThreshold -> 0f
+                    else -> {
+                        // Not enough momentum. Decide based on position
+                        if (offsetY.value > maxOffset / 2) maxOffset else 0f
+                    }
                 }
+
+                offsetY.animateTo(targetOffset)
                 return available
             }
         }
@@ -248,7 +256,7 @@ fun CalculatorScreenContent(
             )
 
             Column(
-                Modifier.weight(1f).imeNestedScroll().nestedScroll(nestedScrollConnection)
+                Modifier.weight(1f).nestedScroll(nestedScrollConnection)
             ) {
                 CalculationHistoryList(
                     calculationHistory,

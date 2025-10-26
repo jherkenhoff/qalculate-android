@@ -131,11 +131,6 @@ private fun Menu(
         onDismissRequest = onDismissRequest
     ) {
         DropdownMenuItem(
-            text = { Text("Pin") },
-            leadingIcon = { Icon(Icons.Outlined.PushPin, contentDescription = null) },
-            onClick = { /* Do something... */ }
-        )
-        DropdownMenuItem(
             text = { Text("Delete") },
             leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null) },
             onClick = { onDismissRequest(); onDeleteClick() }
