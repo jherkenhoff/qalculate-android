@@ -1,7 +1,7 @@
 
 <p align="center"><a href="https://github.com/jherkenhoff/qalculate-android"><img src="graphics/logo_shadow.svg" width="150"></a></p> 
 <h1 align="center">
-  Qalculate! for android
+  Qalculate! for Android
 </h1>
 <!-- description -->
 <p align="center">
