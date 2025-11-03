@@ -9,9 +9,9 @@
   <br/>
   :warning: <i>This project is in very early development state</i>
     <br />
-    <a href="https://github.com/mr-kenhoff/qalculate-android/issues/new">Report Bug</a>
+    <a href="https://github.com/jherkenhoff/qalculate-android/issues/new">Report Bug</a>
     ·
-    <a href="https://github.com/mr-kenhoff/qalculate-android/issues/new">Request Feature</a>
+    <a href="https://github.com/jherkenhoff/qalculate-android/issues/new">Request Feature</a>
 </p>
 Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation). Features include a large library of customizable functions, unit calculations and conversion, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface.
 
@@ -37,28 +37,28 @@ Or download the latest APK from the [Releases Section](https://github.com/jherke
 You need to have the Android `NDK` installed. For building the native binaries, you also need `swig`.
 
 ```
-git clone https://github.com/mr-kenhoff/libqalculate-android
-git clone https://github.com/mr-kenhoff/qalculate-android
+git clone https://github.com/jherkenhoff/libqalculate-android
+git clone https://github.com/jherkenhoff/qalculate-android
 cd qalculate-android
 ./gradlew assembleDebug
 ```
 
 ## Features
-Features specific to qalculate-android:
+Specific to qalculate-android:
 
 * Platform-Native Graphical user interface
 * Simple default view
 * Optional calculate-as-you-type mode
 
-Features from libqalculate:
+From libqalculate:
 
-* Calculation and parsing:
-* Result display:
-* Symbolic calculation:
-* Functions:
-* Units:
-* Variables and constants:
-* Plotting:
+* Calculation and parsing
+* Result display
+* Symbolic calculation
+* Functions
+* Units
+* Variables and constants
+* Plotting
 * and more...
 
 _For more details about the syntax, and available functions, units, and variables, please consult the manual (https://qalculate.github.io/manual/)_
