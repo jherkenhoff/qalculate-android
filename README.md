@@ -7,7 +7,7 @@
 <p align="center">
   <strong>~ Powerful and versatile multi-purpose calculator for the Android platform ~</strong>
   <br/>
-  :warning: <i>This project is in very early development state</i>
+  :warning: <i>This project is in a very early development state!</i>
     <br />
     <a href="https://github.com/jherkenhoff/qalculate-android/issues/new">Report Bug</a>
     ·
@@ -61,7 +61,7 @@ From libqalculate:
 * Plotting
 * and more...
 
-_For more details about the syntax, and available functions, units, and variables, please consult the [manual](https://qalculate.github.io/manual/)_
+_For more details about the syntax, and available functions, units, and variables, please consult the [manual](https://qalculate.github.io/manual/)_.
 
 ## Contributors
 
