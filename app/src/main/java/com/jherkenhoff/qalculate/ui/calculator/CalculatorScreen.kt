@@ -7,6 +7,7 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -77,11 +78,11 @@ data class SecondaryKeypadData(
 )
 
 private val basicSecondaryKeypad = SecondaryKeypadData(
-    title = "Basic",
+    title = "Math",
     keys = arrayOf(
-        arrayOf(Keys.keySiLength, Keys.keyImperialLength, Keys.keyImperialWeight, Keys.keySiWeight, Keys.keyConversion),
-        arrayOf(Keys.keyIntegral, Keys.keyDifferential, Keys.keySum, Keys.keyX, Keys.keyInfinity),
-        arrayOf(Keys.keySin, Keys.keyCos, Keys.keyTan, Keys.keyLn, Keys.keyImaginary)
+        arrayOf(Keys.keyX, Keys.keyY, Keys.keyZ, Keys.keySiWeight, Keys.keyFactorial),
+        arrayOf(Keys.keyIntegral, Keys.keyDifferential, Keys.keySum, Keys.keyImaginary, Keys.keyComplexOperators),
+        arrayOf(Keys.keySin, Keys.keyCos, Keys.keyTan, Keys.keyLn, Keys.keyInfinity)
     )
 )
 
@@ -167,6 +168,7 @@ fun CalculatorScreenContent(
 
     var activeSecondaryKeypad by remember { mutableIntStateOf(0) }
 
+    // TODO: Move dynamic decimal selection to some sort of key-factory
     val decimalChar = when (userPreferences.decimalSeparator) {
         UserPreferences.DecimalSeparator.DOT -> "."
         UserPreferences.DecimalSeparator.COMMA -> ","
@@ -179,11 +181,10 @@ fun CalculatorScreenContent(
     val keyDecimal = Key.CornerDragKey(
         centerAction = KeyAction.InsertText(KeyLabel.Text(decimalChar), decimalChar),
         topRightAction = KeyAction.InsertText(KeyLabel.Text("␣"), " "),
-        bottomRightAction = KeyAction.InsertText(KeyLabel.Text(otherChar), otherChar),
-        bottomLeftAction = KeyAction.InsertText(KeyLabel.Text(";"), ";"),
         role = KeyRole.NUMBER
     )
 
+    // TODO: Move dynamic multiplication and division selection to some sort of key-factory
     val multiplicationChar = userPreferences.getMultiplicationSignString()
     val keyMultiply = Key.DefaultKey(clickAction = KeyAction.InsertText.operator(KeyLabel.Text(multiplicationChar), multiplicationChar), role = KeyRole.OPERATOR)
 
@@ -197,17 +198,24 @@ fun CalculatorScreenContent(
         arrayOf(Keys.keyUnderscore, Keys.keyEqual, Keys.key0, keyDecimal, Keys.keyExp, Keys.keyReturn),
     )
 
+    var calculationHistorySize by remember{ mutableIntStateOf(calculationHistory.size)}
+    calculationHistorySize = calculationHistory.size
+
     val historyListState = rememberLazyListState()
 
     var maxOffset by remember { mutableFloatStateOf(0f) }
     val offsetY = remember { Animatable(0f) }
 
-
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                Log.d("Moin", "Pre Scroll with ${available.y.toString()}")
-                if (historyListState.canScrollBackward) {
+
+                if (historyListState.canScrollForward) {
+                    // If we are not scrolled to the most recent calculation history item, let the history list consume the scroll
+                    return Offset.Zero
+                }
+
+                if (available.y <= 0f) {
                     return Offset.Zero
                 }
                 val newOffset = (offsetY.value + available.y)
@@ -218,10 +226,25 @@ fun CalculatorScreenContent(
                 return Offset(0f, available.y - (newOffset - clippedNewOffset))
             }
 
-            override suspend fun onPreFling(available: Velocity): Velocity {
-                if (historyListState.canScrollBackward) {
-                    return Velocity.Zero
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+
+                if (available.y >= 0f) {
+                    return Offset.Zero
                 }
+                val newOffset = (offsetY.value + available.y)
+                val clippedNewOffset = newOffset.coerceIn(0f, maxOffset)
+                scope.launch {
+                    offsetY.snapTo(clippedNewOffset)
+                    historyListState.scrollToItem(calculationHistorySize - 1)
+                }
+                return Offset(0f, available.y - (newOffset - clippedNewOffset))
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
 
                 val velocityThreshold = with(localDensity) { 1000.dp.toPx() }
 
@@ -235,12 +258,55 @@ fun CalculatorScreenContent(
                 }
 
                 offsetY.animateTo(targetOffset)
+
+                if (targetOffset == 0f) {
+                    if (calculationHistorySize != 0) {
+                        historyListState.animateScrollToItem(calculationHistorySize - 1)
+                    }
+                }
+
                 return available
             }
         }
     }
 
 
+    val nestedScrollConnectionInputSheet = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val newOffset = (offsetY.value + available.y)
+                val clippedNewOffset = newOffset.coerceIn(0f, maxOffset)
+                scope.launch {
+                    offsetY.snapTo(clippedNewOffset)
+                }
+                return Offset(0f, available.y - (newOffset - clippedNewOffset))
+            }
+
+            override suspend fun onPreFling(available: Velocity): Velocity {
+
+                val velocityThreshold = with(localDensity) { 1000.dp.toPx() }
+
+                val targetOffset = when {
+                    available.y > velocityThreshold -> maxOffset
+                    available.y < -velocityThreshold -> 0f
+                    else -> {
+                        // Not enough momentum. Decide based on position
+                        if (offsetY.value > maxOffset / 2) maxOffset else 0f
+                    }
+                }
+
+                offsetY.animateTo(targetOffset)
+
+                if (targetOffset == 0f) {
+                    if (calculationHistorySize != 0) {
+                        historyListState.animateScrollToItem(calculationHistorySize - 1)
+                    }
+                }
+
+                return available
+            }
+        }
+    }
 
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -256,7 +322,7 @@ fun CalculatorScreenContent(
             )
 
             Column(
-                Modifier.weight(1f).nestedScroll(nestedScrollConnection)
+                Modifier.weight(1f)
             ) {
                 CalculationHistoryList(
                     calculationHistory,
@@ -277,9 +343,12 @@ fun CalculatorScreenContent(
                     onInputFieldValueChange,
                     {},
                     interceptKeyboard = !keyboardEnabled,
-                    modifier = Modifier.scrollable(
-                        rememberScrollState(),
-                        orientation = Orientation.Vertical
+                    modifier = Modifier
+                        .imeNestedScroll()
+                        .nestedScroll(nestedScrollConnectionInputSheet)
+                        .scrollable(
+                            rememberScrollState(),
+                            orientation = Orientation.Vertical
                         )
                 )
             }
@@ -294,7 +363,7 @@ fun CalculatorScreenContent(
                             maxOffset = it.size.height.toFloat()
                         }
                     ) {
-                        AnimatedVisibility(imeFullyHidden) {
+                        AnimatedVisibility(!keyboardEnabled) {
                             Column {
                                 PrimaryTabRow(
                                     activeSecondaryKeypad,

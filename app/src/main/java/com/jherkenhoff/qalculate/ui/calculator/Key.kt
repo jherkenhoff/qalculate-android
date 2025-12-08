@@ -387,7 +387,7 @@ fun SelectorKey(
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
-    val nItems = 5
+    val nItems = 5 // Number of items visible at once
 
     val itemHeight = 40.dp
     val itemHeightPx = with(LocalDensity.current) { itemHeight.toPx() }

@@ -20,7 +20,6 @@ import com.jherkenhoff.qalculate.ui.calculator.KeyLabel
 import kotlin.Int.Companion.MAX_VALUE
 import kotlin.Int.Companion.MIN_VALUE
 
-
 private fun superscriptSymbol(base: String, superscript: String) : AnnotatedString {
     return buildAnnotatedString {
         append(base)
@@ -113,32 +112,44 @@ object Keys {
         topRightAction = KeyAction.InsertText(KeyLabel.Text("]"), "]"),
         role = KeyRole.OPERATOR
     )
-    val keyPlus = Key.CornerDragKey(centerAction = KeyAction.InsertText.operator(KeyLabel.Text("+"), "+"), role = KeyRole.OPERATOR)
+    val keyPlus = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText.operator(KeyLabel.Text("+"), "+"),
+        role = KeyRole.OPERATOR
+    )
     val keyMinus = Key.CornerDragKey(centerAction = KeyAction.InsertText.operator(KeyLabel.Text("-"), "-"), role = KeyRole.OPERATOR)
     val keyMultiply = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("×"), "×"), role = KeyRole.OPERATOR)
     val keyDivide = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("÷"), "÷"), role = KeyRole.OPERATOR)
     val keyPower = Key.CornerDragKey(
         centerAction = KeyAction.InsertText.operator(KeyLabel.Text(superscriptSymbol("x", "y")), "^"),
-        topRightAction = KeyAction.InsertText.operator(KeyLabel.Text("E"), "E"),
         role = KeyRole.OPERATOR
     )
     val keySqrt = Key.CornerDragKey(
         centerAction = KeyAction.InsertText.function(KeyLabel.Text("√"), "sqrt"),
-        topRightAction = KeyAction.InsertText.function(KeyLabel.Text("∛"), "cbrt"),
         role = KeyRole.OPERATOR
     )
-    val keyUnderscore = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("_"), "_"), role = KeyRole.OPERATOR)
-    val keyEqual = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("="), "="), role = KeyRole.OPERATOR)
+
+    val keyPlusMinus = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("±"), "±"),
+        role = KeyRole.OPERATOR
+    )
+    val keyUnderscore = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("_"), "_"),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text(";"), ";"),
+        role = KeyRole.OPERATOR
+    )
+    val keyEqual = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("="), "="),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text(","), ","),
+        role = KeyRole.OPERATOR
+    )
     val keyPi = Key.CornerDragKey(
         centerAction = KeyAction.InsertText(KeyLabel.Text("π"), "π"),
         topRightAction = KeyAction.InsertText(KeyLabel.Text("e"), "e"),
-        bottomRightAction = KeyAction.InsertText(KeyLabel.Text(","), ","),
         role = KeyRole.OPERATOR
     )
     val keyFactorial = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.operator(KeyLabel.Text("!"), "!"),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text("e"), "e"),
-        bottomRightAction = KeyAction.InsertText(KeyLabel.Text(","), ","),
+        centerAction = KeyAction.InsertText(KeyLabel.Text("∞"), "∞"),
+        topRightAction = KeyAction.InsertText.operator(KeyLabel.Text("!"), "!"),
         role = KeyRole.OPERATOR
     )
     val keyEuler = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("e"), "e"), role = KeyRole.OPERATOR)
@@ -158,42 +169,52 @@ object Keys {
         topRightAction = KeyAction.InsertText.function(KeyLabel.Text("Π"), "product"),
         role = KeyRole.OPERATOR
     )
-    val keyInfinity = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("∞"), "∞"), role = KeyRole.OPERATOR)
+    val keyInfinity = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText(KeyLabel.Text("∞"), "∞"),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text("!"), "!"),
+        role = KeyRole.OPERATOR
+    )
     val keyImaginary = Key.CornerDragKey(
         centerAction = KeyAction.InsertText(KeyLabel.Text("i"), "i"),
-        topLeftAction = KeyAction.InsertText.function(KeyLabel.Text("Re"), "re"),
-        topRightAction = KeyAction.InsertText.function(KeyLabel.Text("Im"), "im"),
-        bottomRightAction = KeyAction.InsertText(KeyLabel.Text("∠"), "∠"),
+        topRightAction = KeyAction.InsertText(KeyLabel.Text("∠"), "∠"),
         role = KeyRole.OPERATOR
     )
-
+    val keyComplexOperators = Key.SelectorKey(
+        arrayOf(
+            KeyAction.InsertText.function(KeyLabel.Text("Abs."), "abs"),
+            KeyAction.InsertText.function(KeyLabel.Text("Arg."), "arg"),
+            KeyAction.InsertText.function(KeyLabel.Text("Real"), "re"),
+            KeyAction.InsertText.function(KeyLabel.Text("Imag."), "im"),
+            KeyAction.InsertText.function(KeyLabel.Text("Conj."), "conj")
+        ),
+        2,
+        role = KeyRole.OPERATOR
+    )
     val keyPercent = Key.CornerDragKey(
         centerAction = KeyAction.InsertText.operator(KeyLabel.Text("%"), "%"),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text("±"), "±"),
-        bottomRightAction = KeyAction.InsertText.operator(KeyLabel.Text("!"), "!"),
+        topRightAction = KeyAction.InsertText.operator(KeyLabel.Text("±"), "±"),
         role = KeyRole.OPERATOR
     )
-
     val keyX = Key.CornerDragKey(
         centerAction = KeyAction.InsertText(KeyLabel.Text("X"), "x"),
-        topLeftAction = KeyAction.InsertText(KeyLabel.Text("Y"), "y"),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text("Z"), "z"),
+        topRightAction = KeyAction.StoreAsVariable(KeyLabel.Text("→x"), KeyLabel.Text("→x"), "x"),
         role= KeyRole.OPERATOR
     )
-
     val keyY = Key.CornerDragKey(
         centerAction = KeyAction.InsertText(KeyLabel.Text("Y"), "y"),
-        topRightAction = KeyAction.StoreAsVariable(null, KeyLabel.Text("→Y"), "x"),
+        topRightAction = KeyAction.StoreAsVariable(KeyLabel.Text("→y"), KeyLabel.Text("→y"), "x"),
         role = KeyRole.OPERATOR
     )
     val keyZ = Key.CornerDragKey(
         centerAction = KeyAction.InsertText(KeyLabel.Text("Z"), "z"),
-        topRightAction = KeyAction.StoreAsVariable(null, KeyLabel.Text("→Z"), "z"),
+        topRightAction = KeyAction.StoreAsVariable(KeyLabel.Text("→z"), KeyLabel.Text("→z"), "z"),
         role = KeyRole.OPERATOR
     )
-    val keyExp = Key.CornerDragKey(centerAction = KeyAction.InsertText.operator(KeyLabel.Text("E"), "E"), role = KeyRole.OPERATOR)
+    val keyExp = Key.CornerDragKey(
+        centerAction = KeyAction.InsertText.operator(KeyLabel.Text("E"), "E"),
+        role = KeyRole.OPERATOR
+    )
     val keyConversion = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Icon(Icons.AutoMirrored.Filled.ArrowRightAlt, null), "→"), role = KeyRole.OPERATOR)
-
 
     val keyLeft = Key.CornerDragKey(
         centerAction = KeyAction.MoveCursor(label = KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move cursor left"), chars = -1),

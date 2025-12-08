@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +30,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
+import com.jherkenhoff.qalculate.ui.common.DelayedAnimatedVisibility
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -49,6 +52,12 @@ fun CalculationHistoryList(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(calculations.size) {
+        if (calculations.isNotEmpty()) {
+            scrollState.animateScrollToItem(calculations.size - 1)
+        }
+    }
+
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = modifier,
@@ -56,11 +65,19 @@ fun CalculationHistoryList(
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             state = scrollState,
-            verticalArrangement = Arrangement.Top,
-            reverseLayout = true,
+            verticalArrangement = Arrangement.Bottom,
+            reverseLayout = false,
         ) {
-            calculations.groupBy { it.created.toLocalDate() }.map { (id, list) ->
-                list.reversed().forEach { entry ->
+            calculations.sortedBy{ it.created }.groupBy { it.created.toLocalDate() }.map { (id, list) ->
+                stickyHeader{
+                    val dayString = when (id) {
+                        LocalDate.now() -> "Today"
+                        LocalDate.now().minusDays(1) -> "Yesterday"
+                        else -> id.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+                    }
+                    CalculationDivider(text = dayString)
+                }
+                list.forEach { entry ->
                     item(key = entry.id) {
                         CalculationHistoryItem(
                             entry.input,
@@ -70,25 +87,18 @@ fun CalculationHistoryList(
                         )
                     }
                 }
-                stickyHeader{
-                    val dayString = when (id) {
-                        LocalDate.now() -> "Today"
-                        LocalDate.now().minusDays(1) -> "Yesterday"
-                        else -> id.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
-                    }
-                    CalculationDivider(text = dayString)
-                }
             }
         }
-        AnimatedVisibility(
-            visible = scrollState.canScrollBackward,
+        DelayedAnimatedVisibility(
+            scrollState.canScrollForward,
+            500L,
             enter = fadeIn(),
             exit = fadeOut()
         ) {
             JumpToBottomButton(
                 onClick = {
                     coroutineScope.launch {
-                        scrollState.animateScrollToItem(0)
+                        scrollState.animateScrollToItem(calculations.size-1)
                     }
                 },
                 modifier = Modifier.padding(12.dp)
@@ -104,6 +114,7 @@ fun CalculationDivider(
 ) {
     Row(
         modifier = modifier
+            .background(MaterialTheme.colorScheme.background)
             .padding(vertical = 6.dp)
             .height(16.dp)
     ) {
@@ -152,7 +163,7 @@ private fun DefaultPreview() {
             0, "1+1", "1+1", "2", LocalDateTime.now()
         ),
         CalculationHistoryItemData(
-            1, "2+2", "2+2", "4", LocalDateTime.now()
+            1, "2+2", "2+2", "4", LocalDateTime.now().minusMinutes(30)
         ),
         CalculationHistoryItemData(
             2, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
