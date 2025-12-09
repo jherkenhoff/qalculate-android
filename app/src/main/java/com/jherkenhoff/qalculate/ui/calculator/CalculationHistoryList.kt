@@ -8,13 +8,25 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.HistoryToggleOff
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -29,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.room.util.TableInfo
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.ui.common.DelayedAnimatedVisibility
 import kotlinx.coroutines.coroutineScope
@@ -54,55 +67,67 @@ fun CalculationHistoryList(
 
     LaunchedEffect(calculations.size) {
         if (calculations.isNotEmpty()) {
-            scrollState.animateScrollToItem(calculations.size - 1)
+            scrollState.animateScrollToItem(calculations.size)
         }
     }
 
     Box(
-        contentAlignment = Alignment.BottomCenter,
-        modifier = modifier,
+        contentAlignment = Alignment.Center,
+        modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer),
     ) {
-        LazyColumn(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            state = scrollState,
-            verticalArrangement = Arrangement.Bottom,
-            reverseLayout = false,
-        ) {
-            calculations.sortedBy{ it.created }.groupBy { it.created.toLocalDate() }.map { (id, list) ->
-                stickyHeader{
-                    val dayString = when (id) {
-                        LocalDate.now() -> "Today"
-                        LocalDate.now().minusDays(1) -> "Yesterday"
-                        else -> id.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
-                    }
-                    CalculationDivider(text = dayString)
-                }
-                list.forEach { entry ->
-                    item(key = entry.id) {
-                        CalculationHistoryItem(
-                            entry.input,
-                            entry.parsed,
-                            entry.result,
-                            onDeleteClick = { onDeleteClick(entry) },
-                        )
-                    }
-                }
+        if (calculations.isEmpty()) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(Icons.Default.History, null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                Text("No calculations yet", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), style = MaterialTheme.typography.titleLarge)
+                Text("Your calculation history will appear here", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
             }
-        }
-        DelayedAnimatedVisibility(
-            scrollState.canScrollForward,
-            500L,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            JumpToBottomButton(
-                onClick = {
-                    coroutineScope.launch {
-                        scrollState.animateScrollToItem(calculations.size-1)
+        } else {
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                state = scrollState,
+                verticalArrangement = Arrangement.Bottom,
+                reverseLayout = false,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                calculations.sortedBy { it.created }.groupBy { it.created.toLocalDate() }
+                    .map { (id, list) ->
+                        stickyHeader {
+                            val dayString = when (id) {
+                                LocalDate.now() -> "Today"
+                                LocalDate.now().minusDays(1) -> "Yesterday"
+                                else -> id.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+                            }
+                            CalculationDivider(text = dayString)
+                        }
+                        list.forEach { entry ->
+                            item(key = entry.id) {
+                                CalculationHistoryItem(
+                                    entry.input,
+                                    entry.parsed,
+                                    entry.result,
+                                    onDeleteClick = { onDeleteClick(entry) },
+                                )
+                            }
+                        }
                     }
-                },
-                modifier = Modifier.padding(12.dp)
-            )
+            }
+            DelayedAnimatedVisibility(
+                scrollState.canScrollForward,
+                500L,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                JumpToBottomButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            scrollState.animateScrollToItem(calculations.size - 1)
+                        }
+                    },
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
         }
     }
 }
@@ -114,7 +139,7 @@ fun CalculationDivider(
 ) {
     Row(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
             .padding(vertical = 6.dp)
             .height(16.dp)
     ) {
@@ -193,5 +218,13 @@ private fun DefaultPreview() {
 
     CalculationHistoryList(
         testCalculationHistoryItemHistory
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EmptyPreview() {
+    CalculationHistoryList(
+        emptyList()
     )
 }

@@ -6,11 +6,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,12 +24,20 @@ import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Surface
@@ -56,6 +68,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
@@ -71,31 +84,11 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import kotlin.math.max
 
-
-data class SecondaryKeypadData(
-    val title: String,
-    val keys: Array<Array<Key>>
+private val secondaryKeypadKeys: Array<Array<Key>> = arrayOf(
+    arrayOf(Keys.keyX, Keys.keyY, Keys.keyZ, Keys.keySiWeight, Keys.keyFactorial),
+    arrayOf(Keys.keyIntegral, Keys.keyDifferential, Keys.keySum, Keys.keyImaginary, Keys.keyComplexOperators),
+    arrayOf(Keys.keySin, Keys.keyCos, Keys.keyTan, Keys.keyLn, Keys.keyInfinity)
 )
-
-private val basicSecondaryKeypad = SecondaryKeypadData(
-    title = "Math",
-    keys = arrayOf(
-        arrayOf(Keys.keyX, Keys.keyY, Keys.keyZ, Keys.keySiWeight, Keys.keyFactorial),
-        arrayOf(Keys.keyIntegral, Keys.keyDifferential, Keys.keySum, Keys.keyImaginary, Keys.keyComplexOperators),
-        arrayOf(Keys.keySin, Keys.keyCos, Keys.keyTan, Keys.keyLn, Keys.keyInfinity)
-    )
-)
-
-private val physicsSecondaryKeypad = SecondaryKeypadData(
-    title = "Physics",
-    keys = arrayOf(
-        arrayOf(Keys.keySiLength, Keys.keyImperialLength, Keys.keyImperialWeight, Keys.keySiWeight, Keys.keyConversion),
-    )
-)
-
-private val secondaryKeypads = arrayOf(basicSecondaryKeypad, physicsSecondaryKeypad)
-
-
 
 @Composable
 fun CalculatorScreen(
@@ -206,71 +199,6 @@ fun CalculatorScreenContent(
     var maxOffset by remember { mutableFloatStateOf(0f) }
     val offsetY = remember { Animatable(0f) }
 
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-
-                if (historyListState.canScrollForward) {
-                    // If we are not scrolled to the most recent calculation history item, let the history list consume the scroll
-                    return Offset.Zero
-                }
-
-                if (available.y <= 0f) {
-                    return Offset.Zero
-                }
-                val newOffset = (offsetY.value + available.y)
-                val clippedNewOffset = newOffset.coerceIn(0f, maxOffset)
-                scope.launch {
-                    offsetY.snapTo(clippedNewOffset)
-                }
-                return Offset(0f, available.y - (newOffset - clippedNewOffset))
-            }
-
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-
-                if (available.y >= 0f) {
-                    return Offset.Zero
-                }
-                val newOffset = (offsetY.value + available.y)
-                val clippedNewOffset = newOffset.coerceIn(0f, maxOffset)
-                scope.launch {
-                    offsetY.snapTo(clippedNewOffset)
-                    historyListState.scrollToItem(calculationHistorySize - 1)
-                }
-                return Offset(0f, available.y - (newOffset - clippedNewOffset))
-            }
-
-            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-
-                val velocityThreshold = with(localDensity) { 1000.dp.toPx() }
-
-                val targetOffset = when {
-                    available.y > velocityThreshold -> maxOffset
-                    available.y < -velocityThreshold -> 0f
-                    else -> {
-                        // Not enough momentum. Decide based on position
-                        if (offsetY.value > maxOffset / 2) maxOffset else 0f
-                    }
-                }
-
-                offsetY.animateTo(targetOffset)
-
-                if (targetOffset == 0f) {
-                    if (calculationHistorySize != 0) {
-                        historyListState.animateScrollToItem(calculationHistorySize - 1)
-                    }
-                }
-
-                return available
-            }
-        }
-    }
-
-
     val nestedScrollConnectionInputSheet = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -299,7 +227,7 @@ fun CalculatorScreenContent(
 
                 if (targetOffset == 0f) {
                     if (calculationHistorySize != 0) {
-                        historyListState.animateScrollToItem(calculationHistorySize - 1)
+                        historyListState.animateScrollToItem(calculationHistorySize)
                     }
                 }
 
@@ -308,54 +236,46 @@ fun CalculatorScreenContent(
         }
     }
 
-    Surface(
-        color = MaterialTheme.colorScheme.surface,
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeContent))
+        CalculationHistoryList(
+            calculationHistory,
+            onDeleteClick = onDeleteCalculation,
+            scrollState = historyListState,
+            modifier = Modifier.weight(1f).zIndex(1f)
+        )
+
+        InputSheet(
+            inputTextFieldValue,
+            parsedString,
+            resultString,
+            internalAutocompleteResult,
+            userPreferences,
+            onValueChange = onInputFieldValueChange,
+            onUserPreferencesChanged = onUserPreferencesChanged,
+            onMenuClick = onMenuClick,
+            interceptKeyboard = !keyboardEnabled,
+            modifier = Modifier
+                .imeNestedScroll()
+                .nestedScroll(nestedScrollConnectionInputSheet)
+                .scrollable(
+                    rememberScrollState(),
+                    orientation = Orientation.Vertical
+                )
+                .zIndex(2f)
+        )
+
+        Box(
+            modifier = Modifier.background(MaterialTheme.colorScheme.background).zIndex(3f),
         ) {
-            CalculatorTopBar(
-                userPreferences = userPreferences,
-                onUserPreferencesChanged = onUserPreferencesChanged,
-                onMenuClick = onMenuClick,
-                onSettingsClick = onSettingsClick
-            )
-
-            Column(
-                Modifier.weight(1f)
-            ) {
-                CalculationHistoryList(
-                    calculationHistory,
-                    onDeleteClick = onDeleteCalculation,
-                    scrollState = historyListState,
-                    modifier = Modifier.weight(1f)
-                )
-
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-                )
-
-                InputSheet(
-                    inputTextFieldValue,
-                    parsedString,
-                    resultString,
-                    internalAutocompleteResult,
-                    onInputFieldValueChange,
-                    {},
-                    interceptKeyboard = !keyboardEnabled,
-                    modifier = Modifier
-                        .imeNestedScroll()
-                        .nestedScroll(nestedScrollConnectionInputSheet)
-                        .scrollable(
-                            rememberScrollState(),
-                            orientation = Orientation.Vertical
-                        )
-                )
-            }
-
             Surface(
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp),
+                shadowElevation = 6.dp,
+                modifier = Modifier.zIndex(4f)
             ) {
                 Column {
                     Column(
@@ -364,31 +284,12 @@ fun CalculatorScreenContent(
                         }
                     ) {
                         AnimatedVisibility(!keyboardEnabled) {
-                            Column {
-                                PrimaryTabRow(
-                                    activeSecondaryKeypad,
-                                    containerColor = Color.Transparent,
-                                    divider = { Spacer(Modifier.height(4.dp)) }
-                                ) {
-                                    for ((i, keypad) in secondaryKeypads.withIndex()) {
-                                        Tab(
-                                            selected = true,
-                                            onClick = { activeSecondaryKeypad = i },
-                                            text = {
-                                                Text(keypad.title)
-                                            }
-                                        )
-                                    }
-                                }
-
-                                AnimatedContent(activeSecondaryKeypad) {
-                                    Keypad(
-                                        secondaryKeypads[it].keys,
-                                        onKeyAction = onKeyAction,
-                                        compact = keyboardEnabled
-                                    )
-                                }
-                            }
+                            Keypad(
+                                secondaryKeypadKeys,
+                                onKeyAction = onKeyAction,
+                                compact = keyboardEnabled,
+                                topKeyCornerSize = CornerSize(21.dp),
+                            )
                         }
                         Keypad(
                             primaryKeypadKeys,

@@ -1,16 +1,27 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.ChipColors
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.model.UserPreferences
@@ -29,41 +40,34 @@ fun CalculatorChips(
 
     Row(
         modifier,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        AssistChip(
-            onClick = { angleUnitDialogOpen = true },
-            label = { Text(
-                when (userPreferences.angleUnit) {
-                    UserPreferences.AngleUnit.DEGREES -> "DEG"
-                    UserPreferences.AngleUnit.RADIANS -> "RAD"
-                    UserPreferences.AngleUnit.GRADIANS -> "GRA"
-                }
-
-            ) }
+        Chip(
+            text =when (userPreferences.angleUnit) {
+                UserPreferences.AngleUnit.DEGREES -> "DEG"
+                UserPreferences.AngleUnit.RADIANS -> "RAD"
+                UserPreferences.AngleUnit.GRADIANS -> "GRA"
+            },
+            onClick = { angleUnitDialogOpen = true }
         )
-        FilterChip(
-            selected = userPreferences.approximationMode == UserPreferences.ApproximationMode.EXACT,
-            onClick = { approximationModeDialogOpen = true },
-            label = { Text(
-                when (userPreferences.approximationMode) {
-                    UserPreferences.ApproximationMode.EXACT -> "EXACT"
-                    UserPreferences.ApproximationMode.TRY_EXACT -> "EXACT"
-                    UserPreferences.ApproximationMode.APPROXIMATE -> "APPROX"
-                }
-
-            ) }
-        )
-        AssistChip(
-            onClick = { numericalDisplayModeDialogOpen = true },
-            label = { Text(
+        Chip(
+            text =
                 when (userPreferences.numericalDisplayMode) {
                     UserPreferences.NumericalDisplayMode.NORMAL -> "NORM"
                     UserPreferences.NumericalDisplayMode.SCIENTIFIC -> "SCI"
                     UserPreferences.NumericalDisplayMode.ENGINEERING -> "ENG"
-                }
-
-            ) }
+                },
+            onClick = { numericalDisplayModeDialogOpen = true }
+        )
+        Chip(
+            text = when (userPreferences.approximationMode) {
+                UserPreferences.ApproximationMode.EXACT -> "EXACT"
+                UserPreferences.ApproximationMode.TRY_EXACT -> "EXACT"
+                UserPreferences.ApproximationMode.APPROXIMATE -> "APPROX"
+            },
+            onClick = { approximationModeDialogOpen = true },
+            highlight = true
         )
     }
 
@@ -108,6 +112,28 @@ fun CalculatorChips(
             onSelect = { onUserPreferencesChanged(userPreferences.copy(numericalDisplayMode = it)) },
             onDismissRequest = { numericalDisplayModeDialogOpen = false }
         )
+    }
+}
+
+@Composable
+fun Chip(
+    text: String,
+    onClick: () -> Unit = {},
+    highlight: Boolean = false
+) {
+    Surface(
+        color = if (highlight) MaterialTheme.colorScheme.tertiary else Color.Transparent,
+        border = if (highlight) null else BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary),
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.height(28.dp),
+        onClick = onClick
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            Text(text, style = MaterialTheme.typography.labelSmall)
+        }
     }
 }
 
