@@ -84,13 +84,13 @@ fun Key(
     val containerColor = when (keySpec.role) {
         KeyRole.NUMBER -> MaterialTheme.colorScheme.surfaceBright
         KeyRole.OPERATOR -> MaterialTheme.colorScheme.surfaceContainerHigh
-        KeyRole.SYSTEM -> MaterialTheme.colorScheme.secondaryContainer
+        KeyRole.SYSTEM -> MaterialTheme.colorScheme.tertiaryContainer
     }
 
     val labelColor = when (keySpec.role) {
         KeyRole.NUMBER -> MaterialTheme.colorScheme.onSurface
         KeyRole.OPERATOR -> MaterialTheme.colorScheme.onSurface
-        KeyRole.SYSTEM -> MaterialTheme.colorScheme.onSecondaryContainer
+        KeyRole.SYSTEM -> MaterialTheme.colorScheme.onTertiaryContainer
     }
 
     when (keySpec) {

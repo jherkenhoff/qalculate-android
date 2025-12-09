@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -61,14 +61,29 @@ import com.jherkenhoff.qalculate.model.Action
 import com.jherkenhoff.qalculate.model.ActionLabel
 import com.jherkenhoff.qalculate.model.KeyRole
 import com.jherkenhoff.qalculate.model.Keys
+import com.jherkenhoff.qalculate.model.PositionedKeySpec
 import com.jherkenhoff.qalculate.model.UserPreferences
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-private val secondaryKeypadKeySpecs: Array<Array<KeySpec>> = arrayOf(
-    arrayOf(Keys.keySpecX, Keys.keySpecY, Keys.keySpecZ, Keys.keySpecSiWeight, Keys.keySpecFactorial),
-    arrayOf(Keys.keySpecIntegral, Keys.keySpecDifferential, Keys.keySpecSum, Keys.keySpecImaginary, Keys.keySpecComplexOperators),
-    arrayOf(Keys.keySpecSin, Keys.keySpecCos, Keys.keySpecTan, Keys.keySpecLn, Keys.keySpecInfinity)
+private val secondaryKeypad: List<PositionedKeySpec> = listOf(
+    PositionedKeySpec(0, 0, Keys.keySpecX),
+    PositionedKeySpec(0, 1, Keys.keySpecY),
+    PositionedKeySpec(0, 2, Keys.keySpecZ),
+    PositionedKeySpec(0, 3, Keys.keySpecSiWeight),
+    PositionedKeySpec(0, 4, Keys.keySpecFactorial),
+
+    PositionedKeySpec(1, 0, Keys.keySpecIntegral),
+    PositionedKeySpec(1, 1, Keys.keySpecDifferential),
+    PositionedKeySpec(1, 2, Keys.keySpecSum),
+    PositionedKeySpec(1, 3, Keys.keySpecImaginary),
+    PositionedKeySpec(1, 4, Keys.keySpecComplexOperators),
+
+    PositionedKeySpec(2, 0, Keys.keySpecSin),
+    PositionedKeySpec(2, 1, Keys.keySpecCos),
+    PositionedKeySpec(2, 2, Keys.keySpecTan),
+    PositionedKeySpec(2, 3, Keys.keySpecLn),
+    PositionedKeySpec(2, 4, Keys.keySpecInfinity)
 )
 
 @Composable
@@ -165,11 +180,39 @@ fun CalculatorScreenContent(
     val divisionChar = userPreferences.getDivisionSignString()
     val keySpecDivision = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.operator(ActionLabel.Text(divisionChar), divisionChar), role = KeyRole.OPERATOR)
 
-    val primaryKeypadKeySpecs : Array<Array<KeySpec>> = arrayOf(
-        arrayOf(Keys.keySpecPercent, Keys.keySpecPi, Keys.keySpec7, Keys.keySpec8, Keys.keySpec9, Keys.keySpecBackspace, Keys.keySpecClearAll),
-        arrayOf(Keys.keySpecSqrt, Keys.keySpecPower, Keys.keySpec4, Keys.keySpec5, Keys.keySpec6, keySpecMultiply, keySpecDivision),
-        arrayOf(Keys.keySpecBracketOpen, Keys.keySpecBracketClose, Keys.keySpec1, Keys.keySpec2, Keys.keySpec3, Keys.keySpecPlus, Keys.keySpecMinus),
-        arrayOf(Keys.keySpecUnderscore, Keys.keySpecEqual, Keys.keySpec0, keySpecDecimal, Keys.keySpecExp, Keys.keySpecReturn),
+
+
+    val primaryKeypad : List<PositionedKeySpec> = listOf(
+        PositionedKeySpec(0, 0, Keys.keySpecPercent),
+        PositionedKeySpec(0, 1, Keys.keySpecPi),
+        PositionedKeySpec(0, 2, Keys.keySpec7),
+        PositionedKeySpec(0, 3, Keys.keySpec8),
+        PositionedKeySpec(0, 4, Keys.keySpec9),
+        PositionedKeySpec(0, 5, Keys.keySpecBackspace),
+        PositionedKeySpec(0, 6, Keys.keySpecClearAll),
+
+        PositionedKeySpec(1, 0, Keys.keySpecSqrt),
+        PositionedKeySpec(1, 1, Keys.keySpecPower),
+        PositionedKeySpec(1, 2, Keys.keySpec4),
+        PositionedKeySpec(1, 3, Keys.keySpec5),
+        PositionedKeySpec(1, 4, Keys.keySpec6),
+        PositionedKeySpec(1, 5, keySpecMultiply),
+        PositionedKeySpec(1, 6, keySpecDivision),
+
+        PositionedKeySpec(2, 0, Keys.keySpecBracketOpen),
+        PositionedKeySpec(2, 1, Keys.keySpecBracketClose),
+        PositionedKeySpec(2, 2, Keys.keySpec1),
+        PositionedKeySpec(2, 3, Keys.keySpec2),
+        PositionedKeySpec(2, 4, Keys.keySpec3),
+        PositionedKeySpec(2, 5, Keys.keySpecPlus),
+        PositionedKeySpec(2, 6, Keys.keySpecMinus),
+
+        PositionedKeySpec(3, 0, Keys.keySpecUnderscore),
+        PositionedKeySpec(3, 1, Keys.keySpecEqual),
+        PositionedKeySpec(3, 2, Keys.keySpec0),
+        PositionedKeySpec(3, 3, keySpecDecimal),
+        PositionedKeySpec(3, 4, Keys.keySpecExp),
+        PositionedKeySpec(3, 5, 1, 2, Keys.keySpecReturn),
     )
 
     var calculationHistorySize by remember{ mutableIntStateOf(calculationHistory.size)}
@@ -265,20 +308,43 @@ fun CalculatorScreenContent(
                         }
                     ) {
                         AnimatedVisibility(!keyboardEnabled) {
-//                            GridLayout(
-//                                secondaryKeypadKeySpecs,
-//                                onKeyAction = onKeyAction,
-//                                compact = keyboardEnabled,
-//                                topKeyCornerSize = CornerSize(21.dp),
-//                            )
+                            GridLayout(
+                                3,
+                                5,
+                                horizontalSpacing = 3.dp,
+                                verticalSpacing = 3.dp,
+                                aspectRatio = 0.5f,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                secondaryKeypad.forEach {
+                                    item(it.row, it.col, it.rowSpan, it.colSpan) {
+                                        Key(
+                                            it.keySpec,
+                                            onKeyAction = onKeyAction
+                                        )
+                                    }
+                                }
+                            }
                         }
-//                        GridLayout(
-//                            primaryKeypadKeySpecs,
-//                            onKeyAction = onKeyAction,
-//                            compact = keyboardEnabled,
-//                            topKeyCornerSize = if (!imeFullyHidden) CornerSize(21.dp) else KeyDefaults.Shape.topStart,
-//                            modifier = Modifier.fillMaxWidth()
-//                        )
+                        Spacer(Modifier.height(3.dp))
+                        GridLayout(
+                            4,
+                            7,
+                            horizontalSpacing = 3.dp,
+                            verticalSpacing = 3.dp,
+                            aspectRatio = 0.9f,
+                            //topKeyCornerSize = if (!imeFullyHidden) CornerSize(21.dp) else KeyDefaults.Shape.topStart,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            primaryKeypad.forEach {
+                                item(it.row, it.col, it.rowSpan, it.colSpan) {
+                                    Key(
+                                        it.keySpec,
+                                        onKeyAction = onKeyAction
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     AuxiliaryBar(
