@@ -5,7 +5,6 @@ enum class KeyRole {
 }
 
 sealed class KeySpec {
-
     abstract val role: KeyRole
 
     data class DefaultKeySpec (

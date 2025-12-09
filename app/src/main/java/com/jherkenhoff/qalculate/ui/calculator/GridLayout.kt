@@ -3,6 +3,7 @@ package com.jherkenhoff.qalculate.ui.calculator
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -11,10 +12,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 
 
 class GridScope {
-
     internal data class PositionedItem(
         val row: Int,
         val col: Int,
@@ -49,8 +50,9 @@ fun GridLayout(
     rows: Int,
     cols: Int,
     modifier: Modifier = Modifier,
-    horizontalSpacing: Dp = 8.dp,
-    verticalSpacing: Dp = 8.dp,
+    aspectRatio: Float = 1f,
+    horizontalSpacing: Dp = 0.dp,
+    verticalSpacing: Dp = 0.dp,
     content: GridScope.() -> Unit
 ) {
     val scope = GridScope().apply(content)
@@ -65,11 +67,12 @@ fun GridLayout(
         val vSpace = verticalSpacing.roundToPx()
 
         val totalWidth = constraints.maxWidth
-        val totalHeight = constraints.maxHeight
 
         val cellWidth = (totalWidth - hSpace * (cols - 1)) / cols
 
-        val cellHeight = (totalHeight - vSpace * (rows - 1)) / rows
+
+        //val cellHeight = (constraints.maxHeight - vSpace * (rows - 1)) / rows
+        val cellHeight = (cellWidth * aspectRatio).roundToInt()
 
         val placeables = items.indices.map { i ->
             val width = cellWidth * items[i].colSpan + hSpace * (items[i].colSpan - 1)
@@ -79,6 +82,8 @@ fun GridLayout(
                 Constraints.fixed(width, height)
             )
         }
+
+        val totalHeight = cellHeight * rows + vSpace * (rows - 1)
 
         layout(totalWidth, totalHeight) {
             items.indices.map { i ->
@@ -98,7 +103,9 @@ fun Default() {
     GridLayout(
         3,
         3,
-        modifier = Modifier.size(100.dp)
+        aspectRatio = 0.5f,
+        horizontalSpacing = 8.dp,
+        verticalSpacing = 8.dp,
     ) {
         item(0, 0) {
             Box(Modifier.background(Color.Gray))
