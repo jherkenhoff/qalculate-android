@@ -33,11 +33,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.KeyAction
-import com.jherkenhoff.qalculate.model.KeyLabel
+import com.jherkenhoff.qalculate.model.Action
+import com.jherkenhoff.qalculate.model.ActionLabel
 import com.jherkenhoff.qalculate.model.Keys
 
-private val auxiliaryKeys = arrayOf(Keys.keyLeft, Keys.keyRight, Keys.keyUndo, Keys.keyRedo)
+private val auxiliaryKeys = arrayOf(Keys.keySpecLeft, Keys.keySpecRight, Keys.keySpecUndo, Keys.keySpecRedo)
 
 @Composable
 fun AuxiliaryBar(
@@ -46,7 +46,7 @@ fun AuxiliaryBar(
     modifier: Modifier = Modifier,
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     onKeyboardEnableChange: (Boolean) -> Unit = { },
-    onKeyAction: (KeyAction) -> Unit = { },
+    onKeyAction: (Action) -> Unit = { },
     onAutocompleteDismiss: () -> Unit = { },
 ) {
     val fadeWidth = 40f
@@ -97,12 +97,12 @@ fun AuxiliaryBar(
                     for (key in auxiliaryKeys) {
                         IconButton({ onKeyAction(key.centerAction) }) {
                             when (val label = key.centerAction.label) {
-                                is KeyLabel.Text -> Text(
+                                is ActionLabel.Text -> Text(
                                     label.text,
                                     style = MaterialTheme.typography.labelLarge
                                 )
 
-                                is KeyLabel.Icon -> Icon(
+                                is ActionLabel.Icon -> Icon(
                                     label.icon,
                                     label.description,
                                     modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())

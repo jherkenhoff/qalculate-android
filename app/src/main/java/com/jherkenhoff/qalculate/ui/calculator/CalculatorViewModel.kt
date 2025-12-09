@@ -15,7 +15,7 @@ import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
 import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.KeyAction
+import com.jherkenhoff.qalculate.model.Action
 import com.jherkenhoff.qalculate.model.UserPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -106,16 +106,16 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    fun handleKeyAction(keyAction: KeyAction) {
-        when (keyAction) {
-            is KeyAction.InsertText -> insertText(keyAction)
-            is KeyAction.Backspace -> removeChars(keyAction.nChars)
-            is KeyAction.Return -> submitCalculation()
-            is KeyAction.ClearAll -> clearInput()
-            is KeyAction.MoveCursor -> moveCursor(keyAction.chars)
-            is KeyAction.Undo -> null
-            is KeyAction.Redo -> null
-            is KeyAction.StoreAsVariable -> null
+    fun handleKeyAction(action: Action) {
+        when (action) {
+            is Action.InsertText -> insertText(action)
+            is Action.Backspace -> removeChars(action.nChars)
+            is Action.Return -> submitCalculation()
+            is Action.ClearAll -> clearInput()
+            is Action.MoveCursor -> moveCursor(action.chars)
+            is Action.Undo -> null
+            is Action.Redo -> null
+            is Action.StoreAsVariable -> null
         }
     }
 
@@ -128,24 +128,24 @@ class CalculatorViewModel @Inject constructor(
     fun clearInput() = _inputTextFieldValue.update { TextFieldValue("") }
 
 
-    fun insertText(keyAction: KeyAction.InsertText) {
+    fun insertText(action: Action.InsertText) {
         val maxChars = inputTextFieldValue.value.text.length
         val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
         val selectedText = inputTextFieldValue.value.getSelectedText()
         val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
 
-        with(keyAction) {
+        with(action) {
             if (selectedText.isNotEmpty()) {
                     val newText = when (selectionPolicy) {
-                        KeyAction.InsertText.SelectionPolicy.REPLACE -> "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
-                        KeyAction.InsertText.SelectionPolicy.SURROUND -> "$textBeforeSelection$preCursorText$selectedText$postCursorText$textAfterSelection"
-                        KeyAction.InsertText.SelectionPolicy.PARENTHESES -> "$textBeforeSelection($selectedText)$preCursorText$postCursorText$textAfterSelection"
+                        Action.InsertText.SelectionPolicy.REPLACE -> "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
+                        Action.InsertText.SelectionPolicy.SURROUND -> "$textBeforeSelection$preCursorText$selectedText$postCursorText$textAfterSelection"
+                        Action.InsertText.SelectionPolicy.PARENTHESES -> "$textBeforeSelection($selectedText)$preCursorText$postCursorText$textAfterSelection"
                     }
 
                     val newSelection = when (selectionPolicy) {
-                        KeyAction.InsertText.SelectionPolicy.REPLACE -> TextRange(textBeforeSelection.length + preCursorText.length)
-                        KeyAction.InsertText.SelectionPolicy.SURROUND -> TextRange(textBeforeSelection.length, newText.length - textAfterSelection.length)
-                        KeyAction.InsertText.SelectionPolicy.PARENTHESES -> TextRange(newText.length - postCursorText.length - textAfterSelection.length)
+                        Action.InsertText.SelectionPolicy.REPLACE -> TextRange(textBeforeSelection.length + preCursorText.length)
+                        Action.InsertText.SelectionPolicy.SURROUND -> TextRange(textBeforeSelection.length, newText.length - textAfterSelection.length)
+                        Action.InsertText.SelectionPolicy.PARENTHESES -> TextRange(newText.length - postCursorText.length - textAfterSelection.length)
                     }
 
                     updateInput(TextFieldValue(

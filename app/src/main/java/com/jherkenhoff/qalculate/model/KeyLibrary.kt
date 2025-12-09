@@ -16,7 +16,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.em
-import com.jherkenhoff.qalculate.ui.calculator.KeyLabel
 import kotlin.Int.Companion.MAX_VALUE
 import kotlin.Int.Companion.MIN_VALUE
 
@@ -30,208 +29,207 @@ private fun superscriptSymbol(base: String, superscript: String) : AnnotatedStri
 }
 
 object Keys {
-    val key0 = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("0"), "0"),
-        topRightAction = KeyAction.InsertText.operator(KeyLabel.Text(superscriptSymbol("x", "0")), "⁰"),
+    val keySpec0 = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("0"), "0"),
+        topRightAction = Action.InsertText.operator(ActionLabel.Text(superscriptSymbol("x", "0")), "⁰"),
         role = KeyRole.NUMBER
     )
-    val key1 = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("1"), "1"),
-        topRightAction = KeyAction.InsertText.operator( KeyLabel.Text(superscriptSymbol("x", "1")), "¹"),
-        role = KeyRole.NUMBER
-    )
-
-    val key2 = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("2"), "2"),
-        topRightAction = KeyAction.InsertText.operator( KeyLabel.Text(superscriptSymbol("x", "2")), "²"),
+    val keySpec1 = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("1"), "1"),
+        topRightAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "1")), "¹"),
         role = KeyRole.NUMBER
     )
 
-    val key3 = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("3"), "3"),
-        topRightAction = KeyAction.InsertText.operator( KeyLabel.Text(superscriptSymbol("x", "3")), "³"),
+    val keySpec2 = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("2"), "2"),
+        topRightAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "2")), "²"),
         role = KeyRole.NUMBER
     )
 
-    val key4 = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("4"), "4"),
-        topRightAction = KeyAction.InsertText.operator( KeyLabel.Text(superscriptSymbol("x", "4")), "⁴"),
+    val keySpec3 = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("3"), "3"),
+        topRightAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "3")), "³"),
         role = KeyRole.NUMBER
     )
 
-    val key5 = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("5"), "5"),
-        topRightAction = KeyAction.InsertText.operator( KeyLabel.Text(superscriptSymbol("x", "5")), "⁵"),
+    val keySpec4 = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("4"), "4"),
+        topRightAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "4")), "⁴"),
         role = KeyRole.NUMBER
     )
 
-    val key6 = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("6"), "6"),
-        topRightAction = KeyAction.InsertText.operator( KeyLabel.Text(superscriptSymbol("x", "6")), "⁶"),
+    val keySpec5 = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("5"), "5"),
+        topRightAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "5")), "⁵"),
         role = KeyRole.NUMBER
     )
 
-    val key7 = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("7"), "7"),
-        topRightAction = KeyAction.InsertText.operator( KeyLabel.Text(superscriptSymbol("x", "7")), "⁷"),
-        role = KeyRole.NUMBER
-    )
-    val key8 = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("8"), "8"),
-        topRightAction = KeyAction.InsertText.operator( KeyLabel.Text(superscriptSymbol("x", "8")), "⁸"),
+    val keySpec6 = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("6"), "6"),
+        topRightAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "6")), "⁶"),
         role = KeyRole.NUMBER
     )
 
-    val key9 = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("9"), "9"),
-        topRightAction = KeyAction.InsertText.operator( KeyLabel.Text(superscriptSymbol("x", "9")), "⁹"),
+    val keySpec7 = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("7"), "7"),
+        topRightAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "7")), "⁷"),
+        role = KeyRole.NUMBER
+    )
+    val keySpec8 = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("8"), "8"),
+        topRightAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "8")), "⁸"),
         role = KeyRole.NUMBER
     )
 
-    val keyDecimal = Key.CornerDragKey(
-            centerAction = KeyAction.InsertText(KeyLabel.Text("."), "."),
-            topRightAction = KeyAction.InsertText(KeyLabel.Text("␣"), " "),
-            bottomRightAction = KeyAction.InsertText(KeyLabel.Text(","), ","),
+    val keySpec9 = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("9"), "9"),
+        topRightAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "9")), "⁹"),
+        role = KeyRole.NUMBER
+    )
+
+    val keySpecDecimal = KeySpec.CornerDragKeySpec(
+            centerAction = Action.InsertText(ActionLabel.Text("."), "."),
+            topRightAction = Action.InsertText(ActionLabel.Text("␣"), " "),
+            bottomRightAction = Action.InsertText(ActionLabel.Text(","), ","),
             role = KeyRole.NUMBER
     )
 
-    val keyLn = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.function(KeyLabel.Text("ln"), "ln"),
-        topRightAction = KeyAction.InsertText.function(KeyLabel.Text("log"), "log10"),
+    val keySpecLn = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText.function(ActionLabel.Text("ln"), "ln"),
+        topRightAction = Action.InsertText.function(ActionLabel.Text("log"), "log10"),
         role = KeyRole.OPERATOR
     )
 
-    val keyAns = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("ans"), "ans"), role = KeyRole.OPERATOR)
-    val keyBracketOpen = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("("), "("),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text("["), "["),
+    val keySpecAns = KeySpec.CornerDragKeySpec(centerAction = Action.InsertText(ActionLabel.Text("ans"), "ans"), role = KeyRole.OPERATOR)
+    val keySpecBracketOpen = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("("), "("),
+        topRightAction = Action.InsertText(ActionLabel.Text("["), "["),
         role = KeyRole.OPERATOR
     )
-    val keyBracketClose = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text(")"), ")"),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text("]"), "]"),
+    val keySpecBracketClose = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text(")"), ")"),
+        topRightAction = Action.InsertText(ActionLabel.Text("]"), "]"),
         role = KeyRole.OPERATOR
     )
-    val keyPlus = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.operator(KeyLabel.Text("+"), "+"),
+    val keySpecPlus = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText.operator(ActionLabel.Text("+"), "+"),
         role = KeyRole.OPERATOR
     )
-    val keyMinus = Key.CornerDragKey(centerAction = KeyAction.InsertText.operator(KeyLabel.Text("-"), "-"), role = KeyRole.OPERATOR)
-    val keyMultiply = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("×"), "×"), role = KeyRole.OPERATOR)
-    val keyDivide = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("÷"), "÷"), role = KeyRole.OPERATOR)
-    val keyPower = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.operator(KeyLabel.Text(superscriptSymbol("x", "y")), "^"),
+    val keySpecMinus = KeySpec.CornerDragKeySpec(centerAction = Action.InsertText.operator(ActionLabel.Text("-"), "-"), role = KeyRole.OPERATOR)
+    val keySpecMultiply = KeySpec.CornerDragKeySpec(centerAction = Action.InsertText(ActionLabel.Text("×"), "×"), role = KeyRole.OPERATOR)
+    val keySpecDivide = KeySpec.CornerDragKeySpec(centerAction = Action.InsertText(ActionLabel.Text("÷"), "÷"), role = KeyRole.OPERATOR)
+    val keySpecPower = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText.operator(ActionLabel.Text(superscriptSymbol("x", "y")), "^"),
         role = KeyRole.OPERATOR
     )
-    val keySqrt = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.function(KeyLabel.Text("√"), "sqrt"),
+    val keySpecSqrt = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText.function(ActionLabel.Text("√"), "sqrt"),
         role = KeyRole.OPERATOR
     )
 
-    val keyPlusMinus = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("±"), "±"),
+    val keySpecPlusMinus = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("±"), "±"),
         role = KeyRole.OPERATOR
     )
-    val keyUnderscore = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("_"), "_"),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text(";"), ";"),
+    val keySpecUnderscore = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("_"), "_"),
+        topRightAction = Action.InsertText(ActionLabel.Text(";"), ";"),
         role = KeyRole.OPERATOR
     )
-    val keyEqual = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("="), "="),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text(","), ","),
+    val keySpecEqual = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("="), "="),
+        topRightAction = Action.InsertText(ActionLabel.Text(","), ","),
         role = KeyRole.OPERATOR
     )
-    val keyPi = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("π"), "π"),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text("e"), "e"),
+    val keySpecPi = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("π"), "π"),
+        topRightAction = Action.InsertText(ActionLabel.Text("e"), "e"),
         role = KeyRole.OPERATOR
     )
-    val keyFactorial = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("∞"), "∞"),
-        topRightAction = KeyAction.InsertText.operator(KeyLabel.Text("!"), "!"),
+    val keySpecFactorial = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("∞"), "∞"),
+        topRightAction = Action.InsertText.operator(ActionLabel.Text("!"), "!"),
         role = KeyRole.OPERATOR
     )
-    val keyEuler = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Text("e"), "e"), role = KeyRole.OPERATOR)
-    val keyReturn = Key.CornerDragKey(
-        centerAction = KeyAction.Return(KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardReturn, "Return")),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text("ans"), "ans"),
-        role = KeyRole.SYSTEM,
-        width = 2
+    val keySpecEuler = KeySpec.CornerDragKeySpec(centerAction = Action.InsertText(ActionLabel.Text("e"), "e"), role = KeyRole.OPERATOR)
+    val keySpecReturn = KeySpec.CornerDragKeySpec(
+        centerAction = Action.Return(ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardReturn, "Return")),
+        topRightAction = Action.InsertText(ActionLabel.Text("ans"), "ans"),
+        role = KeyRole.SYSTEM
     )
-    val keyBackspace = Key.CornerDragKey(centerAction = KeyAction.Backspace(KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardBackspace, "Backspace")), role = KeyRole.SYSTEM)
-    val keyClearAll = Key.CornerDragKey(centerAction = KeyAction.ClearAll(KeyLabel.Text("AC")), role = KeyRole.SYSTEM)
+    val keySpecBackspace = KeySpec.CornerDragKeySpec(centerAction = Action.Backspace(ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardBackspace, "Backspace")), role = KeyRole.SYSTEM)
+    val keySpecClearAll = KeySpec.CornerDragKeySpec(centerAction = Action.ClearAll(ActionLabel.Text("AC")), role = KeyRole.SYSTEM)
 
-    val keyIntegral = Key.CornerDragKey(centerAction = KeyAction.InsertText.function(KeyLabel.Text("∫"), "integral"), role = KeyRole.OPERATOR)
-    val keyDifferential = Key.CornerDragKey(centerAction = KeyAction.InsertText.function(KeyLabel.Text("dx"), "diff"), role = KeyRole.OPERATOR)
-    val keySum = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.function(KeyLabel.Text("Σ"), "sum"),
-        topRightAction = KeyAction.InsertText.function(KeyLabel.Text("Π"), "product"),
+    val keySpecIntegral = KeySpec.CornerDragKeySpec(centerAction = Action.InsertText.function(ActionLabel.Text("∫"), "integral"), role = KeyRole.OPERATOR)
+    val keySpecDifferential = KeySpec.CornerDragKeySpec(centerAction = Action.InsertText.function(ActionLabel.Text("dx"), "diff"), role = KeyRole.OPERATOR)
+    val keySpecSum = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText.function(ActionLabel.Text("Σ"), "sum"),
+        topRightAction = Action.InsertText.function(ActionLabel.Text("Π"), "product"),
         role = KeyRole.OPERATOR
     )
-    val keyInfinity = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("∞"), "∞"),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text("!"), "!"),
+    val keySpecInfinity = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("∞"), "∞"),
+        topRightAction = Action.InsertText(ActionLabel.Text("!"), "!"),
         role = KeyRole.OPERATOR
     )
-    val keyImaginary = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("i"), "i"),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text("∠"), "∠"),
+    val keySpecImaginary = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("i"), "i"),
+        topRightAction = Action.InsertText(ActionLabel.Text("∠"), "∠"),
         role = KeyRole.OPERATOR
     )
-    val keyComplexOperators = Key.SelectorKey(
-        arrayOf(
-            KeyAction.InsertText.function(KeyLabel.Text("Abs."), "abs"),
-            KeyAction.InsertText.function(KeyLabel.Text("Arg."), "arg"),
-            KeyAction.InsertText.function(KeyLabel.Text("Real"), "re"),
-            KeyAction.InsertText.function(KeyLabel.Text("Imag."), "im"),
-            KeyAction.InsertText.function(KeyLabel.Text("Conj."), "conj")
+    val keySpecComplexOperators = KeySpec.SelectorKeySpec(
+        listOf(
+            Action.InsertText.function(ActionLabel.Text("Abs."), "abs"),
+            Action.InsertText.function(ActionLabel.Text("Arg."), "arg"),
+            Action.InsertText.function(ActionLabel.Text("Real"), "re"),
+            Action.InsertText.function(ActionLabel.Text("Imag."), "im"),
+            Action.InsertText.function(ActionLabel.Text("Conj."), "conj")
         ),
         2,
         role = KeyRole.OPERATOR
     )
-    val keyPercent = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.operator(KeyLabel.Text("%"), "%"),
-        topRightAction = KeyAction.InsertText.operator(KeyLabel.Text("±"), "±"),
+    val keySpecPercent = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText.operator(ActionLabel.Text("%"), "%"),
+        topRightAction = Action.InsertText.operator(ActionLabel.Text("±"), "±"),
         role = KeyRole.OPERATOR
     )
-    val keyX = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("X"), "x"),
-        topRightAction = KeyAction.StoreAsVariable(KeyLabel.Text("→x"), KeyLabel.Text("→x"), "x"),
+    val keySpecX = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("X"), "x"),
+        topRightAction = Action.StoreAsVariable(ActionLabel.Text("→x"), ActionLabel.Text("→x"), "x"),
         role= KeyRole.OPERATOR
     )
-    val keyY = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("Y"), "y"),
-        topRightAction = KeyAction.StoreAsVariable(KeyLabel.Text("→y"), KeyLabel.Text("→y"), "x"),
+    val keySpecY = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("Y"), "y"),
+        topRightAction = Action.StoreAsVariable(ActionLabel.Text("→y"), ActionLabel.Text("→y"), "x"),
         role = KeyRole.OPERATOR
     )
-    val keyZ = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text("Z"), "z"),
-        topRightAction = KeyAction.StoreAsVariable(KeyLabel.Text("→z"), KeyLabel.Text("→z"), "z"),
+    val keySpecZ = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text("Z"), "z"),
+        topRightAction = Action.StoreAsVariable(ActionLabel.Text("→z"), ActionLabel.Text("→z"), "z"),
         role = KeyRole.OPERATOR
     )
-    val keyExp = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.operator(KeyLabel.Text("E"), "E"),
+    val keySpecExp = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText.operator(ActionLabel.Text("E"), "E"),
         role = KeyRole.OPERATOR
     )
-    val keyConversion = Key.CornerDragKey(centerAction = KeyAction.InsertText(KeyLabel.Icon(Icons.AutoMirrored.Filled.ArrowRightAlt, null), "→"), role = KeyRole.OPERATOR)
+    val keySpecConversion = KeySpec.CornerDragKeySpec(centerAction = Action.InsertText(ActionLabel.Icon(Icons.AutoMirrored.Filled.ArrowRightAlt, null), "→"), role = KeyRole.OPERATOR)
 
-    val keyLeft = Key.CornerDragKey(
-        centerAction = KeyAction.MoveCursor(label = KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move cursor left"), chars = -1),
-        topRightAction = KeyAction.MoveCursor(label = null, popupLabel = KeyLabel.Icon(Icons.AutoMirrored.Filled.ArrowLeft, "Move cursor to start"), chars = MIN_VALUE),
+    val keySpecLeft = KeySpec.CornerDragKeySpec(
+        centerAction = Action.MoveCursor(label = ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move cursor left"), chars = -1),
+        topRightAction = Action.MoveCursor(label = null, popupLabel = ActionLabel.Icon(Icons.AutoMirrored.Filled.ArrowLeft, "Move cursor to start"), chars = MIN_VALUE),
         role = KeyRole.OPERATOR
     )
-    val keyRight = Key.CornerDragKey(
-        centerAction = KeyAction.MoveCursor(label = KeyLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Move cursor right"), chars = 1),
-        topRightAction = KeyAction.MoveCursor(label = null, popupLabel = KeyLabel.Icon(Icons.AutoMirrored.Filled.ArrowRight, "Move cursor to end"), chars = MAX_VALUE),
+    val keySpecRight = KeySpec.CornerDragKeySpec(
+        centerAction = Action.MoveCursor(label = ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Move cursor right"), chars = 1),
+        topRightAction = Action.MoveCursor(label = null, popupLabel = ActionLabel.Icon(Icons.AutoMirrored.Filled.ArrowRight, "Move cursor to end"), chars = MAX_VALUE),
         role = KeyRole.SYSTEM
     )
-    val keyUndo = Key.CornerDragKey(
-        centerAction = KeyAction.Undo(label = KeyLabel.Icon(Icons.AutoMirrored.Default.Undo, "Undo")),
+    val keySpecUndo = KeySpec.CornerDragKeySpec(
+        centerAction = Action.Undo(label = ActionLabel.Icon(Icons.AutoMirrored.Default.Undo, "Undo")),
         role = KeyRole.SYSTEM
     )
-    val keyRedo = Key.CornerDragKey(
-        centerAction = KeyAction.Redo(label = KeyLabel.Icon(Icons.AutoMirrored.Default.Redo, "Redo")),
+    val keySpecRedo = KeySpec.CornerDragKeySpec(
+        centerAction = Action.Redo(label = ActionLabel.Icon(Icons.AutoMirrored.Default.Redo, "Redo")),
         role = KeyRole.SYSTEM
     )
 
@@ -240,73 +238,73 @@ object Keys {
 //        topRightAction = KeyAction.InsertText(label = KeyLabel.Text("sin⁻¹"), preCursorText = "arcsin(", postCursorText = ")"),
 //        role = KeyRole.OPERATOR
 //    )
-    val keySin = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.function(KeyLabel.Text("sin"), "sin"),
-        topRightAction = KeyAction.InsertText.function(label = KeyLabel.Text(superscriptSymbol("sin", "-1")), "asin"),
+    val keySpecSin = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText.function(ActionLabel.Text("sin"), "sin"),
+        topRightAction = Action.InsertText.function(label = ActionLabel.Text(superscriptSymbol("sin", "-1")), "asin"),
 //        bottomLeftAction = KeyAction.InsertText(label = KeyLabel.Text("sinh"), preCursorText = "sinh(", postCursorText = ")"),
 //        bottomRightAction = KeyAction.InsertText(label = KeyLabel.Text(superscriptSymbol("sinh", "-1")), preCursorText = "asinh(", postCursorText = ")"),
         role = KeyRole.OPERATOR
     )
-    val keyCos = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.function(label = KeyLabel.Text("cos"), "cos"),
-        topRightAction = KeyAction.InsertText.function(label = KeyLabel.Text(superscriptSymbol("cos", "-1")), "acos"),
+    val keySpecCos = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText.function(label = ActionLabel.Text("cos"), "cos"),
+        topRightAction = Action.InsertText.function(label = ActionLabel.Text(superscriptSymbol("cos", "-1")), "acos"),
 //        bottomLeftAction = KeyAction.InsertText(label = KeyLabel.Text("cosh"), preCursorText = "cosh(", postCursorText = ")"),
 //        bottomRightAction = KeyAction.InsertText(label = KeyLabel.Text(superscriptSymbol("cosh", "-1")), preCursorText = "acosh(", postCursorText = ")"),
         role = KeyRole.OPERATOR
     )
-    val keyTan = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText.function(label = KeyLabel.Text("tan"), "tan"),
-        topRightAction = KeyAction.InsertText.function(label = KeyLabel.Text(superscriptSymbol("tan", "-1")), "atan"),
+    val keySpecTan = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText.function(label = ActionLabel.Text("tan"), "tan"),
+        topRightAction = Action.InsertText.function(label = ActionLabel.Text(superscriptSymbol("tan", "-1")), "atan"),
 //        bottomLeftAction = KeyAction.InsertText(label = KeyLabel.Text("tanh"), preCursorText = "tanh(", postCursorText = ")"),
 //        bottomRightAction = KeyAction.InsertText(label = KeyLabel.Text(superscriptSymbol("tanh", "-1")), preCursorText = "atanh(", postCursorText = ")"),
         role = KeyRole.OPERATOR
     )
 
-    val keySiLength = Key.SelectorKey(
-        arrayOf(
-            KeyAction.InsertText.operator(KeyLabel.Text("nm"), "nm "),
-            KeyAction.InsertText.operator(KeyLabel.Text("um"), "um "),
-            KeyAction.InsertText.operator(KeyLabel.Text("mm"), "mm "),
-            KeyAction.InsertText.operator(KeyLabel.Text("cm"), "cm "),
-            KeyAction.InsertText.operator(KeyLabel.Text("m"), "m "),
-            KeyAction.InsertText.operator(KeyLabel.Text("km"), "km "),
+    val keySpecSiLength = KeySpec.SelectorKeySpec(
+        listOf(
+            Action.InsertText.operator(ActionLabel.Text("nm"), "nm "),
+            Action.InsertText.operator(ActionLabel.Text("um"), "um "),
+            Action.InsertText.operator(ActionLabel.Text("mm"), "mm "),
+            Action.InsertText.operator(ActionLabel.Text("cm"), "cm "),
+            Action.InsertText.operator(ActionLabel.Text("m"), "m "),
+            Action.InsertText.operator(ActionLabel.Text("km"), "km "),
         ),
         4,
         role= KeyRole.OPERATOR
     )
 
-    val keyImperialLength = Key.SelectorKey(
-        arrayOf(
-            KeyAction.InsertText.operator(KeyLabel.Text("thou"), "thou "),
-            KeyAction.InsertText.operator(KeyLabel.Text("inch"), "in "),
-            KeyAction.InsertText.operator(KeyLabel.Text("foot"), "ft "),
-            KeyAction.InsertText.operator(KeyLabel.Text("yard"), "yd "),
-            KeyAction.InsertText.operator(KeyLabel.Text("mile"), "mile "),
+    val keySpecImperialLength = KeySpec.SelectorKeySpec(
+        listOf(
+            Action.InsertText.operator(ActionLabel.Text("thou"), "thou "),
+            Action.InsertText.operator(ActionLabel.Text("inch"), "in "),
+            Action.InsertText.operator(ActionLabel.Text("foot"), "ft "),
+            Action.InsertText.operator(ActionLabel.Text("yard"), "yd "),
+            Action.InsertText.operator(ActionLabel.Text("mile"), "mile "),
         ),
         1,
         role= KeyRole.OPERATOR
     )
 
-    val keyImperialWeight = Key.SelectorKey(
-        arrayOf(
-            KeyAction.InsertText.operator(KeyLabel.Text("grain"), "gr "),
-            KeyAction.InsertText.operator(KeyLabel.Text("ounce"), "oz "),
-            KeyAction.InsertText.operator(KeyLabel.Text("pound"), "lb "),
-            KeyAction.InsertText.operator(KeyLabel.Text("stone"), "stone "),
+    val keySpecImperialWeight = KeySpec.SelectorKeySpec(
+        listOf(
+            Action.InsertText.operator(ActionLabel.Text("grain"), "gr "),
+            Action.InsertText.operator(ActionLabel.Text("ounce"), "oz "),
+            Action.InsertText.operator(ActionLabel.Text("pound"), "lb "),
+            Action.InsertText.operator(ActionLabel.Text("stone"), "stone "),
         ),
         2,
         role= KeyRole.OPERATOR
     )
 
-    val keySiWeight = Key.SelectorKey(
-        arrayOf(
-            KeyAction.InsertText.operator(KeyLabel.Text("pg"), "pg "),
-            KeyAction.InsertText.operator(KeyLabel.Text("ng"), "ng "),
-            KeyAction.InsertText.operator(KeyLabel.Text("µg"), "µg "),
-            KeyAction.InsertText.operator(KeyLabel.Text("mg"), "mg "),
-            KeyAction.InsertText.operator(KeyLabel.Text("g"), "g "),
-            KeyAction.InsertText.operator(KeyLabel.Text("kg"), "kg "),
-            KeyAction.InsertText.operator(KeyLabel.Text("t"), "t "),
+    val keySpecSiWeight = KeySpec.SelectorKeySpec(
+        listOf(
+            Action.InsertText.operator(ActionLabel.Text("pg"), "pg "),
+            Action.InsertText.operator(ActionLabel.Text("ng"), "ng "),
+            Action.InsertText.operator(ActionLabel.Text("µg"), "µg "),
+            Action.InsertText.operator(ActionLabel.Text("mg"), "mg "),
+            Action.InsertText.operator(ActionLabel.Text("g"), "g "),
+            Action.InsertText.operator(ActionLabel.Text("kg"), "kg "),
+            Action.InsertText.operator(ActionLabel.Text("t"), "t "),
         ),
         5,
         role= KeyRole.OPERATOR
