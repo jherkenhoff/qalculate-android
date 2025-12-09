@@ -57,9 +57,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.jherkenhoff.qalculate.model.Key
-import com.jherkenhoff.qalculate.model.KeyAction
-import com.jherkenhoff.qalculate.model.KeyLabel
+import com.jherkenhoff.qalculate.model.KeySpec
+import com.jherkenhoff.qalculate.model.Action
+import com.jherkenhoff.qalculate.model.ActionLabel
 import com.jherkenhoff.qalculate.model.KeyRole
 import com.jherkenhoff.qalculate.model.Keys
 import kotlinx.coroutines.delay
@@ -75,35 +75,35 @@ object KeyDefaults {
 
 @Composable
 fun Key(
-    key: Key,
+    keySpec: KeySpec,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (KeyAction) -> Unit = {}
+    onKeyAction: (Action) -> Unit = {}
 ) {
 
-    val containerColor = when (key.role) {
+    val containerColor = when (keySpec.role) {
         KeyRole.NUMBER -> MaterialTheme.colorScheme.surfaceBright
         KeyRole.OPERATOR -> MaterialTheme.colorScheme.surfaceContainerHigh
         KeyRole.SYSTEM -> MaterialTheme.colorScheme.secondaryContainer
     }
 
-    val labelColor = when (key.role) {
+    val labelColor = when (keySpec.role) {
         KeyRole.NUMBER -> MaterialTheme.colorScheme.onSurface
         KeyRole.OPERATOR -> MaterialTheme.colorScheme.onSurface
         KeyRole.SYSTEM -> MaterialTheme.colorScheme.onSecondaryContainer
     }
 
-    when (key) {
-        is Key.DefaultKey -> DefaultKey(
-            key,
+    when (keySpec) {
+        is KeySpec.DefaultKeySpec -> DefaultKey(
+            keySpec,
             onKeyAction = onKeyAction,
             labelColor = labelColor,
             containerColor = containerColor,
             shape = shape,
             modifier = modifier
         )
-        is Key.SelectorKey -> SelectorKey(
-            key,
+        is KeySpec.SelectorKeySpec -> SelectorKey(
+            keySpec,
             onKeyAction = onKeyAction,
             labelColor = labelColor,
             containerColor = containerColor,
@@ -111,8 +111,8 @@ fun Key(
             modifier = modifier
         )
 
-        is Key.CornerDragKey -> CornerDragKey(
-            key,
+        is KeySpec.CornerDragKeySpec -> CornerDragKey(
+            keySpec,
             onKeyAction = onKeyAction,
             labelColor = labelColor,
             containerColor = containerColor,
@@ -124,10 +124,10 @@ fun Key(
 
 @Composable
 fun DefaultKey(
-    key: Key.DefaultKey,
+    keySpec: KeySpec.DefaultKeySpec,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (KeyAction) -> Unit = {},
+    onKeyAction: (Action) -> Unit = {},
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
@@ -150,7 +150,7 @@ fun DefaultKey(
                         var isLongPress = false
 
                         val longPressDetectionJob = coroutineScope.launch {
-                            if (key.longClickAction != null) {
+                            if (keySpec.longClickAction != null) {
                                 delay(longPressTimeout)
                                 popupSecondary = true
                                 isLongPress = true
@@ -165,13 +165,13 @@ fun DefaultKey(
 
                         if ( up?.changedToUp() == true) {
                             if (isLongPress) {
-                                key.longClickAction?.let {
+                                keySpec.longClickAction?.let {
                                     //haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     onKeyAction(it)
                                 }
                             } else {
                                 haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                                onKeyAction(key.clickAction)
+                                onKeyAction(keySpec.clickAction)
                             }
                         }
 
@@ -194,7 +194,7 @@ fun DefaultKey(
                             contentAlignment = Alignment.Center
                         ) {
                             AnimatedContent(popupSecondary) {
-                                val label = if (it && key.longClickAction != null) key.longClickAction.popupLabel else key.clickAction.popupLabel
+                                val label = if (it && keySpec.longClickAction != null) keySpec.longClickAction.popupLabel else keySpec.clickAction.popupLabel
                                 label?.let {
                                     KeyLabel(
                                         label = label,
@@ -221,11 +221,11 @@ fun DefaultKey(
         ) {
             Box {
                 KeyLabel(
-                    label = key.clickAction.label,
+                    label = keySpec.clickAction.label,
                     color = labelColor,
                     modifier = Modifier.align(Alignment.Center)
                 )
-                key.longClickAction?.let {
+                keySpec.longClickAction?.let {
                     KeyLabel(
                         label = it.label,
                         color = labelColor.copy(alpha = 0.6f),
@@ -242,10 +242,10 @@ fun DefaultKey(
 
 @Composable
 fun CornerDragKey(
-    key: Key.CornerDragKey,
+    keySpec: KeySpec.CornerDragKeySpec,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (KeyAction) -> Unit = {},
+    onKeyAction: (Action) -> Unit = {},
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
@@ -256,30 +256,30 @@ fun CornerDragKey(
 
     var dragOffset by remember { mutableStateOf(Offset(0f, 0f)) }
 
-    var selectedAction by remember { mutableStateOf<KeyAction?>(null) }
+    var selectedAction by remember { mutableStateOf<Action?>(null) }
 
     Box(
         modifier = modifier.pointerInput(Unit) {
             awaitPointerEventScope {
                 while (true) {
                     val down = awaitFirstDown()
-                    selectedAction = key.centerAction
+                    selectedAction = keySpec.centerAction
                     dragOffset = Offset(0f, 0f)
 
                     drag(down.id) { change ->
                         dragOffset += change.positionChange()
 
-                        var newSelectedAction : KeyAction = key.centerAction
+                        var newSelectedAction : Action = keySpec.centerAction
 
                         if (dragOffset.getDistance() >= dragThreshold) {
-                            if (dragOffset.x > 0 && dragOffset.y < 0 && key.topRightAction != null) {
-                                newSelectedAction = key.topRightAction
-                            } else if (dragOffset.x < 0 && dragOffset.y < 0 && key.topLeftAction != null) {
-                                newSelectedAction = key.topLeftAction
-                            } else if (dragOffset.x > 0 && dragOffset.y > 0 && key.bottomRightAction != null) {
-                                newSelectedAction = key.bottomRightAction
-                            } else if (dragOffset.x < 0 && dragOffset.y > 0 && key.bottomLeftAction != null) {
-                                newSelectedAction = key.bottomLeftAction
+                            if (dragOffset.x > 0 && dragOffset.y < 0 && keySpec.topRightAction != null) {
+                                newSelectedAction = keySpec.topRightAction
+                            } else if (dragOffset.x < 0 && dragOffset.y < 0 && keySpec.topLeftAction != null) {
+                                newSelectedAction = keySpec.topLeftAction
+                            } else if (dragOffset.x > 0 && dragOffset.y > 0 && keySpec.bottomRightAction != null) {
+                                newSelectedAction = keySpec.bottomRightAction
+                            } else if (dragOffset.x < 0 && dragOffset.y > 0 && keySpec.bottomLeftAction != null) {
+                                newSelectedAction = keySpec.bottomLeftAction
                             }
                         }
 
@@ -337,11 +337,11 @@ fun CornerDragKey(
         ) {
             Box {
                 KeyLabel(
-                    label = key.centerAction.label,
+                    label = keySpec.centerAction.label,
                     color = labelColor,
                     modifier = Modifier.align(Alignment.Center)
                 )
-                key.topLeftAction?.let {
+                keySpec.topLeftAction?.let {
                     KeyLabel(
                         label = it.label,
                         color = labelColor.copy(alpha = 0.6f),
@@ -349,7 +349,7 @@ fun CornerDragKey(
                         modifier = Modifier.align(Alignment.TopStart)
                     )
                 }
-                key.topRightAction?.let {
+                keySpec.topRightAction?.let {
                     KeyLabel(
                         label = it.label,
                         color = labelColor.copy(alpha = 0.6f),
@@ -357,7 +357,7 @@ fun CornerDragKey(
                         modifier = Modifier.align(Alignment.TopEnd)
                     )
                 }
-                key.bottomLeftAction?.let {
+                keySpec.bottomLeftAction?.let {
                     KeyLabel(
                         label = it.label,
                         color = labelColor.copy(alpha = 0.6f),
@@ -365,7 +365,7 @@ fun CornerDragKey(
                         modifier = Modifier.align(Alignment.BottomStart)
                     )
                 }
-                key.bottomRightAction?.let {
+                keySpec.bottomRightAction?.let {
                     KeyLabel(
                         label = it.label,
                         color = labelColor.copy(alpha = 0.6f),
@@ -380,10 +380,10 @@ fun CornerDragKey(
 
 @Composable
 fun SelectorKey(
-    key: Key.SelectorKey,
+    keySpec: KeySpec.SelectorKeySpec,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (KeyAction) -> Unit = {},
+    onKeyAction: (Action) -> Unit = {},
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
@@ -391,7 +391,7 @@ fun SelectorKey(
 
     val itemHeight = 40.dp
     val itemHeightPx = with(LocalDensity.current) { itemHeight.toPx() }
-    val minOffset = -(key.actions.size - nItems/2 - 1) * itemHeightPx
+    val minOffset = -(keySpec.actions.size - nItems/2 - 1) * itemHeightPx
     val maxOffset = (nItems/2) * itemHeightPx
 
     var isSelecting by remember { mutableStateOf(false) }
@@ -399,7 +399,7 @@ fun SelectorKey(
     var dragOffset by remember { mutableFloatStateOf(0f) }
     var scrollOffset by remember { mutableFloatStateOf(0f) }
 
-    var selectedAction by remember { mutableStateOf(key.actions[key.initialSelectedIndex]) }
+    var selectedAction by remember { mutableStateOf(keySpec.actions[keySpec.initialSelectedIndex]) }
 
     val coroutineScope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
@@ -410,7 +410,7 @@ fun SelectorKey(
                 awaitPointerEventScope {
                     while (true) {
                         val down = awaitFirstDown()
-                        dragOffset = (key.actions.size/2 - key.initialSelectedIndex - 1) * itemHeightPx
+                        dragOffset = (keySpec.actions.size/2 - keySpec.initialSelectedIndex - 1) * itemHeightPx
                         scrollOffset = dragOffset
 
                         val touchSlop = viewConfiguration.touchSlop
@@ -439,8 +439,8 @@ fun SelectorKey(
                                 val dragOffsetFractionalIndex = (dragOffset/itemHeightPx - floor(dragOffset/itemHeightPx))
                                 scrollOffset = dragOffsetItemIndex*itemHeightPx + EaseInOutQuart.transform(dragOffsetFractionalIndex)*itemHeightPx
 
-                                val selectedIndex = (nItems/2 - scrollOffset / itemHeightPx).roundToInt().coerceIn(0, key.actions.lastIndex)
-                                val newSelectedAction = key.actions[selectedIndex]
+                                val selectedIndex = (nItems/2 - scrollOffset / itemHeightPx).roundToInt().coerceIn(0, keySpec.actions.lastIndex)
+                                val newSelectedAction = keySpec.actions[selectedIndex]
                                 if (newSelectedAction != selectedAction) {
                                     haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
                                 }
@@ -509,7 +509,7 @@ fun SelectorKey(
                             .offset(y = scrollOffset.toDp()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        for ((index, action) in key.actions.withIndex()) {
+                        for ((index, action) in keySpec.actions.withIndex()) {
                             val distanceFromCenter = abs(index*itemHeightPx + scrollOffset - centerOffsetPx + itemHeightPx/2)/itemHeightPx
                             val alpha = 1f - (distanceFromCenter * 0.3f)
                             val scale = 1f - (distanceFromCenter * 0.1f)
@@ -540,7 +540,7 @@ fun SelectorKey(
 
 @Composable
 fun KeyLabel(
-    label: KeyLabel?,
+    label: ActionLabel?,
     color: Color = MaterialTheme.colorScheme.onSurface,
     style: TextStyle = MaterialTheme.typography.labelLarge,
     modifier: Modifier = Modifier
@@ -554,7 +554,7 @@ fun KeyLabel(
                     .background(MaterialTheme.colorScheme.secondary, CircleShape)
             )
 
-        is KeyLabel.Text ->
+        is ActionLabel.Text ->
             Text(
                 text = label.text,
                 color = color,
@@ -562,7 +562,7 @@ fun KeyLabel(
                 modifier = modifier.padding(4.dp, 0.dp)
             )
 
-        is KeyLabel.Icon ->
+        is ActionLabel.Icon ->
             Icon(
                 label.icon,
                 label.description,
@@ -577,9 +577,9 @@ fun KeyLabel(
 @Composable
 private fun SingleActionDefaultKeyPreview() {
     Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Key(Keys.key0, Modifier.weight(1f))
-        Key(Keys.keyBackspace, Modifier.weight(1f))
-        Key(Keys.keyPi, Modifier.weight(1f))
+        Key(Keys.keySpec0, Modifier.weight(1f))
+        Key(Keys.keySpecBackspace, Modifier.weight(1f))
+        Key(Keys.keySpecPi, Modifier.weight(1f))
     }
 }
 
@@ -587,9 +587,9 @@ private fun SingleActionDefaultKeyPreview() {
 @Composable
 private fun DualActionDefaultKeyPreview() {
     Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Key(Keys.keySin, Modifier.weight(1f))
-        Key(Keys.keyCos, Modifier.weight(1f))
-        Key(Keys.keyTan, Modifier.weight(1f))
+        Key(Keys.keySpecSin, Modifier.weight(1f))
+        Key(Keys.keySpecCos, Modifier.weight(1f))
+        Key(Keys.keySpecTan, Modifier.weight(1f))
     }
 }
 
@@ -599,8 +599,8 @@ private fun DualActionDefaultKeyPreview() {
 @Composable
 private fun SelectionKeyPreview() {
     Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Key(Keys.keySiLength, Modifier.weight(1f))
-        Key(Keys.keyImperialLength, Modifier.weight(1f))
-        Key(Keys.keySiLength, Modifier.weight(1f))
+        Key(Keys.keySpecSiLength, Modifier.weight(1f))
+        Key(Keys.keySpecImperialLength, Modifier.weight(1f))
+        Key(Keys.keySpecSiLength, Modifier.weight(1f))
     }
 }

@@ -1,48 +1,31 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.util.Log
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -56,7 +39,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -74,20 +56,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.Key
-import com.jherkenhoff.qalculate.model.KeyAction
-import com.jherkenhoff.qalculate.model.KeyLabel
+import com.jherkenhoff.qalculate.model.KeySpec
+import com.jherkenhoff.qalculate.model.Action
+import com.jherkenhoff.qalculate.model.ActionLabel
 import com.jherkenhoff.qalculate.model.KeyRole
 import com.jherkenhoff.qalculate.model.Keys
 import com.jherkenhoff.qalculate.model.UserPreferences
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import kotlin.math.max
 
-private val secondaryKeypadKeys: Array<Array<Key>> = arrayOf(
-    arrayOf(Keys.keyX, Keys.keyY, Keys.keyZ, Keys.keySiWeight, Keys.keyFactorial),
-    arrayOf(Keys.keyIntegral, Keys.keyDifferential, Keys.keySum, Keys.keyImaginary, Keys.keyComplexOperators),
-    arrayOf(Keys.keySin, Keys.keyCos, Keys.keyTan, Keys.keyLn, Keys.keyInfinity)
+private val secondaryKeypadKeySpecs: Array<Array<KeySpec>> = arrayOf(
+    arrayOf(Keys.keySpecX, Keys.keySpecY, Keys.keySpecZ, Keys.keySpecSiWeight, Keys.keySpecFactorial),
+    arrayOf(Keys.keySpecIntegral, Keys.keySpecDifferential, Keys.keySpecSum, Keys.keySpecImaginary, Keys.keySpecComplexOperators),
+    arrayOf(Keys.keySpecSin, Keys.keySpecCos, Keys.keySpecTan, Keys.keySpecLn, Keys.keySpecInfinity)
 )
 
 @Composable
@@ -137,7 +118,7 @@ fun CalculatorScreenContent(
     onUserPreferencesChanged : (UserPreferences) -> Unit,
     calculationHistory: List<CalculationHistoryItemData> = emptyList(),
     autocompleteResult: AutocompleteResult,
-    onKeyAction: (KeyAction) -> Unit = { },
+    onKeyAction: (Action) -> Unit = { },
     onInputFieldValueChange: (TextFieldValue) -> Unit = { },
     onDeleteCalculation: (CalculationHistoryItemData) -> Unit = { },
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
@@ -171,24 +152,24 @@ fun CalculatorScreenContent(
         UserPreferences.DecimalSeparator.COMMA -> "."
     }
 
-    val keyDecimal = Key.CornerDragKey(
-        centerAction = KeyAction.InsertText(KeyLabel.Text(decimalChar), decimalChar),
-        topRightAction = KeyAction.InsertText(KeyLabel.Text("␣"), " "),
+    val keySpecDecimal = KeySpec.CornerDragKeySpec(
+        centerAction = Action.InsertText(ActionLabel.Text(decimalChar), decimalChar),
+        topRightAction = Action.InsertText(ActionLabel.Text("␣"), " "),
         role = KeyRole.NUMBER
     )
 
     // TODO: Move dynamic multiplication and division selection to some sort of key-factory
     val multiplicationChar = userPreferences.getMultiplicationSignString()
-    val keyMultiply = Key.DefaultKey(clickAction = KeyAction.InsertText.operator(KeyLabel.Text(multiplicationChar), multiplicationChar), role = KeyRole.OPERATOR)
+    val keySpecMultiply = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.operator(ActionLabel.Text(multiplicationChar), multiplicationChar), role = KeyRole.OPERATOR)
 
     val divisionChar = userPreferences.getDivisionSignString()
-    val keyDivision = Key.DefaultKey(clickAction = KeyAction.InsertText.operator(KeyLabel.Text(divisionChar), divisionChar), role = KeyRole.OPERATOR)
+    val keySpecDivision = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.operator(ActionLabel.Text(divisionChar), divisionChar), role = KeyRole.OPERATOR)
 
-    val primaryKeypadKeys : Array<Array<Key>> = arrayOf(
-        arrayOf(Keys.keyPercent, Keys.keyPi, Keys.key7, Keys.key8, Keys.key9, Keys.keyBackspace, Keys.keyClearAll),
-        arrayOf(Keys.keySqrt, Keys.keyPower, Keys.key4, Keys.key5, Keys.key6, keyMultiply, keyDivision),
-        arrayOf(Keys.keyBracketOpen, Keys.keyBracketClose, Keys.key1, Keys.key2, Keys.key3, Keys.keyPlus, Keys.keyMinus),
-        arrayOf(Keys.keyUnderscore, Keys.keyEqual, Keys.key0, keyDecimal, Keys.keyExp, Keys.keyReturn),
+    val primaryKeypadKeySpecs : Array<Array<KeySpec>> = arrayOf(
+        arrayOf(Keys.keySpecPercent, Keys.keySpecPi, Keys.keySpec7, Keys.keySpec8, Keys.keySpec9, Keys.keySpecBackspace, Keys.keySpecClearAll),
+        arrayOf(Keys.keySpecSqrt, Keys.keySpecPower, Keys.keySpec4, Keys.keySpec5, Keys.keySpec6, keySpecMultiply, keySpecDivision),
+        arrayOf(Keys.keySpecBracketOpen, Keys.keySpecBracketClose, Keys.keySpec1, Keys.keySpec2, Keys.keySpec3, Keys.keySpecPlus, Keys.keySpecMinus),
+        arrayOf(Keys.keySpecUnderscore, Keys.keySpecEqual, Keys.keySpec0, keySpecDecimal, Keys.keySpecExp, Keys.keySpecReturn),
     )
 
     var calculationHistorySize by remember{ mutableIntStateOf(calculationHistory.size)}
@@ -284,20 +265,20 @@ fun CalculatorScreenContent(
                         }
                     ) {
                         AnimatedVisibility(!keyboardEnabled) {
-                            Keypad(
-                                secondaryKeypadKeys,
-                                onKeyAction = onKeyAction,
-                                compact = keyboardEnabled,
-                                topKeyCornerSize = CornerSize(21.dp),
-                            )
+//                            GridLayout(
+//                                secondaryKeypadKeySpecs,
+//                                onKeyAction = onKeyAction,
+//                                compact = keyboardEnabled,
+//                                topKeyCornerSize = CornerSize(21.dp),
+//                            )
                         }
-                        Keypad(
-                            primaryKeypadKeys,
-                            onKeyAction = onKeyAction,
-                            compact = keyboardEnabled,
-                            topKeyCornerSize = if (!imeFullyHidden) CornerSize(21.dp) else KeyDefaults.Shape.topStart,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+//                        GridLayout(
+//                            primaryKeypadKeySpecs,
+//                            onKeyAction = onKeyAction,
+//                            compact = keyboardEnabled,
+//                            topKeyCornerSize = if (!imeFullyHidden) CornerSize(21.dp) else KeyDefaults.Shape.topStart,
+//                            modifier = Modifier.fillMaxWidth()
+//                        )
                     }
 
                     AuxiliaryBar(
