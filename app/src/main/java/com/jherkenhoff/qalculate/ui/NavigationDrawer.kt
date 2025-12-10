@@ -11,10 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Dataset
-import androidx.compose.material.icons.outlined.Functions
-import androidx.compose.material.icons.outlined.Pin
-import androidx.compose.material.icons.outlined.Straighten
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
@@ -27,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.R
@@ -72,36 +67,36 @@ fun NavigationDrawer(
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         HorizontalDivider(
-            Modifier
-                .padding(horizontal = 25.dp, vertical = 15.dp))
-        NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_functions), textDecoration = TextDecoration.LineThrough) },
-            selected = functionsActive,
-            onClick = onFunctionsClick,
-            icon = { Icon(Icons.Outlined.Functions, contentDescription = null) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+            Modifier.padding(horizontal = 25.dp, vertical = 15.dp)
         )
-        NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_variables), textDecoration = TextDecoration.LineThrough) },
-            selected = variablesActive,
-            onClick = onVariablesClick,
-            icon = { Icon(Icons.Outlined.Pin, contentDescription = null) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
-        NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_units)) },
-            selected = unitsActive,
-            onClick = onUnitsClick,
-            icon = { Icon(Icons.Outlined.Straighten, contentDescription = null) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
-        NavigationDrawerItem(
-            label = { Text(text = stringResource(R.string.navigation_datasets), textDecoration = TextDecoration.LineThrough) },
-            selected = datasetsActive,
-            onClick = onDatasetsClick,
-            icon = { Icon(Icons.Outlined.Dataset, contentDescription = null) },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
+//        NavigationDrawerItem(
+//            label = { Text(text = stringResource(R.string.navigation_functions), textDecoration = TextDecoration.LineThrough) },
+//            selected = functionsActive,
+//            onClick = onFunctionsClick,
+//            icon = { Icon(Icons.Outlined.Functions, contentDescription = null) },
+//            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+//        )
+//        NavigationDrawerItem(
+//            label = { Text(text = stringResource(R.string.navigation_variables), textDecoration = TextDecoration.LineThrough) },
+//            selected = variablesActive,
+//            onClick = onVariablesClick,
+//            icon = { Icon(Icons.Outlined.Pin, contentDescription = null) },
+//            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+//        )
+//        NavigationDrawerItem(
+//            label = { Text(text = stringResource(R.string.navigation_units)) },
+//            selected = unitsActive,
+//            onClick = onUnitsClick,
+//            icon = { Icon(Icons.Outlined.Straighten, contentDescription = null) },
+//            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+//        )
+//        NavigationDrawerItem(
+//            label = { Text(text = stringResource(R.string.navigation_datasets), textDecoration = TextDecoration.LineThrough) },
+//            selected = datasetsActive,
+//            onClick = onDatasetsClick,
+//            icon = { Icon(Icons.Outlined.Dataset, contentDescription = null) },
+//            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+//        )
 
         Spacer(modifier = Modifier.weight(1f))
         HorizontalDivider(
