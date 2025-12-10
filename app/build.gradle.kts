@@ -1,4 +1,4 @@
-
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import com.android.build.api.variant.FilterConfiguration.FilterType.ABI
 
 plugins {
@@ -87,11 +87,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
     }
     buildFeatures {
         compose = true
@@ -99,6 +101,7 @@ android {
         aidl = false
         renderScript = false
         shaders = false
+        buildConfig = true
     }
     packaging {
         resources {
