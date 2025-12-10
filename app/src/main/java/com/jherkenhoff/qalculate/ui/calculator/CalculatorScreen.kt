@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -55,11 +56,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
-import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.KeySpec
 import com.jherkenhoff.qalculate.model.Action
 import com.jherkenhoff.qalculate.model.ActionLabel
+import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.KeyRole
+import com.jherkenhoff.qalculate.model.KeySpec
 import com.jherkenhoff.qalculate.model.Keys
 import com.jherkenhoff.qalculate.model.PositionedKeySpec
 import com.jherkenhoff.qalculate.model.UserPreferences
@@ -262,81 +263,63 @@ fun CalculatorScreenContent(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+        modifier = Modifier.background(MaterialTheme.colorScheme.background)
     ) {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeContent))
         CalculationHistoryList(
             calculationHistory,
             onDeleteClick = onDeleteCalculation,
             scrollState = historyListState,
-            modifier = Modifier.weight(1f).zIndex(1f)
+            modifier = Modifier.weight(1f)
         )
 
-        InputSheet(
-            inputTextFieldValue,
-            parsedString,
-            resultString,
-            internalAutocompleteResult,
-            userPreferences,
-            onValueChange = onInputFieldValueChange,
-            onUserPreferencesChanged = onUserPreferencesChanged,
-            onMenuClick = onMenuClick,
-            interceptKeyboard = !keyboardEnabled,
-            modifier = Modifier
-                .imeNestedScroll()
-                .nestedScroll(nestedScrollConnectionInputSheet)
-                .scrollable(
-                    rememberScrollState(),
-                    orientation = Orientation.Vertical
-                )
-                .zIndex(2f)
-        )
-
-        Box(
-            modifier = Modifier.background(MaterialTheme.colorScheme.background).zIndex(3f),
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp),
+            shadowElevation = 10.dp,
+            modifier = Modifier.zIndex(2f)
         ) {
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp),
-                shadowElevation = 6.dp,
-                modifier = Modifier.zIndex(4f)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column {
-                    Column(
-                        Modifier.clipToBounds().shrinkHeightAbsolute(offsetY.value.toInt()).onGloballyPositioned{
+                InputSheet(
+                    inputTextFieldValue,
+                    parsedString,
+                    resultString,
+                    internalAutocompleteResult,
+                    userPreferences,
+                    onValueChange = onInputFieldValueChange,
+                    onUserPreferencesChanged = onUserPreferencesChanged,
+                    onMenuClick = onMenuClick,
+                    interceptKeyboard = !keyboardEnabled,
+                    modifier = Modifier
+                        .imeNestedScroll()
+                        .nestedScroll(nestedScrollConnectionInputSheet)
+                        .scrollable(
+                            rememberScrollState(),
+                            orientation = Orientation.Vertical
+                        )
+                )
+
+                Column(
+                    Modifier
+                        .clipToBounds()
+                        .shrinkHeightAbsolute(offsetY.value.toInt())
+                        .onGloballyPositioned {
                             maxOffset = it.size.height.toFloat()
                         }
-                    ) {
-                        AnimatedVisibility(!keyboardEnabled) {
-                            GridLayout(
-                                3,
-                                5,
-                                horizontalSpacing = 3.dp,
-                                verticalSpacing = 3.dp,
-                                aspectRatio = 0.5f,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                secondaryKeypad.forEach {
-                                    item(it.row, it.col, it.rowSpan, it.colSpan) {
-                                        Key(
-                                            it.keySpec,
-                                            onKeyAction = onKeyAction
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        Spacer(Modifier.height(3.dp))
+                        .padding(horizontal = 3.dp)
+                ) {
+                    AnimatedVisibility(!keyboardEnabled) {
                         GridLayout(
-                            4,
-                            7,
+                            3,
+                            5,
                             horizontalSpacing = 3.dp,
                             verticalSpacing = 3.dp,
-                            aspectRatio = 0.9f,
-                            //topKeyCornerSize = if (!imeFullyHidden) CornerSize(21.dp) else KeyDefaults.Shape.topStart,
+                            aspectRatio = 0.5f,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            primaryKeypad.forEach {
+                            secondaryKeypad.forEach {
                                 item(it.row, it.col, it.rowSpan, it.colSpan) {
                                     Key(
                                         it.keySpec,
@@ -346,17 +329,37 @@ fun CalculatorScreenContent(
                             }
                         }
                     }
-
-                    AuxiliaryBar(
-                        autocompleteResult = internalAutocompleteResult,
-                        keyboardEnable = keyboardEnabled,
-                        onAutocompleteClick = onAutocompleteClick,
-                        onKeyboardEnableChange = {keyboardEnabled = it},
-                        onKeyAction = onKeyAction,
-                        onAutocompleteDismiss = { autocompleteDismissed = true },
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).navigationBarsPadding().imePadding()
-                    )
+                    Spacer(Modifier.height(3.dp))
+                    GridLayout(
+                        4,
+                        7,
+                        horizontalSpacing = 3.dp,
+                        verticalSpacing = 3.dp,
+                        aspectRatio = 0.9f,
+                        //topKeyCornerSize = if (!imeFullyHidden) CornerSize(21.dp) else KeyDefaults.Shape.topStart,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        primaryKeypad.forEach {
+                            item(it.row, it.col, it.rowSpan, it.colSpan) {
+                                Key(
+                                    it.keySpec,
+                                    onKeyAction = onKeyAction
+                                )
+                            }
+                        }
+                    }
                 }
+
+                AuxiliaryBar(
+                    autocompleteResult = internalAutocompleteResult,
+                    keyboardEnable = keyboardEnabled,
+                    onAutocompleteClick = onAutocompleteClick,
+                    onKeyboardEnableChange = { keyboardEnabled = it },
+                    onKeyAction = onKeyAction,
+                    onAutocompleteDismiss = { autocompleteDismissed = true },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                        .navigationBarsPadding().imePadding()
+                )
             }
         }
     }

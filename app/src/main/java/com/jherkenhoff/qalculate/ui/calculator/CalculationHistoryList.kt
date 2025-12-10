@@ -1,7 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -10,23 +9,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
-import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
-import androidx.compose.material.icons.filled.Calculate
-import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.HistoryToggleOff
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -38,13 +29,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.room.util.TableInfo
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.ui.common.DelayedAnimatedVisibility
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -67,23 +55,25 @@ fun CalculationHistoryList(
 
     LaunchedEffect(calculations.size) {
         if (calculations.isNotEmpty()) {
-            scrollState.animateScrollToItem(calculations.size)
+            //scrollState.animateScrollToItem(calculations.size)
         }
     }
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer),
-    ) {
-        if (calculations.isEmpty()) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(Icons.Default.History, null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                Text("No calculations yet", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), style = MaterialTheme.typography.titleLarge)
-                Text("Your calculation history will appear here", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
-            }
-        } else {
+    if (calculations.isEmpty()) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(Icons.Default.History, null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+            Text("No calculations yet", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), style = MaterialTheme.typography.titleLarge)
+            Text("Your calculation history will appear here", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
+        }
+    } else {
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = modifier.fillMaxWidth(),
+        ) {
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 state = scrollState,
@@ -139,7 +129,7 @@ fun CalculationDivider(
 ) {
     Row(
         modifier = modifier
-            .background(color = MaterialTheme.colorScheme.surfaceContainer)
+            .background(color = MaterialTheme.colorScheme.background)
             .padding(vertical = 6.dp)
             .height(16.dp)
     ) {
