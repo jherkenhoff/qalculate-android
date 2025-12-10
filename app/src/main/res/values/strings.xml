@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Qalculate!</string>
-    <string name="top_sheet_arrow_down">Down arrow</string>
-    <string name="top_sheet_menu">Menu button</string>
     <string name="textfield_hint">Enter expression</string>
     <string name="about_qalculate_text">Powerful and versatile multi-purpose calculator based on the almighty Qalculate! desktop calculator.</string>
     <string name="navigation_calculator">Calculator</string>
@@ -11,6 +9,5 @@
     <string name="navigation_datasets">Datasets</string>
     <string name="navigation_about">About</string>
     <string name="navigation_settings">Settings</string>
-    <string name="clear_input">Clear input</string>
     <string name="open_menu_content_description">Open menu</string>
 </resources>
