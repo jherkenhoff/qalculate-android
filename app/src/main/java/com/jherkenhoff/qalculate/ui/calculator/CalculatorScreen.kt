@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.imeNestedScroll
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsTopHeight
@@ -225,6 +222,22 @@ fun CalculatorScreenContent(
     val nestedScrollConnectionInputSheet = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (available.y <= 0) {
+                    return Offset.Zero
+                }
+                val newOffset = (offsetY.value + available.y)
+                val clippedNewOffset = newOffset.coerceIn(0f, maxOffset)
+                scope.launch {
+                    offsetY.snapTo(clippedNewOffset)
+                }
+                return Offset(0f, available.y - (newOffset - clippedNewOffset))
+            }
+
+            override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                if (available.y >= 0) {
+                    return Offset.Zero
+                }
+
                 val newOffset = (offsetY.value + available.y)
                 val clippedNewOffset = newOffset.coerceIn(0f, maxOffset)
                 scope.launch {
@@ -246,13 +259,11 @@ fun CalculatorScreenContent(
                     }
                 }
 
-                offsetY.animateTo(targetOffset)
-
                 if (targetOffset == 0f) {
-                    if (calculationHistorySize != 0) {
-                        historyListState.animateScrollToItem(calculationHistorySize)
-                    }
+                    historyListState.animateScrollToItem(0)
                 }
+
+                offsetY.animateTo(targetOffset)
 
                 return available
             }
@@ -269,6 +280,7 @@ fun CalculatorScreenContent(
             onDeleteClick = onDeleteCalculation,
             scrollState = historyListState,
             modifier = Modifier.weight(1f)
+                .nestedScroll(nestedScrollConnectionInputSheet)
         )
 
         Surface(
@@ -291,7 +303,6 @@ fun CalculatorScreenContent(
                     onMenuClick = onMenuClick,
                     interceptKeyboard = !keyboardEnabled,
                     modifier = Modifier
-                        .imeNestedScroll()
                         .nestedScroll(nestedScrollConnectionInputSheet)
                         .scrollable(
                             rememberScrollState(),
@@ -299,65 +310,75 @@ fun CalculatorScreenContent(
                         )
                 )
 
-                Column(
-                    Modifier
-                        .clipToBounds()
-                        .shrinkHeightAbsolute(offsetY.value.toInt())
-                        .onGloballyPositioned {
-                            maxOffset = it.size.height.toFloat()
-                        }
-                        .padding(horizontal = 3.dp)
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    shadowElevation = 10.dp,
+                    modifier = Modifier.zIndex(3f)
                 ) {
-                    AnimatedVisibility(!keyboardEnabled) {
-                        GridLayout(
-                            3,
-                            5,
-                            horizontalSpacing = 3.dp,
-                            verticalSpacing = 3.dp,
-                            aspectRatio = 0.5f,
+                    Column() {
+                        AuxiliaryBar(
+                            autocompleteResult = internalAutocompleteResult,
+                            keyboardEnable = keyboardEnabled,
+                            onAutocompleteClick = onAutocompleteClick,
+                            onKeyboardEnableChange = { keyboardEnabled = it },
+                            onKeyAction = onKeyAction,
+                            onAutocompleteDismiss = { autocompleteDismissed = true },
                             modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Column(
+                            Modifier
+                                .clipToBounds()
+                                .shrinkHeightAbsolute(offsetY.value.toInt())
+                                .onGloballyPositioned {
+                                    maxOffset = it.size.height.toFloat()
+                                }
+                                .padding(horizontal = 3.dp)
                         ) {
-                            secondaryKeypad.forEach {
-                                item(it.row, it.col, it.rowSpan, it.colSpan) {
-                                    Key(
-                                        it.keySpec,
-                                        onKeyAction = onKeyAction
-                                    )
+                            AnimatedVisibility(!keyboardEnabled) {
+                                GridLayout(
+                                    3,
+                                    5,
+                                    horizontalSpacing = 3.dp,
+                                    verticalSpacing = 3.dp,
+                                    aspectRatio = 0.5f,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    secondaryKeypad.forEach {
+                                        item(it.row, it.col, it.rowSpan, it.colSpan) {
+                                            Key(
+                                                it.keySpec,
+                                                onKeyAction = onKeyAction
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            Spacer(Modifier.height(3.dp))
+                            GridLayout(
+                                4,
+                                7,
+                                horizontalSpacing = 3.dp,
+                                verticalSpacing = 3.dp,
+                                aspectRatio = if (imeFullyHidden) 0.9f else 0.6f,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                primaryKeypad.forEach {
+                                    item(it.row, it.col, it.rowSpan, it.colSpan) {
+                                        Key(
+                                            it.keySpec,
+                                            onKeyAction = onKeyAction
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
-                    Spacer(Modifier.height(3.dp))
-                    GridLayout(
-                        4,
-                        7,
-                        horizontalSpacing = 3.dp,
-                        verticalSpacing = 3.dp,
-                        aspectRatio = 0.9f,
-                        //topKeyCornerSize = if (!imeFullyHidden) CornerSize(21.dp) else KeyDefaults.Shape.topStart,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        primaryKeypad.forEach {
-                            item(it.row, it.col, it.rowSpan, it.colSpan) {
-                                Key(
-                                    it.keySpec,
-                                    onKeyAction = onKeyAction
-                                )
-                            }
-                        }
+
+                        Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
+
                     }
                 }
 
-                AuxiliaryBar(
-                    autocompleteResult = internalAutocompleteResult,
-                    keyboardEnable = keyboardEnabled,
-                    onAutocompleteClick = onAutocompleteClick,
-                    onKeyboardEnableChange = { keyboardEnabled = it },
-                    onKeyAction = onKeyAction,
-                    onAutocompleteDismiss = { autocompleteDismissed = true },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-                        .navigationBarsPadding().imePadding()
-                )
             }
         }
     }

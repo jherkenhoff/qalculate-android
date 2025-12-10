@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,6 +42,8 @@ import java.time.format.FormatStyle
 
 
 private fun LazyListState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+
+
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -78,19 +81,14 @@ fun CalculationHistoryList(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 state = scrollState,
                 verticalArrangement = Arrangement.Bottom,
-                reverseLayout = false,
+                reverseLayout = true,
                 modifier = Modifier.fillMaxSize()
             ) {
-                calculations.sortedBy { it.created }.groupBy { it.created.toLocalDate() }
+                item{
+                    Spacer(Modifier.height(8.dp))
+                }
+                calculations.sortedBy { it.created }.reversed().groupBy { it.created.toLocalDate() }
                     .map { (id, list) ->
-                        stickyHeader {
-                            val dayString = when (id) {
-                                LocalDate.now() -> "Today"
-                                LocalDate.now().minusDays(1) -> "Yesterday"
-                                else -> id.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
-                            }
-                            CalculationDivider(text = dayString)
-                        }
                         list.forEach { entry ->
                             item(key = entry.id) {
                                 CalculationHistoryItem(
@@ -101,10 +99,18 @@ fun CalculationHistoryList(
                                 )
                             }
                         }
+                        stickyHeader {
+                            val dayString = when (id) {
+                                LocalDate.now() -> "Today"
+                                LocalDate.now().minusDays(1) -> "Yesterday"
+                                else -> id.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+                            }
+                            CalculationDivider(text = dayString)
+                        }
                     }
             }
             DelayedAnimatedVisibility(
-                scrollState.canScrollForward,
+                scrollState.canScrollBackward,
                 500L,
                 enter = fadeIn(),
                 exit = fadeOut()
@@ -112,7 +118,7 @@ fun CalculationHistoryList(
                 JumpToBottomButton(
                     onClick = {
                         coroutineScope.launch {
-                            scrollState.animateScrollToItem(calculations.size - 1)
+                            scrollState.animateScrollToItem(0)
                         }
                     },
                     modifier = Modifier.padding(12.dp)
