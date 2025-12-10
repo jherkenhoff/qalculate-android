@@ -73,6 +73,16 @@ class CalculateUseCase @Inject constructor(
         printOptions.use_unicode_signs = 1
         printOptions.place_units_separately = true
 
+        printOptions.number_fraction_format = when (userPreferences.numberFractionFormat) {
+            UserPreferences.NumberFractionFormat.FRACTION_DECIMAL -> NumberFractionFormat.FRACTION_DECIMAL
+            UserPreferences.NumberFractionFormat.FRACTION_DECIMAL_EXACT -> NumberFractionFormat.FRACTION_DECIMAL_EXACT
+            UserPreferences.NumberFractionFormat.FRACTION_FRACTIONAL -> NumberFractionFormat.FRACTION_FRACTIONAL
+            UserPreferences.NumberFractionFormat.FRACTION_COMBINED -> NumberFractionFormat.FRACTION_COMBINED
+            UserPreferences.NumberFractionFormat.FRACTION_PERCENT -> NumberFractionFormat.FRACTION_PERCENT
+            UserPreferences.NumberFractionFormat.FRACTION_PERMILLE -> NumberFractionFormat.FRACTION_PERMILLE
+            UserPreferences.NumberFractionFormat.FRACTION_PERMYRIAD -> NumberFractionFormat.FRACTION_PERMYRIAD
+        }
+
         when (userPreferences.decimalSeparator) {
             UserPreferences.DecimalSeparator.DOT -> {
                 calc.useDecimalPoint()

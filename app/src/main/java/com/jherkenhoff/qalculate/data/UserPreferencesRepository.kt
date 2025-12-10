@@ -23,6 +23,7 @@ class UserPreferencesRepository @Inject constructor(
         val SPACIEOUS_OUTPUT_KEY = booleanPreferencesKey("spacious_output")
         val APPROXIMATION_MODE_KEY = stringPreferencesKey("approximation_mode")
         val NUMERICAL_DISPLAY_MODE_KEY = stringPreferencesKey("numerical_display_mode")
+        val NUMBER_FRACTION_FORMAT_KEY = stringPreferencesKey("number_fraction_format")
     }
 
     inline fun <reified T : Enum<T>> String?.toEnum() : T? {
@@ -41,6 +42,7 @@ class UserPreferencesRepository @Inject constructor(
             spaciousOutput = preferences[SPACIEOUS_OUTPUT_KEY] ?: UserPreferences.Default.spaciousOutput,
             approximationMode = preferences[APPROXIMATION_MODE_KEY].toEnum<UserPreferences.ApproximationMode>() ?: UserPreferences.Default.approximationMode,
             numericalDisplayMode = preferences[NUMERICAL_DISPLAY_MODE_KEY].toEnum<UserPreferences.NumericalDisplayMode>() ?: UserPreferences.Default.numericalDisplayMode,
+            numberFractionFormat = preferences[NUMBER_FRACTION_FORMAT_KEY].toEnum<UserPreferences.NumberFractionFormat>() ?: UserPreferences.Default.numberFractionFormat,
         )
     }
 
@@ -55,6 +57,7 @@ class UserPreferencesRepository @Inject constructor(
             it[SPACIEOUS_OUTPUT_KEY] = userPreferences.spaciousOutput
             it[APPROXIMATION_MODE_KEY] = userPreferences.approximationMode.name
             it[NUMERICAL_DISPLAY_MODE_KEY] = userPreferences.numericalDisplayMode.name
+            it[NUMBER_FRACTION_FORMAT_KEY] = userPreferences.numberFractionFormat.name
         }
     }
 }

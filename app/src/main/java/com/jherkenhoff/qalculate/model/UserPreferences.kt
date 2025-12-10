@@ -9,7 +9,8 @@ data class UserPreferences(
     val negativeExponents: Boolean = true,
     val spaciousOutput: Boolean = true,
     val approximationMode: ApproximationMode = ApproximationMode.TRY_EXACT,
-    val numericalDisplayMode: NumericalDisplayMode = NumericalDisplayMode.ENGINEERING
+    val numericalDisplayMode: NumericalDisplayMode = NumericalDisplayMode.ENGINEERING,
+    val numberFractionFormat: NumberFractionFormat = NumberFractionFormat.FRACTION_DECIMAL
 ) {
     companion object {
         val Default = UserPreferences()
@@ -21,6 +22,11 @@ data class UserPreferences(
     enum class DivisionSign {DIVISION, SLASH, DIVISION_SLASH}
     enum class ApproximationMode {EXACT, TRY_EXACT, APPROXIMATE}
     enum class NumericalDisplayMode {NORMAL, SCIENTIFIC, ENGINEERING}
+
+    enum class NumberFractionFormat {
+        FRACTION_DECIMAL, FRACTION_DECIMAL_EXACT, FRACTION_FRACTIONAL, FRACTION_COMBINED,
+        FRACTION_PERCENT, FRACTION_PERMILLE, FRACTION_PERMYRIAD
+    }
 
     fun getDivisionSignString(): String {
         return when (this.divisionSign) {
