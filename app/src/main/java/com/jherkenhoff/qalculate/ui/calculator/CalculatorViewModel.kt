@@ -142,7 +142,9 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun updateInput(input: TextFieldValue) {
-        undoManager.snapshot(_inputTextFieldValue.value)
+        if (input.text != _inputTextFieldValue.value.text)
+            undoManager.snapshot(_inputTextFieldValue.value)
+
         _inputTextFieldValue.update { input }
     }
 
