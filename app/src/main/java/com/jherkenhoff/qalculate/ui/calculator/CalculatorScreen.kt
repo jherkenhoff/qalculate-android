@@ -19,6 +19,12 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -316,12 +322,29 @@ fun CalculatorScreenContent(
                     modifier = Modifier.zIndex(3f)
                 ) {
                     Column() {
+
+                        val auxiliaryActions = listOf(
+                            Action.MoveCursor(
+                                ActionLabel.Icon(Icons.Default.ChevronLeft, "Move cursor to the left"),
+                                -1,
+                                enabled = (inputTextFieldValue.selection.end != 0)
+                            ),
+                            Action.MoveCursor(
+                                ActionLabel.Icon(Icons.Default.ChevronRight, "Move cursor to the right"),
+                                1,
+                                enabled = (inputTextFieldValue.selection.end != inputTextFieldValue.text.length)
+                            ),
+                            Action.Undo(ActionLabel.Icon(Icons.AutoMirrored.Filled.Undo, "Undo"), enabled = false),
+                            Action.Redo(ActionLabel.Icon(Icons.AutoMirrored.Filled.Redo, "Redo")),
+                        )
+
                         AuxiliaryBar(
                             autocompleteResult = internalAutocompleteResult,
                             keyboardEnable = keyboardEnabled,
+                            auxiliaryActions = auxiliaryActions,
                             onAutocompleteClick = onAutocompleteClick,
                             onKeyboardEnableChange = { keyboardEnabled = it },
-                            onKeyAction = onKeyAction,
+                            onAction = onKeyAction,
                             onAutocompleteDismiss = { autocompleteDismissed = true },
                             modifier = Modifier.fillMaxWidth()
                         )

@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,21 +31,20 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
-import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Action
+import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.ActionLabel
 import com.jherkenhoff.qalculate.model.Keys
-
-private val auxiliaryKeys = arrayOf(Keys.keySpecLeft, Keys.keySpecRight, Keys.keySpecUndo, Keys.keySpecRedo)
 
 @Composable
 fun AuxiliaryBar(
     autocompleteResult: AutocompleteResult,
     keyboardEnable: Boolean,
+    auxiliaryActions: List<Action>,
     modifier: Modifier = Modifier,
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     onKeyboardEnableChange: (Boolean) -> Unit = { },
-    onKeyAction: (Action) -> Unit = { },
+    onAction: (Action) -> Unit = { },
     onAutocompleteDismiss: () -> Unit = { },
 ) {
     val fadeWidth = 40f
@@ -94,9 +92,9 @@ fun AuxiliaryBar(
                     FilledIconToggleButton(keyboardEnable, onKeyboardEnableChange) {
                         Icon(Icons.Filled.Keyboard, null)
                     }
-                    for (key in auxiliaryKeys) {
-                        IconButton({ onKeyAction(key.centerAction) }) {
-                            when (val label = key.centerAction.label) {
+                    for (action in auxiliaryActions) {
+                        IconButton({ onAction(action) }, enabled = action.enabled) {
+                            when (val label = action.label) {
                                 is ActionLabel.Text -> Text(
                                     label.text,
                                     style = MaterialTheme.typography.labelLarge
@@ -111,9 +109,6 @@ fun AuxiliaryBar(
                                 null -> null
                             }
                         }
-                    }
-                    IconButton({}) {
-                        Icon(Icons.Default.MoreVert, null)
                     }
                 }
             }
