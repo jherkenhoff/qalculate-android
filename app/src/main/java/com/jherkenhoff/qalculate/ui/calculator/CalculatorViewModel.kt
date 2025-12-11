@@ -16,6 +16,7 @@ import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
 import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Action
+import com.jherkenhoff.qalculate.model.UndoManager
 import com.jherkenhoff.qalculate.model.UserPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,6 +76,9 @@ class CalculatorViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
+    private val undoManager = UndoManager<TextFieldValue>()
+    val undoState = undoManager.state
+
     private val _autocompleteDismissed = MutableStateFlow(false)
     val autocompleteDismissed = _autocompleteDismissed.asStateFlow()
 
@@ -98,6 +102,7 @@ class CalculatorViewModel @Inject constructor(
         updateInput(
             inputTextFieldValue.value.copy(selection = TextRange(0, inputTextFieldValue.value.text.length))
         )
+        undoManager.clear()
     }
 
     fun deleteCalculation(item: CalculationHistoryItemData) {
@@ -113,10 +118,22 @@ class CalculatorViewModel @Inject constructor(
             is Action.Return -> submitCalculation()
             is Action.ClearAll -> clearInput()
             is Action.MoveCursor -> moveCursor(action.chars)
-            is Action.Undo -> null
-            is Action.Redo -> null
+            is Action.Undo -> undo()
+            is Action.Redo -> redo()
             is Action.StoreAsVariable -> null
         }
+    }
+
+    fun undo() {
+        val undoState = undoManager.undo(_inputTextFieldValue.value)
+        if (undoState !== null)
+            _inputTextFieldValue.update { undoState }
+    }
+
+    fun redo() {
+        val redoState = undoManager.redo(_inputTextFieldValue.value)
+        if (redoState !== null)
+            _inputTextFieldValue.update { redoState }
     }
 
     fun moveCursor(chars: Int) {
@@ -124,9 +141,14 @@ class CalculatorViewModel @Inject constructor(
         updateInput(inputTextFieldValue.value.copy(selection = TextRange(newCursorPosition)))
     }
 
-    fun updateInput(input: TextFieldValue) = _inputTextFieldValue.update { input }
-    fun clearInput() = _inputTextFieldValue.update { TextFieldValue("") }
+    fun updateInput(input: TextFieldValue) {
+        undoManager.snapshot(_inputTextFieldValue.value)
+        _inputTextFieldValue.update { input }
+    }
 
+    fun clearInput() {
+        updateInput(TextFieldValue(""))
+    }
 
     fun insertText(action: Action.InsertText) {
         val maxChars = inputTextFieldValue.value.text.length

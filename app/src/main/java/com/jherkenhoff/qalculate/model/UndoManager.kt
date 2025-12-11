@@ -1,11 +1,22 @@
 package com.jherkenhoff.qalculate.model
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+data class UndoState<T> (
+    val undoStack: ArrayDeque<T> = ArrayDeque<T>(),
+    val redoStack: ArrayDeque<T> = ArrayDeque<T>(),
+) {
+    val canUndo get() = undoStack.isNotEmpty()
+    val canRedo get() = redoStack.isNotEmpty()
+}
+
 class UndoManager<T : Any>(
     private val groupingWindowMs: Long = 400L
 ) {
 
-    private val undoStack = ArrayDeque<T>()
-    private val redoStack = ArrayDeque<T>()
+    private val _state = MutableStateFlow(UndoState<T>())
+    val state: StateFlow<UndoState<T>> = _state
 
     private var pendingSnapshot: T? = null
     private var lastSnapshotTime = 0L
@@ -17,7 +28,7 @@ class UndoManager<T : Any>(
         // If this starts a new group
         if (now - lastSnapshotTime > groupingWindowMs) {
             // push previous pending snapshot
-            pendingSnapshot?.let { undoStack.addLast(it) }
+            pendingSnapshot?.let { _state.value.undoStack.addLast(it) }
             pendingSnapshot = beforeChange
         }
 
@@ -27,34 +38,34 @@ class UndoManager<T : Any>(
         }
 
         lastSnapshotTime = now
-        redoStack.clear() // new edits kill redo history
+        _state.value.redoStack.clear() // new edits kill redo history
     }
 
     fun undo(currentState: T): T? {
         // Finalize pending snapshot into undo history
         pendingSnapshot?.let {
-            undoStack.addLast(it)
+            _state.value.undoStack.addLast(it)
             pendingSnapshot = null
         }
 
-        if (undoStack.isEmpty()) return null
+        if (!_state.value.canUndo) return null
 
         // Push current to redo
-        redoStack.addLast(currentState)
-        return undoStack.removeLast()
+        _state.value.redoStack.addLast(currentState)
+        return _state.value.undoStack.removeLast()
     }
 
     fun redo(currentState: T): T? {
-        if (redoStack.isEmpty()) return null
+        if (!_state.value.canRedo) return null
 
         // Push current to undo
-        undoStack.addLast(currentState)
-        return redoStack.removeLast()
+        _state.value.undoStack.addLast(currentState)
+        return _state.value.redoStack.removeLast()
     }
 
     fun clear() {
-        undoStack.clear()
-        redoStack.clear()
+        _state.value.undoStack.clear()
+        _state.value.redoStack.clear()
         pendingSnapshot = null
         lastSnapshotTime = 0
     }
