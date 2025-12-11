@@ -58,6 +58,7 @@ fun CalculationHistoryItem(
             Text(
                 input,
                 style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                     .combinedClickable(
@@ -132,7 +133,8 @@ private fun ResultSection(
             Text(
                 "= ",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.alignByBaseline()
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.alignByBaseline(),
             )
             Text(
                 mathExpressionFormatter(resultText),
