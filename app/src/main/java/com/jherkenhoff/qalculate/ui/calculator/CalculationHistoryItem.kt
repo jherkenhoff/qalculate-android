@@ -138,6 +138,7 @@ private fun ResultSection(
             )
             Text(
                 mathExpressionFormatter(resultText),
+                color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.alignByBaseline()
             )

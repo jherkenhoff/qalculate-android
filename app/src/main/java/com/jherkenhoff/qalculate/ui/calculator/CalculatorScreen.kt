@@ -73,8 +73,8 @@ private val secondaryKeypad: List<PositionedKeySpec> = listOf(
     PositionedKeySpec(0, 0, Keys.keySpecX),
     PositionedKeySpec(0, 1, Keys.keySpecY),
     PositionedKeySpec(0, 2, Keys.keySpecZ),
-    PositionedKeySpec(0, 3, Keys.keySpecSiWeight),
-    PositionedKeySpec(0, 4, Keys.keySpecFactorial),
+    PositionedKeySpec(0, 3, Keys.keySpecSiPrefix),
+    PositionedKeySpec(0, 4, Keys.keySpecBasicUnits),
 
     PositionedKeySpec(1, 0, Keys.keySpecIntegral),
     PositionedKeySpec(1, 1, Keys.keySpecDifferential),
@@ -172,9 +172,9 @@ fun CalculatorScreenContent(
         UserPreferences.DecimalSeparator.COMMA -> "."
     }
 
-    val keySpecDecimal = KeySpec.CornerDragKeySpec(
-        centerAction = Action.InsertText(ActionLabel.Text(decimalChar), decimalChar),
-        topRightAction = Action.InsertText(ActionLabel.Text("␣"), " "),
+    val keySpecDecimal = KeySpec.DefaultKeySpec(
+        clickAction = Action.InsertText(ActionLabel.Text(decimalChar), decimalChar),
+        longClickAction = Action.InsertText(ActionLabel.Text("␣"), " "),
         role = KeyRole.NUMBER
     )
 

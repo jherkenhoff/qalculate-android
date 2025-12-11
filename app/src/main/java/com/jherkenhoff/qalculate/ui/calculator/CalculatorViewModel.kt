@@ -156,10 +156,12 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun updateInput(input: TextFieldValue, doAutocomplete: Boolean = false) {
-        if (input.text != inputTextFieldValue.value.text)
+        val textChanged = input.text != inputTextFieldValue.value.text
+        if (textChanged)
             undoManager.snapshot(inputTextFieldValue.value)
 
-        _internalInputTextFieldValue.update { InternalTextFieldValue(input, doAutocomplete) }
+
+        _internalInputTextFieldValue.update { InternalTextFieldValue(input, doAutocomplete && textChanged) }
     }
 
     fun clearInput() {

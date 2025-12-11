@@ -3,6 +3,8 @@ package com.jherkenhoff.qalculate.domain
 import android.util.Log
 import com.jherkenhoff.libqalculate.AngleUnit
 import com.jherkenhoff.libqalculate.ApproximationMode
+import com.jherkenhoff.libqalculate.AutomaticApproximation
+import com.jherkenhoff.libqalculate.AutomaticFractionFormat
 import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.DigitGrouping
 import com.jherkenhoff.libqalculate.DivisionSign
@@ -22,7 +24,6 @@ class CalculateUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(input: String, userPreferences: UserPreferences): String {
 
-
         val parseOptions = ParseOptions()
         parseOptions.preserve_format = true
         parseOptions.angle_unit = when (userPreferences.angleUnit) {
@@ -30,7 +31,6 @@ class CalculateUseCase @Inject constructor(
             UserPreferences.AngleUnit.DEGREES -> AngleUnit.ANGLE_UNIT_DEGREES
             UserPreferences.AngleUnit.GRADIANS -> AngleUnit.ANGLE_UNIT_GRADIANS
         }
-
 
         var eo = EvaluationOptions()
         eo.sync_units = true
@@ -94,10 +94,23 @@ class CalculateUseCase @Inject constructor(
         }
 
         val unlocalizedInput = calc.unlocalizeExpression(input, parseOptions)
-        val ms = calc.parse(unlocalizedInput, parseOptions)
-        val mathStructure = calc.calculate(ms, eo)
 
-        return calc.print(mathStructure, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
+        return calc.calculateAndPrint(
+            unlocalizedInput,
+            2000,
+            eo,
+            printOptions,
+            AutomaticFractionFormat.AUTOMATIC_FRACTION_AUTO,
+            AutomaticApproximation.AUTOMATIC_APPROXIMATION_AUTO,
+            null,
+            -1,
+            null,
+            true,
+            1,
+            libqalculateConstants.TAG_TYPE_HTML
+        )
+
+        //return calc.print(mathStructure, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
 
     }
 }

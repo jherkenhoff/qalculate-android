@@ -280,4 +280,37 @@ object Keys {
         5,
         role= KeyRole.OPERATOR
     )
+
+    val keySpecSiPrefix = KeySpec.SelectorKeySpec(
+        listOf(
+            Action.InsertText.operator(ActionLabel.Text("giga"), "G"),
+            Action.InsertText.operator(ActionLabel.Text("mega"), "M"),
+            Action.InsertText.operator(ActionLabel.Text("kilo"), "k"),
+            Action.InsertText.operator(ActionLabel.Text("milli"), "m"),
+            Action.InsertText.operator(ActionLabel.Text("micro"), "µ"),
+            Action.InsertText.operator(ActionLabel.Text("nano"), "n"),
+            Action.InsertText.operator(ActionLabel.Text("pico"), "p"),
+        ),
+        2,
+        role= KeyRole.OPERATOR
+    )
+
+    val keySpecBasicUnits = KeySpec.SelectorKeySpec(
+        listOf(
+            Action.InsertText.operator(ActionLabel.Text("Ampere"), "A"),
+            Action.InsertText.operator(ActionLabel.Text("Gram"), "g"),
+            Action.InsertText.operator(ActionLabel.Text("Joule"), "J"),
+            Action.InsertText.operator(ActionLabel.Text("Kelvin"), "K"),
+            Action.InsertText.operator(ActionLabel.Text("Liter"), "L"),
+            Action.InsertText.operator(ActionLabel.Text("Meter"), "m"),
+            Action.InsertText.operator(ActionLabel.Text("Newton"), "N"),
+            Action.InsertText.operator(ActionLabel.Text("Ohm"), "Ω"),
+            Action.InsertText.operator(ActionLabel.Text("Pacal"), "Pa"),
+            Action.InsertText.operator(ActionLabel.Text("Second"), "s"),
+            Action.InsertText.operator(ActionLabel.Text("Volt"), "V"),
+            Action.InsertText.operator(ActionLabel.Text("Watt"), "W"),
+        ),
+        5,
+        role= KeyRole.OPERATOR
+    )
 }
