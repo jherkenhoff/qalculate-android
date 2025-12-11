@@ -1,5 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import com.android.build.api.variant.FilterConfiguration.FilterType.ABI
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
@@ -24,8 +24,8 @@ android {
         applicationId = "com.jherkenhoff.qalculate"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "0.1.2"
+        versionCode = 4
+        versionName = "0.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {useSupportLibrary = true }
