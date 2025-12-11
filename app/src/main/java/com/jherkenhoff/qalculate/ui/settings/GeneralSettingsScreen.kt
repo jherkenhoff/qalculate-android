@@ -32,37 +32,6 @@ fun GeneralSettingsScreenContent(
         "General settings",
         onNavigateUp = onNavigateUp
     ) {
-        ListItem(
-            headlineContent = { Text("Negative exponents") },
-            supportingContent = { Text("Print A${userPreferences.getMultiplicationSignString()}B⁻¹ instead of A${userPreferences.getDivisionSignString()}B")},
-            trailingContent = {
-                Switch(
-                    checked = userPreferences.negativeExponents,
-                    onCheckedChange = { onUserPreferenceChange(userPreferences.copy(negativeExponents = it)) }
-                )
-            }
-        )
-        ListItem(
-            headlineContent = { Text("Abbreviate names") },
-            supportingContent = { Text("Print m instead of meter")},
-            trailingContent = {
-                Switch(
-                    checked = userPreferences.abbreviateNames,
-                    onCheckedChange = { onUserPreferenceChange(userPreferences.copy(abbreviateNames = it)) }
-                )
-            }
-        )
-        ListItem(
-            headlineContent = { Text("Spacious output") },
-            supportingContent = { Text("Use more spaces to improve readability")},
-            trailingContent = {
-                Switch(
-                    checked = userPreferences.spaciousOutput,
-                    onCheckedChange = { onUserPreferenceChange(userPreferences.copy(spaciousOutput = it)) }
-                )
-            }
-        )
-
         SingleEnumSelectSettingsListItem<UserPreferences.DecimalSeparator>(
             "Decimal separator",
             enumLabelMap = {

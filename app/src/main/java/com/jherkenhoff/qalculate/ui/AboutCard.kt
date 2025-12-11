@@ -91,7 +91,6 @@ fun AboutCard(
 
 @Composable
 fun LicenseText() {
-
     // Display a link in the text
     Text(
         buildAnnotatedString {

@@ -62,10 +62,7 @@ fun QalculateNavGraph(
 
         composable<NavDestinations.Settings> {
             SettingsScreen(
-                onGeneralSettingsClick = { navController.navigate(NavDestinations.SettingsGeneral) },
-                onCalculationSettingsClick = { navController.navigate(NavDestinations.SettingsCalculation) },
-                onInputSettingsClick = { navController.navigate(NavDestinations.SettingsInput) },
-                onOutputSettingsClick = { navController.navigate(NavDestinations.SettingsOutput) },
+                viewModel = hiltViewModel<SettingsViewModel>(),
                 onNavigateUp = onNavigateUp,
             )
         }

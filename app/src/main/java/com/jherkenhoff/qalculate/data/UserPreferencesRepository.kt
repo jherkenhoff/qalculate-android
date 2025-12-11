@@ -24,6 +24,10 @@ class UserPreferencesRepository @Inject constructor(
         val APPROXIMATION_MODE_KEY = stringPreferencesKey("approximation_mode")
         val NUMERICAL_DISPLAY_MODE_KEY = stringPreferencesKey("numerical_display_mode")
         val NUMBER_FRACTION_FORMAT_KEY = stringPreferencesKey("number_fraction_format")
+        val USE_DENOMINATOR_PREFIX_KEY = booleanPreferencesKey("use_denominator_prefix")
+        val PLACE_UNITS_SEPARATELY = booleanPreferencesKey("place_units_separately")
+        val PRESERVE_FORMAT_KEY = booleanPreferencesKey("preserve_format")
+        val EXP_DISPLAY_KEY = stringPreferencesKey("exp_display")
     }
 
     inline fun <reified T : Enum<T>> String?.toEnum() : T? {
@@ -43,6 +47,10 @@ class UserPreferencesRepository @Inject constructor(
             approximationMode = preferences[APPROXIMATION_MODE_KEY].toEnum<UserPreferences.ApproximationMode>() ?: UserPreferences.Default.approximationMode,
             numericalDisplayMode = preferences[NUMERICAL_DISPLAY_MODE_KEY].toEnum<UserPreferences.NumericalDisplayMode>() ?: UserPreferences.Default.numericalDisplayMode,
             numberFractionFormat = preferences[NUMBER_FRACTION_FORMAT_KEY].toEnum<UserPreferences.NumberFractionFormat>() ?: UserPreferences.Default.numberFractionFormat,
+            useDenominatorPrefix = preferences[USE_DENOMINATOR_PREFIX_KEY] ?: UserPreferences.Default.useDenominatorPrefix,
+            placeUnitsSeparately = preferences[PLACE_UNITS_SEPARATELY] ?: UserPreferences.Default.placeUnitsSeparately,
+            preserveFormat = preferences[PRESERVE_FORMAT_KEY] ?: UserPreferences.Default.preserveFormat,
+            expDisplay = preferences[EXP_DISPLAY_KEY].toEnum<UserPreferences.ExpDisplay>() ?: UserPreferences.Default.expDisplay,
         )
     }
 
@@ -58,6 +66,10 @@ class UserPreferencesRepository @Inject constructor(
             it[APPROXIMATION_MODE_KEY] = userPreferences.approximationMode.name
             it[NUMERICAL_DISPLAY_MODE_KEY] = userPreferences.numericalDisplayMode.name
             it[NUMBER_FRACTION_FORMAT_KEY] = userPreferences.numberFractionFormat.name
+            it[USE_DENOMINATOR_PREFIX_KEY] = userPreferences.useDenominatorPrefix
+            it[PLACE_UNITS_SEPARATELY] = userPreferences.placeUnitsSeparately
+            it[PRESERVE_FORMAT_KEY] = userPreferences.preserveFormat
+            it[EXP_DISPLAY_KEY] = userPreferences.expDisplay.name
         }
     }
 }

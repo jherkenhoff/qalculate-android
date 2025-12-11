@@ -25,7 +25,7 @@ class CalculateUseCase @Inject constructor(
     suspend operator fun invoke(input: String, userPreferences: UserPreferences): String {
 
         val parseOptions = ParseOptions()
-        parseOptions.preserve_format = true
+        parseOptions.preserve_format = userPreferences.preserveFormat
         parseOptions.angle_unit = when (userPreferences.angleUnit) {
             UserPreferences.AngleUnit.RADIANS -> AngleUnit.ANGLE_UNIT_RADIANS
             UserPreferences.AngleUnit.DEGREES -> AngleUnit.ANGLE_UNIT_DEGREES
@@ -42,11 +42,18 @@ class CalculateUseCase @Inject constructor(
         eo.parse_options = parseOptions
 
         var printOptions = PrintOptions()
+        printOptions.use_unicode_signs = 1
+
+        printOptions.exp_display = when (userPreferences.expDisplay) {
+            UserPreferences.ExpDisplay.POWER_OF_10 -> ExpDisplay.EXP_POWER_OF_10
+            UserPreferences.ExpDisplay.LOWERCASE_E -> ExpDisplay.EXP_LOWERCASE_E
+            UserPreferences.ExpDisplay.UPPERCASE_E -> ExpDisplay.EXP_UPPERCASE_E
+        }
+        printOptions.interval_display   = IntervalDisplay.INTERVAL_DISPLAY_CONCISE
 
         printOptions.negative_exponents = userPreferences.negativeExponents
         printOptions.abbreviate_names   = userPreferences.abbreviateNames
         printOptions.spacious           = userPreferences.spaciousOutput
-        printOptions.interval_display   = IntervalDisplay.INTERVAL_DISPLAY_CONCISE
         printOptions.decimalpoint_sign  = when (userPreferences.decimalSeparator) {
             UserPreferences.DecimalSeparator.DOT -> "."
             UserPreferences.DecimalSeparator.COMMA -> ","
@@ -58,7 +65,6 @@ class CalculateUseCase @Inject constructor(
             UserPreferences.NumericalDisplayMode.SCIENTIFIC -> 3
             UserPreferences.NumericalDisplayMode.ENGINEERING -> -3
         }
-        printOptions.exp_display = ExpDisplay.EXP_POWER_OF_10
         printOptions.multiplication_sign = when (userPreferences.multiplicationSign) {
             UserPreferences.MultiplicationSign.DOT -> MultiplicationSign.MULTIPLICATION_SIGN_DOT
             UserPreferences.MultiplicationSign.X -> MultiplicationSign.MULTIPLICATION_SIGN_X
@@ -70,8 +76,8 @@ class CalculateUseCase @Inject constructor(
             UserPreferences.DivisionSign.DIVISION -> DivisionSign.DIVISION_SIGN_DIVISION
             UserPreferences.DivisionSign.SLASH -> DivisionSign.DIVISION_SIGN_SLASH
         }
-        printOptions.use_unicode_signs = 1
-        printOptions.place_units_separately = true
+        printOptions.place_units_separately = userPreferences.placeUnitsSeparately
+        printOptions.use_denominator_prefix = userPreferences.useDenominatorPrefix
 
         printOptions.number_fraction_format = when (userPreferences.numberFractionFormat) {
             UserPreferences.NumberFractionFormat.FRACTION_DECIMAL -> NumberFractionFormat.FRACTION_DECIMAL
@@ -109,8 +115,5 @@ class CalculateUseCase @Inject constructor(
             1,
             libqalculateConstants.TAG_TYPE_HTML
         )
-
-        //return calc.print(mathStructure, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
-
     }
 }

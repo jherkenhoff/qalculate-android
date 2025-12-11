@@ -34,9 +34,14 @@ fun CalculationSettingsScreenContent(
         onNavigateUp = onNavigateUp
     ) {
         ListItem(
-            headlineContent = { Text("Sync units") },
-            supportingContent = { Text("If units will be synced/converted to allow evaluation (ex. 1 min + 60 s = 2 min)")},
-            trailingContent = { Switch(checked = false, onCheckedChange = {  }) }
+            headlineContent = { Text("Preserve structure") },
+            supportingContent = { Text("Preserve the input structure as much as possible")},
+            trailingContent = {
+                Switch(
+                    checked = userPreferences.preserveFormat,
+                    onCheckedChange = { onUserPreferenceChange(userPreferences.copy(preserveFormat = it)) }
+                )
+            }
         )
     }
 }

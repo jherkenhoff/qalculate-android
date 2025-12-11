@@ -1,5 +1,7 @@
 package com.jherkenhoff.qalculate.model
 
+import com.jherkenhoff.libqalculate.PrintOptions
+
 data class UserPreferences(
     val decimalSeparator: DecimalSeparator = DecimalSeparator.DOT,
     val angleUnit: AngleUnit = AngleUnit.RADIANS,
@@ -10,7 +12,11 @@ data class UserPreferences(
     val spaciousOutput: Boolean = true,
     val approximationMode: ApproximationMode = ApproximationMode.TRY_EXACT,
     val numericalDisplayMode: NumericalDisplayMode = NumericalDisplayMode.ENGINEERING,
-    val numberFractionFormat: NumberFractionFormat = NumberFractionFormat.FRACTION_DECIMAL
+    val numberFractionFormat: NumberFractionFormat = NumberFractionFormat.FRACTION_DECIMAL,
+    val useDenominatorPrefix: Boolean = false,
+    val placeUnitsSeparately: Boolean = true,
+    val preserveFormat: Boolean = true,
+    val expDisplay: ExpDisplay = ExpDisplay.POWER_OF_10
 ) {
     companion object {
         val Default = UserPreferences()
@@ -22,6 +28,7 @@ data class UserPreferences(
     enum class DivisionSign {DIVISION, SLASH, DIVISION_SLASH}
     enum class ApproximationMode {EXACT, TRY_EXACT, APPROXIMATE}
     enum class NumericalDisplayMode {NORMAL, SCIENTIFIC, ENGINEERING}
+    enum class ExpDisplay {POWER_OF_10, LOWERCASE_E, UPPERCASE_E}
 
     enum class NumberFractionFormat {
         FRACTION_DECIMAL, FRACTION_DECIMAL_EXACT, FRACTION_FRACTIONAL, FRACTION_COMBINED,
