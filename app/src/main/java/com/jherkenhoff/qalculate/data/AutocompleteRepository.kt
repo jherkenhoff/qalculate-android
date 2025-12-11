@@ -23,7 +23,7 @@ class AutocompleteRepository @Inject constructor(
                 title = unit.title(),
                 abbreviations = emptyList(),
                 description = unit.description(),
-                typeBeforeCursor = unit.print(false, true) + " ",
+                typeBeforeCursor = unit.print(false, true),
                 typeAfterCursor = ""
             )
 

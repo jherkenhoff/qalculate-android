@@ -23,11 +23,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
+
+data class InternalTextFieldValue(
+    val textFieldValue: TextFieldValue,
+    val doAutocomplete: Boolean
+)
 
 @HiltViewModel
 class CalculatorViewModel @Inject constructor(
@@ -37,10 +43,15 @@ class CalculatorViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val calculationHistoryStore: CalculationHistoryStore
 ) : ViewModel() {
-    private val _inputTextFieldValue = MutableStateFlow(TextFieldValue(""))
-    val inputTextFieldValue = _inputTextFieldValue.asStateFlow()
+    private val _internalInputTextFieldValue = MutableStateFlow(InternalTextFieldValue(TextFieldValue(), false))
 
-    val parsedString = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
+    val inputTextFieldValue = _internalInputTextFieldValue.map { it.textFieldValue }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue = TextFieldValue()
+    )
+
+    val parsedString = combine(inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
         return@combine parseUseCase(inputTextFieldValue.text, userPreferences)
     }.stateIn(
         viewModelScope,
@@ -48,7 +59,7 @@ class CalculatorViewModel @Inject constructor(
         initialValue = ""
     )
 
-    val resultString = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
+    val resultString = combine(inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
         return@combine calculateUseCase(inputTextFieldValue.text, userPreferences)
     }.stateIn(
         viewModelScope,
@@ -56,8 +67,11 @@ class CalculatorViewModel @Inject constructor(
         initialValue = ""
     )
 
-    val autocompleteResult = combine(_inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
-        autocompleteUseCase(inputTextFieldValue, userPreferences)
+    val autocompleteResult = combine(_internalInputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { internalInputTextFieldValue, userPreferences ->
+        if (internalInputTextFieldValue.doAutocomplete)
+            autocompleteUseCase(internalInputTextFieldValue.textFieldValue, userPreferences)
+        else
+            AutocompleteResult()
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -125,15 +139,15 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun undo() {
-        val undoState = undoManager.undo(_inputTextFieldValue.value)
+        val undoState = undoManager.undo(inputTextFieldValue.value)
         if (undoState !== null)
-            _inputTextFieldValue.update { undoState }
+            _internalInputTextFieldValue.update { InternalTextFieldValue(undoState, false) }
     }
 
     fun redo() {
-        val redoState = undoManager.redo(_inputTextFieldValue.value)
+        val redoState = undoManager.redo(inputTextFieldValue.value)
         if (redoState !== null)
-            _inputTextFieldValue.update { redoState }
+            _internalInputTextFieldValue.update { InternalTextFieldValue(redoState, false) }
     }
 
     fun moveCursor(chars: Int) {
@@ -141,11 +155,11 @@ class CalculatorViewModel @Inject constructor(
         updateInput(inputTextFieldValue.value.copy(selection = TextRange(newCursorPosition)))
     }
 
-    fun updateInput(input: TextFieldValue) {
-        if (input.text != _inputTextFieldValue.value.text)
-            undoManager.snapshot(_inputTextFieldValue.value)
+    fun updateInput(input: TextFieldValue, doAutocomplete: Boolean = false) {
+        if (input.text != inputTextFieldValue.value.text)
+            undoManager.snapshot(inputTextFieldValue.value)
 
-        _inputTextFieldValue.update { input }
+        _internalInputTextFieldValue.update { InternalTextFieldValue(input, doAutocomplete) }
     }
 
     fun clearInput() {
@@ -185,6 +199,16 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
+    fun replaceRange(range: TextRange, preCursorText: String, postCursorText: String = "") {
+        val newText = inputTextFieldValue.value.text.replaceRange(range.start, range.end, "$preCursorText$postCursorText")
+        val newCursorPosition = range.start + preCursorText.length
+
+        updateInput(TextFieldValue(
+            text = newText,
+            selection = TextRange(newCursorPosition)
+        ))
+    }
+
     fun insertText(preCursorText: String, postCursorText: String = "") {
         val maxChars = inputTextFieldValue.value.text.length
         val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
@@ -212,6 +236,11 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun acceptAutocomplete(autocompleteItem: AutocompleteItem) {
-        insertText(autocompleteItem.typeBeforeCursor, autocompleteItem.typeAfterCursor)
+        replaceRange(
+            autocompleteResult.value.contextRange,
+            autocompleteItem.typeBeforeCursor,
+            autocompleteItem.typeAfterCursor
+        )
+
     }
 }

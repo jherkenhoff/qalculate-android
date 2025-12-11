@@ -105,7 +105,7 @@ fun CalculatorScreen(
         onKeyAction = viewModel::handleKeyAction,
         autocompleteResult = viewModel.autocompleteResult.collectAsStateWithLifecycle().value,
         undoState = viewModel.undoState.collectAsStateWithLifecycle().value,
-        onInputFieldValueChange = viewModel::updateInput,
+        onInputFieldValueChange = { viewModel.updateInput(it, true) },
         onDeleteCalculation = viewModel::deleteCalculation,
         onMenuClick = openDrawer,
         onSettingsClick = openSettings,
@@ -401,6 +401,7 @@ fun CalculatorScreenContent(
                             }
                         }
 
+                        Spacer(Modifier.height(3.dp))
                         Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
 
                     }

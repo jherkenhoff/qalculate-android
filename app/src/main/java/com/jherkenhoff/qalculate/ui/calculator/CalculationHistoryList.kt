@@ -30,6 +30,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
@@ -54,11 +60,13 @@ fun CalculationHistoryList(
     scrollState: LazyListState = rememberLazyListState(),
     onDeleteClick: (CalculationHistoryItemData) -> Unit = {},
 ) {
+    val fadeWidth = 60.dp
+    val fadeWidthPx = fadeWidth.toFloatPx()
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(calculations.size) {
         if (calculations.isNotEmpty()) {
-            //scrollState.animateScrollToItem(calculations.size)
+            scrollState.animateScrollToItem(0)
         }
     }
 
@@ -75,7 +83,13 @@ fun CalculationHistoryList(
     } else {
         Box(
             contentAlignment = Alignment.BottomCenter,
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier
+                .fillMaxSize()
+                .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+                .drawWithContent {
+                    drawContent()
+                    drawRect(brush = Brush.verticalGradient(0f to Color.Transparent, 1f to Color.White, startY = 0f, endY = fadeWidthPx), blendMode = BlendMode.DstIn)
+                },
         ) {
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,7 +113,7 @@ fun CalculationHistoryList(
                                 )
                             }
                         }
-                        stickyHeader {
+                        item {
                             val dayString = when (id) {
                                 LocalDate.now() -> "Today"
                                 LocalDate.now().minusDays(1) -> "Yesterday"
@@ -108,6 +122,10 @@ fun CalculationHistoryList(
                             CalculationDivider(text = dayString)
                         }
                     }
+
+                item{
+                    Spacer(Modifier.height(fadeWidth))
+                }
             }
             DelayedAnimatedVisibility(
                 scrollState.canScrollBackward,
