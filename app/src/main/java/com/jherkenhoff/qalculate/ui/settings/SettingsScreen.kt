@@ -1,55 +1,30 @@
 package com.jherkenhoff.qalculate.ui.settings
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.AppSettingsAlt
-import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material.icons.outlined.Keyboard
-import androidx.compose.material.icons.outlined.Numbers
-import androidx.compose.material.icons.outlined.TextFields
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jherkenhoff.libqalculate.libqalculateConstants
-import com.jherkenhoff.qalculate.BuildConfig
 import com.jherkenhoff.qalculate.R
 import com.jherkenhoff.qalculate.model.UserPreferences
-import com.jherkenhoff.qalculate.ui.LicenseText
+import com.jherkenhoff.qalculate.ui.common.SegmentedListItem
 
 
 @Composable
@@ -94,55 +69,197 @@ fun SettingsScreenContent(
         },
         modifier = Modifier.imePadding(),
     ) { innerPadding ->
-        Column(
+        LazyColumn (
             verticalArrangement = Arrangement.spacedBy(3.dp),
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp),
         ) {
 
-            SingleEnumSelectSettingsListItem<UserPreferences.DecimalSeparator>(
-                "Decimal separator",
-                enumLabelMap = {
-                    when (it) {
-                        UserPreferences.DecimalSeparator.DOT -> "Dot"
-                        UserPreferences.DecimalSeparator.COMMA -> "Comma"
-                    }
-                },
-                currentSelection = userPreferences.decimalSeparator,
-                onSelect = { onUserPreferenceChange(userPreferences.copy(decimalSeparator = it)) },
-                top = true
-            )
+            item {
+                SettingsHeading("General")
+            }
 
-            SingleEnumSelectSettingsListItem<UserPreferences.MultiplicationSign>(
-                "Multiplication sign",
-                enumLabelMap = {
-                    when (it) {
-                        UserPreferences.MultiplicationSign.DOT -> "Dot"
-                        UserPreferences.MultiplicationSign.X -> "Times"
-                        UserPreferences.MultiplicationSign.ASTERISK -> "Asterisk"
-                        UserPreferences.MultiplicationSign.ALTDOT -> "Alt. dot"
-                    }
-                },
-                currentSelection = userPreferences.multiplicationSign,
-                onSelect = { onUserPreferenceChange(userPreferences.copy(multiplicationSign = it)) }
-            )
+            item {
+                SingleEnumSelectSettingsListItem<UserPreferences.DecimalSeparator>(
+                    "Decimal separator",
+                    enumLabelMap = {
+                        when (it) {
+                            UserPreferences.DecimalSeparator.DOT -> "Dot"
+                            UserPreferences.DecimalSeparator.COMMA -> "Comma"
+                        }
+                    },
+                    currentSelection = userPreferences.decimalSeparator,
+                    onSelect = { onUserPreferenceChange(userPreferences.copy(decimalSeparator = it)) },
+                    top = true
+                )
+            }
 
-            SingleEnumSelectSettingsListItem<UserPreferences.DivisionSign>(
-                "Division sign",
-                enumLabelMap = {
-                    when (it) {
-                        UserPreferences.DivisionSign.DIVISION_SLASH -> "Division slash"
-                        UserPreferences.DivisionSign.SLASH -> "Slash"
-                        UserPreferences.DivisionSign.DIVISION -> "Division"
-                    }
-                },
-                currentSelection = userPreferences.divisionSign,
-                onSelect = { onUserPreferenceChange(userPreferences.copy(divisionSign = it)) },
-                bottom = true
-            )
+            item {
+                SingleEnumSelectSettingsListItem<UserPreferences.MultiplicationSign>(
+                    "Multiplication sign",
+                    enumLabelMap = {
+                        when (it) {
+                            UserPreferences.MultiplicationSign.DOT -> "Dot"
+                            UserPreferences.MultiplicationSign.X -> "Times"
+                            UserPreferences.MultiplicationSign.ASTERISK -> "Asterisk"
+                            UserPreferences.MultiplicationSign.ALTDOT -> "Alt. dot"
+                        }
+                    },
+                    currentSelection = userPreferences.multiplicationSign,
+                    onSelect = { onUserPreferenceChange(userPreferences.copy(multiplicationSign = it)) }
+                )
+            }
+
+            item {
+                SingleEnumSelectSettingsListItem<UserPreferences.DivisionSign>(
+                    "Division sign",
+                    enumLabelMap = {
+                        when (it) {
+                            UserPreferences.DivisionSign.DIVISION_SLASH -> "Division slash"
+                            UserPreferences.DivisionSign.SLASH -> "Slash"
+                            UserPreferences.DivisionSign.DIVISION -> "Division"
+                        }
+                    },
+                    currentSelection = userPreferences.divisionSign,
+                    onSelect = { onUserPreferenceChange(userPreferences.copy(divisionSign = it)) },
+                    bottom = true
+                )
+            }
+
+
+            item {
+                SettingsHeading("Calculation")
+            }
+
+            item {
+                SegmentedListItem(
+                    headlineContent = { Text("Preserve structure") },
+                    supportingContent = { Text("Preserve the input structure as much as possible") },
+                    trailingContent = {
+                        Switch(
+                            checked = userPreferences.preserveFormat,
+                            onCheckedChange = {
+                                onUserPreferenceChange(
+                                    userPreferences.copy(
+                                        preserveFormat = it
+                                    )
+                                )
+                            }
+                        )
+                    },
+                    colors = ListItemDefaults.colors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                    top = true,
+                    bottom = true
+                )
+            }
+
+            item {
+                SettingsHeading("Output")
+            }
+            item {
+                SegmentedListItem(
+                    headlineContent = { Text("Negative exponents") },
+                    supportingContent = { Text("Print A${userPreferences.getMultiplicationSignString()}B⁻¹ instead of A${userPreferences.getDivisionSignString()}B") },
+                    trailingContent = {
+                        Switch(
+                            checked = userPreferences.negativeExponents,
+                            onCheckedChange = {
+                                onUserPreferenceChange(
+                                    userPreferences.copy(
+                                        negativeExponents = it
+                                    )
+                                )
+                            }
+                        )
+                    },
+                    colors = ListItemDefaults.colors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                    top = true
+                )
+            }
+
+            item {
+                SegmentedListItem(
+                    headlineContent = { Text("Abbreviate names") },
+                    supportingContent = { Text("Print m instead of meter")},
+                    trailingContent = {
+                        Switch(
+                            checked = userPreferences.abbreviateNames,
+                            onCheckedChange = { onUserPreferenceChange(userPreferences.copy(abbreviateNames = it)) }
+                        )
+                    },
+                    colors = ListItemDefaults.colors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                )
+            }
+
+            item {
+                SegmentedListItem(
+                    headlineContent = { Text("Spacious output") },
+                    supportingContent = { Text("Use more spaces to improve readability")},
+                    trailingContent = {
+                        Switch(
+                            checked = userPreferences.spaciousOutput,
+                            onCheckedChange = { onUserPreferenceChange(userPreferences.copy(spaciousOutput = it)) }
+                        )
+                    },
+                    colors = ListItemDefaults.colors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                )
+            }
+            item {
+                SegmentedListItem(
+                    headlineContent = { Text("Allow prefix in denominator") },
+                    supportingContent = { Text("Print km${userPreferences.getDivisionSignString()}ms instead of Mm${userPreferences.getDivisionSignString()}s")},
+                    trailingContent = {
+                        Switch(
+                            checked = userPreferences.useDenominatorPrefix,
+                            onCheckedChange = { onUserPreferenceChange(userPreferences.copy(useDenominatorPrefix = it)) }
+                        )
+                    },
+                    colors = ListItemDefaults.colors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                )
+            }
+            item {
+                SegmentedListItem(
+                    headlineContent = { Text("Isolate units") },
+                    supportingContent = { Text("Place units at the end of the result")},
+                    trailingContent = {
+                        Switch(
+                            checked = userPreferences.placeUnitsSeparately,
+                            onCheckedChange = { onUserPreferenceChange(userPreferences.copy(placeUnitsSeparately = it)) }
+                        )
+                    },
+                    colors = ListItemDefaults.colors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                )
+            }
+            item {
+                SingleEnumSelectSettingsListItem<UserPreferences.ExpDisplay>(
+                    "Exp display",
+                    enumLabelMap = {
+                        when (it) {
+                            UserPreferences.ExpDisplay.POWER_OF_10 -> "2${userPreferences.getMultiplicationSignString()}10³"
+                            UserPreferences.ExpDisplay.LOWERCASE_E -> "XeY"
+                            UserPreferences.ExpDisplay.UPPERCASE_E -> "2E3"
+                        }
+                    },
+                    currentSelection = userPreferences.expDisplay,
+                    onSelect = { onUserPreferenceChange(userPreferences.copy(expDisplay = it)) },
+                    bottom = true
+                )
+            }
         }
     }
+}
+
+@Composable
+fun SettingsHeading(
+    text: String
+) {
+    Text(
+        text,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.tertiary,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 4.dp)
+    )
 }
 
 

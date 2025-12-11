@@ -10,10 +10,6 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorScreen
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorViewModel
-import com.jherkenhoff.qalculate.ui.settings.CalculationSettingsScreen
-import com.jherkenhoff.qalculate.ui.settings.GeneralSettingsScreen
-import com.jherkenhoff.qalculate.ui.settings.InputSettingsScreen
-import com.jherkenhoff.qalculate.ui.settings.OutputSettingsScreen
 import com.jherkenhoff.qalculate.ui.settings.SettingsScreen
 import com.jherkenhoff.qalculate.ui.settings.SettingsViewModel
 import com.jherkenhoff.qalculate.ui.units.UnitsScreen
@@ -26,10 +22,6 @@ sealed class NavDestinations{
     @Serializable data object Units
     @Serializable data object About
     @Serializable data object Settings
-    @Serializable data object SettingsGeneral
-    @Serializable data object SettingsCalculation
-    @Serializable data object SettingsInput
-    @Serializable data object SettingsOutput
 }
 
 @Composable
@@ -62,34 +54,6 @@ fun QalculateNavGraph(
 
         composable<NavDestinations.Settings> {
             SettingsScreen(
-                viewModel = hiltViewModel<SettingsViewModel>(),
-                onNavigateUp = onNavigateUp,
-            )
-        }
-
-        composable<NavDestinations.SettingsGeneral> {
-            GeneralSettingsScreen(
-                viewModel = hiltViewModel<SettingsViewModel>(),
-                onNavigateUp = onNavigateUp,
-            )
-        }
-
-        composable<NavDestinations.SettingsCalculation> {
-            CalculationSettingsScreen(
-                viewModel = hiltViewModel<SettingsViewModel>(),
-                onNavigateUp = onNavigateUp,
-            )
-        }
-
-        composable<NavDestinations.SettingsInput> {
-            InputSettingsScreen(
-                viewModel = hiltViewModel<SettingsViewModel>(),
-                onNavigateUp = onNavigateUp,
-            )
-        }
-
-        composable<NavDestinations.SettingsOutput> {
-            OutputSettingsScreen(
                 viewModel = hiltViewModel<SettingsViewModel>(),
                 onNavigateUp = onNavigateUp,
             )
