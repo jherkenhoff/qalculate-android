@@ -64,6 +64,7 @@ import com.jherkenhoff.qalculate.model.KeyRole
 import com.jherkenhoff.qalculate.model.KeySpec
 import com.jherkenhoff.qalculate.model.Keys
 import com.jherkenhoff.qalculate.model.PositionedKeySpec
+import com.jherkenhoff.qalculate.model.UndoState
 import com.jherkenhoff.qalculate.model.UserPreferences
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -103,6 +104,7 @@ fun CalculatorScreen(
         calculationHistory = viewModel.calculationHistory.collectAsStateWithLifecycle().value,
         onKeyAction = viewModel::handleKeyAction,
         autocompleteResult = viewModel.autocompleteResult.collectAsStateWithLifecycle().value,
+        undoState = viewModel.undoState.collectAsStateWithLifecycle().value,
         onInputFieldValueChange = viewModel::updateInput,
         onDeleteCalculation = viewModel::deleteCalculation,
         onMenuClick = openDrawer,
@@ -135,6 +137,7 @@ fun CalculatorScreenContent(
     onUserPreferencesChanged : (UserPreferences) -> Unit,
     calculationHistory: List<CalculationHistoryItemData> = emptyList(),
     autocompleteResult: AutocompleteResult,
+    undoState: UndoState<TextFieldValue>,
     onKeyAction: (Action) -> Unit = { },
     onInputFieldValueChange: (TextFieldValue) -> Unit = { },
     onDeleteCalculation: (CalculationHistoryItemData) -> Unit = { },
@@ -182,8 +185,6 @@ fun CalculatorScreenContent(
     val divisionChar = userPreferences.getDivisionSignString()
     val keySpecDivision = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.operator(ActionLabel.Text(divisionChar), divisionChar), role = KeyRole.OPERATOR)
 
-
-
     val primaryKeypad : List<PositionedKeySpec> = listOf(
         PositionedKeySpec(0, 0, Keys.keySpecPercent),
         PositionedKeySpec(0, 1, Keys.keySpecPi),
@@ -216,9 +217,6 @@ fun CalculatorScreenContent(
         PositionedKeySpec(3, 4, Keys.keySpecExp),
         PositionedKeySpec(3, 5, 1, 2, Keys.keySpecReturn),
     )
-
-    var calculationHistorySize by remember{ mutableIntStateOf(calculationHistory.size)}
-    calculationHistorySize = calculationHistory.size
 
     val historyListState = rememberLazyListState()
 
@@ -334,8 +332,14 @@ fun CalculatorScreenContent(
                                 1,
                                 enabled = (inputTextFieldValue.selection.end != inputTextFieldValue.text.length)
                             ),
-                            Action.Undo(ActionLabel.Icon(Icons.AutoMirrored.Filled.Undo, "Undo"), enabled = false),
-                            Action.Redo(ActionLabel.Icon(Icons.AutoMirrored.Filled.Redo, "Redo")),
+                            Action.Undo(
+                                ActionLabel.Icon(Icons.AutoMirrored.Filled.Undo, "Undo"),
+                                enabled = undoState.canUndo
+                            ),
+                            Action.Redo(
+                                ActionLabel.Icon(Icons.AutoMirrored.Filled.Redo, "Redo"),
+                                enabled = undoState.canRedo
+                            ),
                         )
 
                         AuxiliaryBar(
@@ -419,6 +423,7 @@ private fun DefaultPreview() {
         userPreferences = UserPreferences(),
         onUserPreferencesChanged = {},
         autocompleteResult = AutocompleteResult(),
+        undoState = UndoState<TextFieldValue>(),
         calculationHistory = listOf(
             CalculationHistoryItemData(
                 0, "1+1", "1+1", "2", LocalDateTime.now()
@@ -448,6 +453,7 @@ private fun ManyHistoryItemsPreview() {
         userPreferences = UserPreferences(),
         onUserPreferencesChanged = {},
         autocompleteResult = AutocompleteResult(),
+        undoState = UndoState<TextFieldValue>(),
         calculationHistory = listOf(
             CalculationHistoryItemData(
                 0, "1+1", "1+1", "2", LocalDateTime.now()
@@ -493,6 +499,7 @@ private fun EmptyHistoryPreview() {
         userPreferences = UserPreferences(),
         onUserPreferencesChanged = {},
         autocompleteResult = AutocompleteResult(),
+        undoState = UndoState<TextFieldValue>(),
         calculationHistory = emptyList()
     )
 }
