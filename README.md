@@ -19,16 +19,16 @@ Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> 
 <br/>
 <p align="center">
   <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png">
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="250">
+    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="20%">
   </a>
   <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png">
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="250">
+    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="20%">
   </a>
   <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png">
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="250">
+    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="20%">
   </a>
   <a href="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png">
-    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="250">
+    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="20%">
   </a>
 </p>
 
