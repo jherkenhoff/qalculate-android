@@ -4,6 +4,7 @@ import android.view.ViewConfiguration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.EaseInOutQuart
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -140,7 +141,8 @@ fun DefaultKey(
     var popupSecondary by remember { mutableStateOf(false) }
 
     Box(
-        modifier = modifier.pointerInput(Unit) {
+        modifier = modifier.clickable { }
+            .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
                         awaitFirstDown()
