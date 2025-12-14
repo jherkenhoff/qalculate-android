@@ -28,7 +28,11 @@ class ParseUseCase @Inject constructor(
         printOptions.number_fraction_format = NumberFractionFormat.FRACTION_DECIMAL
         printOptions.digit_grouping = DigitGrouping.DIGIT_GROUPING_NONE
         printOptions.min_exp = 4
-        printOptions.exp_display = ExpDisplay.EXP_POWER_OF_10
+        printOptions.exp_display = when (userPreferences.expDisplay) {
+            UserPreferences.ExpDisplay.POWER_OF_10 -> ExpDisplay.EXP_POWER_OF_10
+            UserPreferences.ExpDisplay.LOWERCASE_E -> ExpDisplay.EXP_LOWERCASE_E
+            UserPreferences.ExpDisplay.UPPERCASE_E -> ExpDisplay.EXP_UPPERCASE_E
+        }
         printOptions.use_unicode_signs = 1
         printOptions.place_units_separately = false
         printOptions.decimalpoint_sign  = when (userPreferences.decimalSeparator) {
@@ -46,7 +50,6 @@ class ParseUseCase @Inject constructor(
             UserPreferences.DivisionSign.DIVISION -> DivisionSign.DIVISION_SIGN_DIVISION
             UserPreferences.DivisionSign.SLASH -> DivisionSign.DIVISION_SIGN_SLASH
         }
-
 
         val parseOptions = ParseOptions()
         parseOptions.preserve_format = true

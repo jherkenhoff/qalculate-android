@@ -1,6 +1,5 @@
 package com.jherkenhoff.qalculate.domain
 
-import android.util.Log
 import com.jherkenhoff.libqalculate.AngleUnit
 import com.jherkenhoff.libqalculate.ApproximationMode
 import com.jherkenhoff.libqalculate.AutomaticApproximation
@@ -50,6 +49,7 @@ class CalculateUseCase @Inject constructor(
             UserPreferences.ExpDisplay.UPPERCASE_E -> ExpDisplay.EXP_UPPERCASE_E
         }
         printOptions.interval_display   = IntervalDisplay.INTERVAL_DISPLAY_CONCISE
+        printOptions.indicate_infinite_series = true
 
         printOptions.negative_exponents = userPreferences.negativeExponents
         printOptions.abbreviate_names   = userPreferences.abbreviateNames
@@ -58,7 +58,6 @@ class CalculateUseCase @Inject constructor(
             UserPreferences.DecimalSeparator.DOT -> "."
             UserPreferences.DecimalSeparator.COMMA -> ","
         }
-        printOptions.number_fraction_format = NumberFractionFormat.FRACTION_DECIMAL
         printOptions.digit_grouping = DigitGrouping.DIGIT_GROUPING_NONE
         printOptions.min_exp = when (userPreferences.numericalDisplayMode) {
             UserPreferences.NumericalDisplayMode.NORMAL -> -1
@@ -106,8 +105,8 @@ class CalculateUseCase @Inject constructor(
             2000,
             eo,
             printOptions,
-            AutomaticFractionFormat.AUTOMATIC_FRACTION_AUTO,
-            AutomaticApproximation.AUTOMATIC_APPROXIMATION_AUTO,
+            AutomaticFractionFormat.AUTOMATIC_FRACTION_OFF,
+            AutomaticApproximation.AUTOMATIC_APPROXIMATION_OFF,
             null,
             -1,
             null,
