@@ -305,7 +305,7 @@ object Keys {
             Action.InsertText.operator(ActionLabel.Text("Meter"), "m"),
             Action.InsertText.operator(ActionLabel.Text("Newton"), "N"),
             Action.InsertText.operator(ActionLabel.Text("Ohm"), "Ω"),
-            Action.InsertText.operator(ActionLabel.Text("Pacal"), "Pa"),
+            Action.InsertText.operator(ActionLabel.Text("Pascal"), "Pa"),
             Action.InsertText.operator(ActionLabel.Text("Second"), "s"),
             Action.InsertText.operator(ActionLabel.Text("Volt"), "V"),
             Action.InsertText.operator(ActionLabel.Text("Watt"), "W"),
