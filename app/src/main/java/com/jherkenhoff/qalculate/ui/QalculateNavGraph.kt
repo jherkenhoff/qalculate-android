@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import com.jherkenhoff.libqalculate.libqalculateConstants
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorScreen
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorViewModel
 import com.jherkenhoff.qalculate.ui.settings.SettingsScreen
@@ -60,7 +61,9 @@ fun QalculateNavGraph(
         }
 
         dialog<NavDestinations.About> {
-            AboutCard()
+            AboutCard(
+                libqalculateVersion = "${libqalculateConstants.QALCULATE_MAJOR_VERSION}.${libqalculateConstants.QALCULATE_MINOR_VERSION}.${libqalculateConstants.QALCULATE_MICRO_VERSION}"
+            )
         }
 
     }

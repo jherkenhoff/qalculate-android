@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +41,7 @@ import com.jherkenhoff.qalculate.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutCard(
+    libqalculateVersion: String,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -68,9 +70,7 @@ fun AboutCard(
                             text = "App version " + BuildConfig.VERSION_NAME
                         )
                         Text(
-                            text = "libqalculate version ${libqalculateConstants.QALCULATE_MAJOR_VERSION}" +
-                                    ".${libqalculateConstants.QALCULATE_MINOR_VERSION}" +
-                                    ".${libqalculateConstants.QALCULATE_MICRO_VERSION}"
+                            text = "libqalculate version $libqalculateVersion"
                         )
                     }
                 }
@@ -80,6 +80,7 @@ fun AboutCard(
                     textAlign = TextAlign.Center
                 )
 
+                GithubText(Modifier.padding(top = 20.dp))
                 HorizontalDivider(modifier = Modifier.padding(vertical = 20.dp))
                 Text(text = "Copyright © 2023 - 2025 Jost Herkenhoff")
                 Spacer(modifier = Modifier.height(6.dp))
@@ -87,6 +88,29 @@ fun AboutCard(
             }
         }
     }
+}
+
+@Composable
+fun GithubText(
+    modifier: Modifier = Modifier
+) {
+    // Display a link in the text
+    Text(
+        buildAnnotatedString {
+            append("Check out on ")
+            withLink(
+                LinkAnnotation.Url(
+                    "https://github.com/jherkenhoff/qalculate-android",
+                    TextLinkStyles(style = SpanStyle(textDecoration = TextDecoration.Underline))
+                )
+            ) {
+                append("GitHub")
+            }
+        },
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.titleSmall,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -107,11 +131,12 @@ fun LicenseText() {
         },
         textAlign = TextAlign.Center
     )
-
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
-    AboutCard()
+    AboutCard(
+        "5.1.0"
+    )
 }
