@@ -4,7 +4,6 @@ import com.jherkenhoff.libqalculate.AngleUnit
 import com.jherkenhoff.libqalculate.ApproximationMode
 import com.jherkenhoff.libqalculate.AutomaticApproximation
 import com.jherkenhoff.libqalculate.AutomaticFractionFormat
-import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.DigitGrouping
 import com.jherkenhoff.libqalculate.DivisionSign
 import com.jherkenhoff.libqalculate.EvaluationOptions
@@ -15,11 +14,12 @@ import com.jherkenhoff.libqalculate.NumberFractionFormat
 import com.jherkenhoff.libqalculate.ParseOptions
 import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants
+import com.jherkenhoff.qalculate.data.CalculatorRepository
 import com.jherkenhoff.qalculate.model.UserPreferences
 import javax.inject.Inject
 
 class CalculateUseCase @Inject constructor(
-    private val calc: Calculator
+    private val calculatorRepository: CalculatorRepository
 ) {
     suspend operator fun invoke(input: String, userPreferences: UserPreferences): String {
 
@@ -31,14 +31,14 @@ class CalculateUseCase @Inject constructor(
             UserPreferences.AngleUnit.GRADIANS -> AngleUnit.ANGLE_UNIT_GRADIANS
         }
 
-        var eo = EvaluationOptions()
-        eo.sync_units = true
-        eo.approximation = when (userPreferences.approximationMode) {
+        var evaluationOptions = EvaluationOptions()
+        evaluationOptions.sync_units = true
+        evaluationOptions.approximation = when (userPreferences.approximationMode) {
             UserPreferences.ApproximationMode.TRY_EXACT -> ApproximationMode.APPROXIMATION_TRY_EXACT
             UserPreferences.ApproximationMode.EXACT -> ApproximationMode.APPROXIMATION_EXACT
             UserPreferences.ApproximationMode.APPROXIMATE -> ApproximationMode.APPROXIMATION_APPROXIMATE
         }
-        eo.parse_options = parseOptions
+        evaluationOptions.parse_options = parseOptions
 
         var printOptions = PrintOptions()
         printOptions.use_unicode_signs = 1
@@ -88,31 +88,10 @@ class CalculateUseCase @Inject constructor(
             UserPreferences.NumberFractionFormat.FRACTION_PERMYRIAD -> NumberFractionFormat.FRACTION_PERMYRIAD
         }
 
-        when (userPreferences.decimalSeparator) {
-            UserPreferences.DecimalSeparator.DOT -> {
-                calc.useDecimalPoint()
-            }
-
-            UserPreferences.DecimalSeparator.COMMA -> {
-                calc.useDecimalComma()
-            }
-        }
-
-        val unlocalizedInput = calc.unlocalizeExpression(input, parseOptions)
-
-        return calc.calculateAndPrint(
-            unlocalizedInput,
-            2000,
-            eo,
-            printOptions,
-            AutomaticFractionFormat.AUTOMATIC_FRACTION_OFF,
-            AutomaticApproximation.AUTOMATIC_APPROXIMATION_OFF,
-            null,
-            -1,
-            null,
-            true,
-            1,
-            libqalculateConstants.TAG_TYPE_HTML
+        return calculatorRepository.calculateAndPrint(
+            input,
+            evaluationOptions,
+            printOptions
         )
     }
 }

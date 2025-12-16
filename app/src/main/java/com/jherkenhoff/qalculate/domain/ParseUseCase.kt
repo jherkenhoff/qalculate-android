@@ -11,15 +11,15 @@ import com.jherkenhoff.libqalculate.NumberFractionFormat
 import com.jherkenhoff.libqalculate.ParseOptions
 import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.libqalculateConstants
+import com.jherkenhoff.qalculate.data.CalculatorRepository
 import com.jherkenhoff.qalculate.model.UserPreferences
 import javax.inject.Inject
 
 class ParseUseCase @Inject constructor(
-   private val calc: Calculator
+    private val calculatorRepository: CalculatorRepository
 ) {
-    suspend operator fun invoke(input: String, userPreferences: UserPreferences): String {
-
-        var printOptions = PrintOptions()
+    operator fun invoke(input: String, userPreferences: UserPreferences): String {
+        val printOptions = PrintOptions()
 
         printOptions.negative_exponents = true
         printOptions.abbreviate_names   = false
@@ -61,33 +61,11 @@ class ParseUseCase @Inject constructor(
         //parseOptions.comma_as_separator = true
         //parseOptions.dot_as_separator = true
 
-        when (userPreferences.decimalSeparator) {
-            UserPreferences.DecimalSeparator.DOT -> {
-                printOptions.decimalpoint_sign = "."
-                calc.useDecimalPoint()
-            }
-
-            UserPreferences.DecimalSeparator.COMMA -> {
-                printOptions.decimalpoint_sign = ","
-                calc.useDecimalComma()
-            }
+        printOptions.decimalpoint_sign = when (userPreferences.decimalSeparator) {
+            UserPreferences.DecimalSeparator.DOT -> "."
+            UserPreferences.DecimalSeparator.COMMA -> ","
         }
 
-        val unlocalizedInput = calc.unlocalizeExpression(input, parseOptions)
-
-        // TODO: Implement proper conversion handling
-        val toExpressions = unlocalizedInput.split(" to ")
-        if (toExpressions.size == 2) {
-            val beforeToExpression = calc.parse(toExpressions.first(), parseOptions)
-            val afterToExpression = calc.parse(toExpressions.last(), parseOptions)
-
-            val beforeToString = calc.print(beforeToExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
-            val afterToString = calc.print(afterToExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
-
-            return "$beforeToString to $afterToString"
-        } else {
-            val parsedExpression = calc.parse(unlocalizedInput, parseOptions)
-            return calc.print(parsedExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
-        }
+        return calculatorRepository.parse(input, parseOptions, printOptions)
     }
 }
