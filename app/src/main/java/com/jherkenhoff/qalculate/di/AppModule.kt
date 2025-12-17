@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.jherkenhoff.libqalculate.Calculator
+import com.jherkenhoff.qalculate.data.CalculatorRepository
+import com.jherkenhoff.qalculate.data.UserPreferencesRepository
 import com.jherkenhoff.qalculate.data.database.QalculateDatabase
 import com.jherkenhoff.qalculate.data.database.dao.CalculationHistoryItemDao
 import com.jherkenhoff.qalculate.data.repository.CalculationHistoryStore
@@ -60,6 +62,12 @@ class AppModule {
     @Singleton
     fun provideCalculationHistoryStore(dao: CalculationHistoryItemDao): CalculationHistoryStore {
         return CalculationHistoryStore(dao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCalculatorRepository(userPreferencesRepository: UserPreferencesRepository): CalculatorRepository {
+        return CalculatorRepository(userPreferencesRepository, provideAppScope())
     }
 
 }

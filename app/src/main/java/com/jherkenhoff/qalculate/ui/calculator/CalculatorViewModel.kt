@@ -8,6 +8,7 @@ import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jherkenhoff.qalculate.data.AutocompleteRepository
+import com.jherkenhoff.qalculate.data.CalculatorRepository
 import com.jherkenhoff.qalculate.data.UserPreferencesRepository
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.data.repository.CalculationHistoryStore
@@ -19,6 +20,7 @@ import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Action
 import com.jherkenhoff.qalculate.model.UndoManager
 import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -43,7 +45,8 @@ class CalculatorViewModel @Inject constructor(
     private val autocompleteUseCase: AutocompleteUseCase,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val autocompleteRepository: AutocompleteRepository,
-    private val calculationHistoryStore: CalculationHistoryStore
+    private val calculationHistoryStore: CalculationHistoryStore,
+    private val calculatorRepository: CalculatorRepository
 ) : ViewModel() {
     private val _internalInputTextFieldValue = MutableStateFlow(InternalTextFieldValue(TextFieldValue(), false))
 
@@ -115,6 +118,7 @@ class CalculatorViewModel @Inject constructor(
                 )
             )
         }
+        calculatorRepository.setAnsExpression(mathExpressionPlainText(resultString.value))
         updateInput(
             inputTextFieldValue.value.copy(selection = TextRange(0, inputTextFieldValue.value.text.length))
         )

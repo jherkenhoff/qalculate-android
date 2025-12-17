@@ -1,9 +1,11 @@
 package com.jherkenhoff.qalculate.data
 
+import android.util.Log
 import com.jherkenhoff.libqalculate.AutomaticApproximation
 import com.jherkenhoff.libqalculate.AutomaticFractionFormat
 import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.EvaluationOptions
+import com.jherkenhoff.libqalculate.KnownVariable
 import com.jherkenhoff.libqalculate.MathFunction
 import com.jherkenhoff.libqalculate.ParseOptions
 import com.jherkenhoff.libqalculate.PrintOptions
@@ -34,8 +36,12 @@ class CalculatorRepository @Inject constructor(
     private var _functions = MutableStateFlow<List<MathFunction>>(calc.functions)
     val functions: StateFlow<List<MathFunction>> = _functions.asStateFlow()
 
+    val ans = KnownVariable(calc.temporaryCategory(), "ans", "undefined")
+
     init {
         calc.loadGlobalDefinitions()
+
+        calc.addVariable(ans)
 
         userPreferencesRepository.userPreferencesFlow.onEach {
             when (it.decimalSeparator) {
@@ -47,6 +53,10 @@ class CalculatorRepository @Inject constructor(
         _variables.value = calc.variables
         _units.value = calc.units
         _functions.value = calc.functions
+    }
+
+    fun setAnsExpression(expression: String) {
+        ans.set(expression)
     }
 
     fun calculateAndPrint(
