@@ -7,6 +7,7 @@ import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jherkenhoff.qalculate.data.AutocompleteRepository
 import com.jherkenhoff.qalculate.data.UserPreferencesRepository
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.data.repository.CalculationHistoryStore
@@ -41,6 +42,7 @@ class CalculatorViewModel @Inject constructor(
     private val calculateUseCase: CalculateUseCase,
     private val autocompleteUseCase: AutocompleteUseCase,
     private val userPreferencesRepository: UserPreferencesRepository,
+    private val autocompleteRepository: AutocompleteRepository,
     private val calculationHistoryStore: CalculationHistoryStore
 ) : ViewModel() {
     private val _internalInputTextFieldValue = MutableStateFlow(InternalTextFieldValue(TextFieldValue(), false))
@@ -67,9 +69,9 @@ class CalculatorViewModel @Inject constructor(
         initialValue = ""
     )
 
-    val autocompleteResult = combine(_internalInputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { internalInputTextFieldValue, userPreferences ->
+    val autocompleteResult = combine(autocompleteRepository.trie , _internalInputTextFieldValue, ) { autocompleteTrie, internalInputTextFieldValue ->
         if (internalInputTextFieldValue.doAutocomplete)
-            autocompleteUseCase(internalInputTextFieldValue.textFieldValue, userPreferences)
+            autocompleteUseCase(autocompleteTrie, internalInputTextFieldValue.textFieldValue)
         else
             AutocompleteResult()
     }.stateIn(
