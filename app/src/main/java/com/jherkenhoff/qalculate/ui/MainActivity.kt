@@ -24,9 +24,5 @@ class MainActivity : ComponentActivity() {
         setContent {
             QalculateApp()
         }
-
-        lifecycleScope.launch {
-            autocompleteRepository.initialize()
-        }
     }
 }

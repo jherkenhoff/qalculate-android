@@ -1,6 +1,5 @@
 package com.jherkenhoff.qalculate.data
 
-import androidx.compose.foundation.layout.FlowRow
 import com.jherkenhoff.libqalculate.AutomaticApproximation
 import com.jherkenhoff.libqalculate.AutomaticFractionFormat
 import com.jherkenhoff.libqalculate.Calculator
@@ -13,7 +12,6 @@ import com.jherkenhoff.libqalculate.Variable
 import com.jherkenhoff.libqalculate.libqalculateConstants
 import com.jherkenhoff.qalculate.model.UserPreferences
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,24 +23,30 @@ class CalculatorRepository @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val appScope: CoroutineScope
 ) {
-    private val calculator = Calculator()
+    private val calc = Calculator()
 
-    private var _variables = MutableStateFlow<List<Variable>>(calculator.variables)
+    private var _variables = MutableStateFlow<List<Variable>>(calc.variables)
     val variables: StateFlow<List<Variable>> = _variables.asStateFlow()
 
-    private var _units = MutableStateFlow<List<Unit>>(calculator.units)
+    private var _units = MutableStateFlow<List<Unit>>(calc.units)
     val units: StateFlow<List<Unit>> = _units.asStateFlow()
 
-    private var _functions = MutableStateFlow<List<MathFunction>>(calculator.functions)
+    private var _functions = MutableStateFlow<List<MathFunction>>(calc.functions)
     val functions: StateFlow<List<MathFunction>> = _functions.asStateFlow()
 
     init {
+        calc.loadGlobalDefinitions()
+
         userPreferencesRepository.userPreferencesFlow.onEach {
             when (it.decimalSeparator) {
-                UserPreferences.DecimalSeparator.DOT -> calculator.useDecimalPoint()
-                UserPreferences.DecimalSeparator.COMMA -> calculator.useDecimalComma()
+                UserPreferences.DecimalSeparator.DOT -> calc.useDecimalPoint()
+                UserPreferences.DecimalSeparator.COMMA -> calc.useDecimalComma()
             }
         }.launchIn(appScope)
+
+        _variables.value = calc.variables
+        _units.value = calc.units
+        _functions.value = calc.functions
     }
 
     fun calculateAndPrint(
@@ -50,9 +54,9 @@ class CalculatorRepository @Inject constructor(
         evaluationOptions: EvaluationOptions,
         printOptions: PrintOptions
     ): String {
-        val unlocalizedInput = calculator.unlocalizeExpression(input, evaluationOptions.parse_options)
+        val unlocalizedInput = calc.unlocalizeExpression(input, evaluationOptions.parse_options)
 
-        return calculator.calculateAndPrint(
+        return calc.calculateAndPrint(
             unlocalizedInput,
             2000,
             evaluationOptions,
@@ -73,21 +77,21 @@ class CalculatorRepository @Inject constructor(
         parseOptions: ParseOptions,
         printOptions: PrintOptions
     ): String {
-        val unlocalizedInput = calculator.unlocalizeExpression(input, parseOptions)
+        val unlocalizedInput = calc.unlocalizeExpression(input, parseOptions)
 
         // TODO: Implement proper conversion handling
         val toExpressions = unlocalizedInput.split(" to ")
         if (toExpressions.size == 2) {
-            val beforeToExpression = calculator.parse(toExpressions.first(), parseOptions)
-            val afterToExpression = calculator.parse(toExpressions.last(), parseOptions)
+            val beforeToExpression = calc.parse(toExpressions.first(), parseOptions)
+            val afterToExpression = calc.parse(toExpressions.last(), parseOptions)
 
-            val beforeToString = calculator.print(beforeToExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
-            val afterToString = calculator.print(afterToExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
+            val beforeToString = calc.print(beforeToExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
+            val afterToString = calc.print(afterToExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
 
             return "$beforeToString to $afterToString"
         } else {
-            val parsedExpression = calculator.parse(unlocalizedInput, parseOptions)
-            return calculator.print(parsedExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
+            val parsedExpression = calc.parse(unlocalizedInput, parseOptions)
+            return calc.print(parsedExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
         }
     }
 }
