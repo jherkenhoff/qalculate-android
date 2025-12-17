@@ -49,7 +49,7 @@ class CalculateUseCase @Inject constructor(
             UserPreferences.ExpDisplay.UPPERCASE_E -> ExpDisplay.EXP_UPPERCASE_E
         }
         printOptions.interval_display   = IntervalDisplay.INTERVAL_DISPLAY_CONCISE
-        printOptions.indicate_infinite_series = true
+        //printOptions.indicate_infinite_series = true // TODO: Why is this a char? Check with upstream libqalculate
 
         printOptions.negative_exponents = userPreferences.negativeExponents
         printOptions.abbreviate_names   = userPreferences.abbreviateNames
