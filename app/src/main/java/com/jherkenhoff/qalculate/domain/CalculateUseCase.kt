@@ -2,8 +2,6 @@ package com.jherkenhoff.qalculate.domain
 
 import com.jherkenhoff.libqalculate.AngleUnit
 import com.jherkenhoff.libqalculate.ApproximationMode
-import com.jherkenhoff.libqalculate.AutomaticApproximation
-import com.jherkenhoff.libqalculate.AutomaticFractionFormat
 import com.jherkenhoff.libqalculate.DigitGrouping
 import com.jherkenhoff.libqalculate.DivisionSign
 import com.jherkenhoff.libqalculate.EvaluationOptions
@@ -13,7 +11,6 @@ import com.jherkenhoff.libqalculate.MultiplicationSign
 import com.jherkenhoff.libqalculate.NumberFractionFormat
 import com.jherkenhoff.libqalculate.ParseOptions
 import com.jherkenhoff.libqalculate.PrintOptions
-import com.jherkenhoff.libqalculate.libqalculateConstants
 import com.jherkenhoff.qalculate.data.CalculatorRepository
 import com.jherkenhoff.qalculate.model.UserPreferences
 import javax.inject.Inject
@@ -39,9 +36,11 @@ class CalculateUseCase @Inject constructor(
             UserPreferences.ApproximationMode.APPROXIMATE -> ApproximationMode.APPROXIMATION_APPROXIMATE
         }
         evaluationOptions.parse_options = parseOptions
+        evaluationOptions.allow_complex = true
 
         var printOptions = PrintOptions()
         printOptions.use_unicode_signs = 1
+        printOptions.spell_out_logical_operators = true
 
         printOptions.exp_display = when (userPreferences.expDisplay) {
             UserPreferences.ExpDisplay.POWER_OF_10 -> ExpDisplay.EXP_POWER_OF_10
