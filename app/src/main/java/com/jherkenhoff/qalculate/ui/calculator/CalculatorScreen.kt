@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
@@ -24,7 +25,6 @@ import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -263,7 +263,7 @@ fun CalculatorScreenContent(
                     }
                 }
 
-                if (targetOffset == 0f) {
+                if (calculationHistory.isNotEmpty() && targetOffset == 0f) {
                     historyListState.animateScrollToItem(0)
                 }
 
