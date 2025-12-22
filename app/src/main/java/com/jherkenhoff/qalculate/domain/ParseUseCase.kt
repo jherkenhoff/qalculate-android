@@ -1,7 +1,6 @@
 package com.jherkenhoff.qalculate.domain
 
 import com.jherkenhoff.libqalculate.AngleUnit
-import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.DigitGrouping
 import com.jherkenhoff.libqalculate.DivisionSign
 import com.jherkenhoff.libqalculate.ExpDisplay
@@ -10,7 +9,6 @@ import com.jherkenhoff.libqalculate.MultiplicationSign
 import com.jherkenhoff.libqalculate.NumberFractionFormat
 import com.jherkenhoff.libqalculate.ParseOptions
 import com.jherkenhoff.libqalculate.PrintOptions
-import com.jherkenhoff.libqalculate.libqalculateConstants
 import com.jherkenhoff.qalculate.data.CalculatorRepository
 import com.jherkenhoff.qalculate.model.UserPreferences
 import javax.inject.Inject
@@ -33,6 +31,7 @@ class ParseUseCase @Inject constructor(
             UserPreferences.ExpDisplay.LOWERCASE_E -> ExpDisplay.EXP_LOWERCASE_E
             UserPreferences.ExpDisplay.UPPERCASE_E -> ExpDisplay.EXP_UPPERCASE_E
         }
+        printOptions.improve_division_multipliers = false
         printOptions.use_unicode_signs = 1
         printOptions.place_units_separately = false
         printOptions.decimalpoint_sign  = when (userPreferences.decimalSeparator) {
