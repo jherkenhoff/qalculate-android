@@ -54,14 +54,15 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.jherkenhoff.qalculate.model.KeySpec
 import com.jherkenhoff.qalculate.model.Action
 import com.jherkenhoff.qalculate.model.ActionLabel
 import com.jherkenhoff.qalculate.model.KeyRole
+import com.jherkenhoff.qalculate.model.KeySpec
 import com.jherkenhoff.qalculate.model.Keys
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -188,7 +189,7 @@ fun DefaultKey(
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = CircleShape,
-                        shadowElevation = 3.dp,
+                        shadowElevation = 6.dp,
                         modifier = Modifier.defaultMinSize(32.dp, 32.dp),
                     ) {
                         Box(
@@ -201,7 +202,8 @@ fun DefaultKey(
                                     KeyLabel(
                                         label = label,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.padding(horizontal = 8.dp)
+                                        modifier = Modifier.padding(horizontal = 8.dp),
+                                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                                     )
                                 }
                             }
