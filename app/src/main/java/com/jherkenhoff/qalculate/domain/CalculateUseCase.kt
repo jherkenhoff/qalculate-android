@@ -47,7 +47,15 @@ class CalculateUseCase @Inject constructor(
             UserPreferences.ExpDisplay.LOWERCASE_E -> ExpDisplay.EXP_LOWERCASE_E
             UserPreferences.ExpDisplay.UPPERCASE_E -> ExpDisplay.EXP_UPPERCASE_E
         }
-        printOptions.interval_display   = IntervalDisplay.INTERVAL_DISPLAY_CONCISE
+
+        printOptions.interval_display = when (userPreferences.intervalDisplay) {
+            UserPreferences.IntervalDisplay.CONCISE -> IntervalDisplay.INTERVAL_DISPLAY_CONCISE
+            UserPreferences.IntervalDisplay.INTERVAL -> IntervalDisplay.INTERVAL_DISPLAY_INTERVAL
+            UserPreferences.IntervalDisplay.PLUSMINUS -> IntervalDisplay.INTERVAL_DISPLAY_PLUSMINUS
+            UserPreferences.IntervalDisplay.MIDPOINT -> IntervalDisplay.INTERVAL_DISPLAY_MIDPOINT
+            UserPreferences.IntervalDisplay.RELATIVE -> IntervalDisplay.INTERVAL_DISPLAY_RELATIVE
+            UserPreferences.IntervalDisplay.SIGNIFICANT_DIGITS -> IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
+        }
         //printOptions.indicate_infinite_series = true // TODO: Why is this a char? Check with upstream libqalculate
 
         printOptions.negative_exponents = userPreferences.negativeExponents

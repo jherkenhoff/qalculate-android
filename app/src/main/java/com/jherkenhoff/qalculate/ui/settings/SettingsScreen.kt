@@ -246,6 +246,24 @@ fun SettingsScreenContent(
                     bottom = true
                 )
             }
+            item {
+                SingleEnumSelectSettingsListItem<UserPreferences.IntervalDisplay>(
+                    "Interval display",
+                    enumLabelMap = {
+                        when (it) {
+                            UserPreferences.IntervalDisplay.CONCISE -> "Concise"
+                            UserPreferences.IntervalDisplay.INTERVAL -> "Interval"
+                            UserPreferences.IntervalDisplay.PLUSMINUS -> "Plus minus"
+                            UserPreferences.IntervalDisplay.MIDPOINT -> "Midpoint"
+                            UserPreferences.IntervalDisplay.RELATIVE -> "Relative"
+                            UserPreferences.IntervalDisplay.SIGNIFICANT_DIGITS -> "Significant digits"
+                        }
+                    },
+                    currentSelection = userPreferences.intervalDisplay,
+                    onSelect = { onUserPreferenceChange(userPreferences.copy(intervalDisplay = it)) },
+                    bottom = true
+                )
+            }
         }
     }
 }

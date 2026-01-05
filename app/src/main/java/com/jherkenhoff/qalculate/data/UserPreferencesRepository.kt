@@ -28,6 +28,7 @@ class UserPreferencesRepository @Inject constructor(
         val PLACE_UNITS_SEPARATELY = booleanPreferencesKey("place_units_separately")
         val PRESERVE_FORMAT_KEY = booleanPreferencesKey("preserve_format")
         val EXP_DISPLAY_KEY = stringPreferencesKey("exp_display")
+        val INTERVAL_DISPLAY_KEY = stringPreferencesKey("interval_display")
     }
 
     inline fun <reified T : Enum<T>> String?.toEnum() : T? {
@@ -51,6 +52,7 @@ class UserPreferencesRepository @Inject constructor(
             placeUnitsSeparately = preferences[PLACE_UNITS_SEPARATELY] ?: UserPreferences.Default.placeUnitsSeparately,
             preserveFormat = preferences[PRESERVE_FORMAT_KEY] ?: UserPreferences.Default.preserveFormat,
             expDisplay = preferences[EXP_DISPLAY_KEY].toEnum<UserPreferences.ExpDisplay>() ?: UserPreferences.Default.expDisplay,
+            intervalDisplay = preferences[INTERVAL_DISPLAY_KEY].toEnum<UserPreferences.IntervalDisplay>() ?: UserPreferences.Default.intervalDisplay,
         )
     }
 
@@ -70,6 +72,7 @@ class UserPreferencesRepository @Inject constructor(
             it[PLACE_UNITS_SEPARATELY] = userPreferences.placeUnitsSeparately
             it[PRESERVE_FORMAT_KEY] = userPreferences.preserveFormat
             it[EXP_DISPLAY_KEY] = userPreferences.expDisplay.name
+            it[INTERVAL_DISPLAY_KEY] = userPreferences.intervalDisplay.name
         }
     }
 }

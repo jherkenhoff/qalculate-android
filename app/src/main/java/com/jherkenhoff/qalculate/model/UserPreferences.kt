@@ -1,7 +1,5 @@
 package com.jherkenhoff.qalculate.model
 
-import com.jherkenhoff.libqalculate.PrintOptions
-
 data class UserPreferences(
     val decimalSeparator: DecimalSeparator = DecimalSeparator.DOT,
     val angleUnit: AngleUnit = AngleUnit.RADIANS,
@@ -16,7 +14,8 @@ data class UserPreferences(
     val useDenominatorPrefix: Boolean = false,
     val placeUnitsSeparately: Boolean = true,
     val preserveFormat: Boolean = true,
-    val expDisplay: ExpDisplay = ExpDisplay.POWER_OF_10
+    val expDisplay: ExpDisplay = ExpDisplay.POWER_OF_10,
+    val intervalDisplay: IntervalDisplay = IntervalDisplay.CONCISE
 ) {
     companion object {
         val Default = UserPreferences()
@@ -34,6 +33,7 @@ data class UserPreferences(
         FRACTION_DECIMAL, FRACTION_DECIMAL_EXACT, FRACTION_FRACTIONAL, FRACTION_COMBINED,
         FRACTION_PERCENT, FRACTION_PERMILLE, FRACTION_PERMYRIAD
     }
+    enum class IntervalDisplay {CONCISE, INTERVAL, PLUSMINUS, MIDPOINT, RELATIVE, SIGNIFICANT_DIGITS}
 
     fun getDivisionSignString(): String {
         return when (this.divisionSign) {
