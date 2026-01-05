@@ -9,15 +9,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -41,9 +48,13 @@ fun NavigationDrawer(
     onVariablesClick: () -> Unit = {},
     onUnitsClick: () -> Unit = {},
     onDatasetsClick: () -> Unit = {},
+    onClearCalculationHistoryClicked: () -> Unit = {},
     onAboutClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
 ) {
+
+    var clearHistoryDialogOpen by remember { mutableStateOf(false) }
+
     ModalDrawerSheet(modifier = modifier) {
         Box(
             modifier = Modifier
@@ -97,12 +108,15 @@ fun NavigationDrawer(
 //            icon = { Icon(Icons.Outlined.Dataset, contentDescription = null) },
 //            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 //        )
-
         Spacer(modifier = Modifier.weight(1f))
-        HorizontalDivider(
-            Modifier
-                .padding(horizontal = 25.dp)
-                .padding(top = 15.dp))
+        NavigationDrawerItem(
+            label = { Text(text = stringResource(R.string.clear_history)) },
+            selected = false,
+            onClick = { clearHistoryDialogOpen = true },
+            icon = { Icon(Icons.Default.Delete, contentDescription = null) },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        )
+        HorizontalDivider(Modifier.padding(horizontal = 25.dp))
         NavigationDrawerItem(
             label = { Text(text = stringResource(R.string.navigation_settings)) },
             selected = false,
@@ -116,6 +130,43 @@ fun NavigationDrawer(
             onClick = onAboutClick,
             icon = { Icon(Icons.Filled.Info, contentDescription = null) },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        )
+    }
+
+
+    if (clearHistoryDialogOpen) {
+        AlertDialog(
+            icon = {
+                Icon(Icons.Default.Delete, contentDescription = null)
+            },
+            title = {
+                Text(text = stringResource(R.string.clear_history_dialog_title))
+            },
+            text = {
+                Text(text = stringResource(R.string.clear_history_dialog_text))
+            },
+            onDismissRequest = {
+                clearHistoryDialogOpen = false
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        clearHistoryDialogOpen = false
+                        onClearCalculationHistoryClicked()
+                    }
+                ) {
+                    Text(stringResource(R.string.dialog_delete_button))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        clearHistoryDialogOpen = false
+                    }
+                ) {
+                    Text(stringResource(R.string.dialog_cancel_button))
+                }
+            }
         )
     }
 }

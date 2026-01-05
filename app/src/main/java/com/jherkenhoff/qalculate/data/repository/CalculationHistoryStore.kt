@@ -12,4 +12,6 @@ class CalculationHistoryStore(
     suspend fun addItem(item : CalculationHistoryItemData) = dao.insert(item)
 
     suspend fun deleteItem(item: CalculationHistoryItemData) = dao.delete(item)
+
+    suspend fun deleteAll() = dao.deleteAll()
 }

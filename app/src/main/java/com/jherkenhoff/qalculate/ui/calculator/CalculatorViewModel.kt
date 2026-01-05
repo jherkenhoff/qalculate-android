@@ -16,8 +16,8 @@ import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
-import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Action
+import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.UndoManager
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
@@ -100,6 +100,12 @@ class CalculatorViewModel @Inject constructor(
 
     private val _autocompleteDismissed = MutableStateFlow(false)
     val autocompleteDismissed = _autocompleteDismissed.asStateFlow()
+
+    fun clearCalculationHistory() {
+        viewModelScope.launch {
+            calculationHistoryStore.deleteAll()
+        }
+    }
 
     fun updateUserPreferences(userPreferences: UserPreferences) {
         viewModelScope.launch {

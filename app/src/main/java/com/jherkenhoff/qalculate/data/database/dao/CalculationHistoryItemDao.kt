@@ -27,6 +27,9 @@ interface CalculationHistoryItemDao {
     @Delete
     suspend fun delete(items: List<CalculationHistoryItemData>)
 
+    @Query("DELETE FROM calculation_history")
+    suspend fun deleteAll()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(entities: Collection<CalculationHistoryItemData>)
 

@@ -8,16 +8,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.jherkenhoff.qalculate.ui.calculator.CalculatorViewModel
 import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun QalculateApp() {
+
+    val viewModel: CalculatorViewModel = viewModel()
+
     QalculateTheme(dynamicColor = true) {
         val navController = rememberNavController()
 
@@ -48,6 +53,7 @@ fun QalculateApp() {
                     onUnitsClick = { navController.navigate(NavDestinations.Units); coroutineScope.launch { drawerState.close() } },
                     onAboutClick = { navController.navigate(NavDestinations.About); coroutineScope.launch { drawerState.close() } },
                     onSettingsClick = { navController.navigate(NavDestinations.Settings); coroutineScope.launch { drawerState.close() } },
+                    onClearCalculationHistoryClicked = { viewModel.clearCalculationHistory(); coroutineScope.launch { drawerState.close() }  }
                 )
             }
         ) {
@@ -59,7 +65,6 @@ fun QalculateApp() {
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
