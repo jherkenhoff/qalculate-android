@@ -1,6 +1,5 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.util.Log
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -21,6 +20,7 @@ import com.jherkenhoff.qalculate.model.Action
 import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.UndoManager
 import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -125,12 +125,7 @@ class CalculatorViewModel @Inject constructor(
             )
         }
 
-        viewModelScope.launch {
-            val unformattedResultString = calculateUseCase(inputTextFieldValue.value.text, userPreferences.value, format = false)
-            Log.d("moin", unformattedResultString)
-            calculatorRepository.setAnsExpression(unformattedResultString)
-        }
-
+        calculatorRepository.setAnsExpression(mathExpressionPlainText(inputTextFieldValue.value.text))
         updateInput(
             inputTextFieldValue.value.copy(selection = TextRange(0, inputTextFieldValue.value.text.length))
         )
