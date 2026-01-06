@@ -13,6 +13,6 @@
     <string name="clear_history">Clear history</string>
     <string name="clear_history_dialog_text">All history entries will be permanently deleted and cannot be recovered.</string>
     <string name="clear_history_dialog_title">Clear calculation history?</string>
-    <string name="dialog_delete_button">Delete</string>
+    <string name="dialog_clear_button">Clear</string>
     <string name="dialog_cancel_button">Cancel</string>
 </resources>

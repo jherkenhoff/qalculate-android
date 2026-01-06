@@ -65,6 +65,6 @@ class ParseUseCase @Inject constructor(
             UserPreferences.DecimalSeparator.COMMA -> ","
         }
 
-        return calculatorRepository.parse(input, parseOptions, printOptions)
+        return calculatorRepository.parseAndPrint(input, parseOptions, printOptions)
     }
 }

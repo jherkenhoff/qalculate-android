@@ -1,6 +1,5 @@
 package com.jherkenhoff.qalculate.data
 
-import android.util.Log
 import com.jherkenhoff.libqalculate.AutomaticApproximation
 import com.jherkenhoff.libqalculate.AutomaticFractionFormat
 import com.jherkenhoff.libqalculate.Calculator
@@ -56,13 +55,15 @@ class CalculatorRepository @Inject constructor(
     }
 
     fun setAnsExpression(expression: String) {
-        ans.set(expression)
+        val parsedExpression = calc.parse(expression)
+        ans.set(parsedExpression)
     }
 
     fun calculateAndPrint(
         input: String,
         evaluationOptions: EvaluationOptions,
-        printOptions: PrintOptions
+        printOptions: PrintOptions,
+        format: Boolean = true
     ): String {
         val unlocalizedInput = calc.unlocalizeExpression(input, evaluationOptions.parse_options)
 
@@ -76,13 +77,13 @@ class CalculatorRepository @Inject constructor(
             null,
             -1,
             null,
-            true,
-            1,
+            format,
+            if (format) 1 else 0,
             libqalculateConstants.TAG_TYPE_HTML
         )
     }
 
-    fun parse(
+    fun parseAndPrint(
         input: String,
         parseOptions: ParseOptions,
         printOptions: PrintOptions

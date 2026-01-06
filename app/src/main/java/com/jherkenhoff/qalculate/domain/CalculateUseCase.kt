@@ -18,7 +18,7 @@ import javax.inject.Inject
 class CalculateUseCase @Inject constructor(
     private val calculatorRepository: CalculatorRepository
 ) {
-    suspend operator fun invoke(input: String, userPreferences: UserPreferences): String {
+    operator fun invoke(input: String, userPreferences: UserPreferences, format: Boolean = true): String {
 
         val parseOptions = ParseOptions()
         parseOptions.preserve_format = userPreferences.preserveFormat
@@ -98,7 +98,8 @@ class CalculateUseCase @Inject constructor(
         return calculatorRepository.calculateAndPrint(
             input,
             evaluationOptions,
-            printOptions
+            printOptions,
+            format = format
         )
     }
 }
