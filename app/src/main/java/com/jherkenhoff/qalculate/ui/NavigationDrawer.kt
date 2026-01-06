@@ -155,7 +155,7 @@ fun NavigationDrawer(
                         onClearCalculationHistoryClicked()
                     }
                 ) {
-                    Text(stringResource(R.string.dialog_delete_button))
+                    Text(stringResource(R.string.dialog_clear_button))
                 }
             },
             dismissButton = {
