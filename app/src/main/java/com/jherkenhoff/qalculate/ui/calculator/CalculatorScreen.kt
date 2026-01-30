@@ -1,7 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
+import android.content.res.Configuration
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
@@ -11,20 +10,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Redo
-import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -60,34 +54,38 @@ import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.model.Action
 import com.jherkenhoff.qalculate.model.ActionLabel
 import com.jherkenhoff.qalculate.model.AutocompleteItem
+import com.jherkenhoff.qalculate.model.KeyPositionSpec
 import com.jherkenhoff.qalculate.model.KeyRole
 import com.jherkenhoff.qalculate.model.KeySpec
+import com.jherkenhoff.qalculate.model.KeypadSection
+import com.jherkenhoff.qalculate.model.KeypadSpec
 import com.jherkenhoff.qalculate.model.Keys
-import com.jherkenhoff.qalculate.model.PositionedKeySpec
 import com.jherkenhoff.qalculate.model.UndoState
 import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-private val secondaryKeypad: List<PositionedKeySpec> = listOf(
-    PositionedKeySpec(0, 0, Keys.keySpecX),
-    PositionedKeySpec(0, 1, Keys.keySpecY),
-    PositionedKeySpec(0, 2, Keys.keySpecZ),
-    PositionedKeySpec(0, 3, Keys.keySpecSiPrefix),
-    PositionedKeySpec(0, 4, Keys.keySpecBasicUnits),
+private val secondaryKeypad: List<Pair<KeyPositionSpec, KeySpec>> = listOf(
+    Pair(KeyPositionSpec(0, 0), Keys.keySpecX),
+    Pair(KeyPositionSpec(0, 1), Keys.keySpecY),
+    Pair(KeyPositionSpec(0, 2), Keys.keySpecZ),
+    Pair(KeyPositionSpec(0, 3), Keys.keySpecSiPrefix),
+    Pair(KeyPositionSpec(0, 4), Keys.keySpecBasicUnits),
 
-    PositionedKeySpec(1, 0, Keys.keySpecIntegral),
-    PositionedKeySpec(1, 1, Keys.keySpecDifferential),
-    PositionedKeySpec(1, 2, Keys.keySpecSum),
-    PositionedKeySpec(1, 3, Keys.keySpecImaginary),
-    PositionedKeySpec(1, 4, Keys.keySpecComplexOperators),
+    Pair(KeyPositionSpec(1, 0), Keys.keySpecIntegral),
+    Pair(KeyPositionSpec(1, 1), Keys.keySpecDifferential),
+    Pair(KeyPositionSpec(1, 2), Keys.keySpecSum),
+    Pair(KeyPositionSpec(1, 3), Keys.keySpecImaginary),
+    Pair(KeyPositionSpec(1, 4), Keys.keySpecComplexOperators),
 
-    PositionedKeySpec(2, 0, Keys.keySpecSin),
-    PositionedKeySpec(2, 1, Keys.keySpecCos),
-    PositionedKeySpec(2, 2, Keys.keySpecTan),
-    PositionedKeySpec(2, 3, Keys.keySpecLn),
-    PositionedKeySpec(2, 4, Keys.keySpecInfinity)
+    Pair(KeyPositionSpec(2, 0), Keys.keySpecSin),
+    Pair(KeyPositionSpec(2, 1), Keys.keySpecCos),
+    Pair(KeyPositionSpec(2, 2), Keys.keySpecTan),
+    Pair(KeyPositionSpec(2, 3), Keys.keySpecLn),
+    Pair(KeyPositionSpec(2, 4), Keys.keySpecInfinity)
 )
+
 
 @Composable
 fun CalculatorScreen(
@@ -124,7 +122,6 @@ fun Modifier.shrinkHeightAbsolute(shrinkPx: Int): Modifier = this.then(
     }
 )
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
     ExperimentalSharedTransitionApi::class, ExperimentalLayoutApi::class
 )
@@ -148,8 +145,6 @@ fun CalculatorScreenContent(
     val scope = rememberCoroutineScope()
     val localDensity = LocalDensity.current
 
-    var keyboardEnabled by remember { mutableStateOf(false) }
-
     val imeHeight = WindowInsets.ime.getBottom(localDensity)
     val imeFullyHidden = imeHeight == 0
 
@@ -159,8 +154,6 @@ fun CalculatorScreenContent(
     }
 
     val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
-
-    var activeSecondaryKeypad by remember { mutableIntStateOf(0) }
 
     // TODO: Move dynamic decimal selection to some sort of key-factory
     val decimalChar = when (userPreferences.decimalSeparator) {
@@ -185,38 +178,60 @@ fun CalculatorScreenContent(
     val divisionChar = userPreferences.getDivisionSignString()
     val keySpecDivision = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.operator(ActionLabel.Text(divisionChar), divisionChar), role = KeyRole.OPERATOR)
 
-    val primaryKeypad : List<PositionedKeySpec> = listOf(
-        PositionedKeySpec(0, 0, Keys.keySpecPercent),
-        PositionedKeySpec(0, 1, Keys.keySpecPi),
-        PositionedKeySpec(0, 2, Keys.keySpec7),
-        PositionedKeySpec(0, 3, Keys.keySpec8),
-        PositionedKeySpec(0, 4, Keys.keySpec9),
-        PositionedKeySpec(0, 5, Keys.keySpecBackspace),
-        PositionedKeySpec(0, 6, Keys.keySpecClearAll),
+    val primaryKeypad : List<Pair<KeyPositionSpec, KeySpec>> = listOf(
+        Pair(KeyPositionSpec(0, 0), Keys.keySpecPercent),
+        Pair(KeyPositionSpec(0, 1), Keys.keySpecPi),
+        Pair(KeyPositionSpec(0, 2), Keys.keySpec7),
+        Pair(KeyPositionSpec(0, 3), Keys.keySpec8),
+        Pair(KeyPositionSpec(0, 4), Keys.keySpec9),
+        Pair(KeyPositionSpec(0, 5), Keys.keySpecBackspace),
+        Pair(KeyPositionSpec(0, 6), Keys.keySpecClearAll),
 
-        PositionedKeySpec(1, 0, Keys.keySpecSqrt),
-        PositionedKeySpec(1, 1, Keys.keySpecPower),
-        PositionedKeySpec(1, 2, Keys.keySpec4),
-        PositionedKeySpec(1, 3, Keys.keySpec5),
-        PositionedKeySpec(1, 4, Keys.keySpec6),
-        PositionedKeySpec(1, 5, keySpecMultiply),
-        PositionedKeySpec(1, 6, keySpecDivision),
+        Pair(KeyPositionSpec(1, 0), Keys.keySpecSqrt),
+        Pair(KeyPositionSpec(1, 1), Keys.keySpecPower),
+        Pair(KeyPositionSpec(1, 2), Keys.keySpec4),
+        Pair(KeyPositionSpec(1, 3), Keys.keySpec5),
+        Pair(KeyPositionSpec(1, 4), Keys.keySpec6),
+        Pair(KeyPositionSpec(1, 5), keySpecMultiply),
+        Pair(KeyPositionSpec(1, 6), keySpecDivision),
 
-        PositionedKeySpec(2, 0, Keys.keySpecBracketOpen),
-        PositionedKeySpec(2, 1, Keys.keySpecBracketClose),
-        PositionedKeySpec(2, 2, Keys.keySpec1),
-        PositionedKeySpec(2, 3, Keys.keySpec2),
-        PositionedKeySpec(2, 4, Keys.keySpec3),
-        PositionedKeySpec(2, 5, Keys.keySpecPlus),
-        PositionedKeySpec(2, 6, Keys.keySpecMinus),
+        Pair(KeyPositionSpec(2, 0), Keys.keySpecBracketOpen),
+        Pair(KeyPositionSpec(2, 1), Keys.keySpecBracketClose),
+        Pair(KeyPositionSpec(2, 2), Keys.keySpec1),
+        Pair(KeyPositionSpec(2, 3), Keys.keySpec2),
+        Pair(KeyPositionSpec(2, 4), Keys.keySpec3),
+        Pair(KeyPositionSpec(2, 5), Keys.keySpecPlus),
+        Pair(KeyPositionSpec(2, 6), Keys.keySpecMinus),
 
-        PositionedKeySpec(3, 0, Keys.keySpecUnderscore),
-        PositionedKeySpec(3, 1, Keys.keySpecEqual),
-        PositionedKeySpec(3, 2, Keys.keySpec0),
-        PositionedKeySpec(3, 3, keySpecDecimal),
-        PositionedKeySpec(3, 4, Keys.keySpecExp),
-        PositionedKeySpec(3, 5, 1, 2, Keys.keySpecReturn),
+        Pair(KeyPositionSpec(3, 0), Keys.keySpecUnderscore),
+        Pair(KeyPositionSpec(3, 1), Keys.keySpecEqual),
+        Pair(KeyPositionSpec(3, 2), Keys.keySpec0),
+        Pair(KeyPositionSpec(3, 3), keySpecDecimal),
+        Pair(KeyPositionSpec(3, 4), Keys.keySpecExp),
+        Pair(KeyPositionSpec(3, 5, 1, 2), Keys.keySpecReturn),
     )
+
+    val keypads = listOf(
+        KeypadSpec(
+            name = "Keyboard",
+            icon = Icons.Default.Keyboard,
+            sections = listOf(
+                KeypadSection(4, 7, primaryKeypad, 0.6f)
+            ),
+            imeEnabled = true
+        ),
+        KeypadSpec(
+            name = "Advanced",
+            icon = Icons.Default.Science,
+            sections = listOf(
+                KeypadSection(3, 5, secondaryKeypad, 0.5f),
+                KeypadSection(4, 7, primaryKeypad, 0.9f)
+            ),
+            imeEnabled = false
+        )
+    )
+
+    var activeKeypad by remember { mutableIntStateOf(0) }
 
     val historyListState = rememberLazyListState()
 
@@ -305,7 +320,7 @@ fun CalculatorScreenContent(
                     onValueChange = onInputFieldValueChange,
                     onUserPreferencesChanged = onUserPreferencesChanged,
                     onMenuClick = onMenuClick,
-                    interceptKeyboard = !keyboardEnabled,
+                    interceptKeyboard = !keypads[activeKeypad].imeEnabled,
                     modifier = Modifier
                         .nestedScroll(nestedScrollConnectionInputSheet)
                         .scrollable(
@@ -314,98 +329,13 @@ fun CalculatorScreenContent(
                         )
                 )
 
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    shadowElevation = 10.dp,
-                    modifier = Modifier.zIndex(3f)
-                ) {
-                    Column() {
-
-                        val auxiliaryActions = listOf(
-                            Action.MoveCursor(
-                                ActionLabel.Icon(Icons.Default.ChevronLeft, "Move cursor to the left"),
-                                -1,
-                                enabled = (inputTextFieldValue.selection.end != 0)
-                            ),
-                            Action.MoveCursor(
-                                ActionLabel.Icon(Icons.Default.ChevronRight, "Move cursor to the right"),
-                                1,
-                                enabled = (inputTextFieldValue.selection.end != inputTextFieldValue.text.length)
-                            ),
-                            Action.Undo(
-                                ActionLabel.Icon(Icons.AutoMirrored.Filled.Undo, "Undo"),
-                                enabled = undoState.canUndo
-                            ),
-                            Action.Redo(
-                                ActionLabel.Icon(Icons.AutoMirrored.Filled.Redo, "Redo"),
-                                enabled = undoState.canRedo
-                            ),
-                        )
-
-                        AuxiliaryBar(
-                            autocompleteResult = internalAutocompleteResult,
-                            keyboardEnable = keyboardEnabled,
-                            auxiliaryActions = auxiliaryActions,
-                            onAutocompleteClick = onAutocompleteClick,
-                            onKeyboardEnableChange = { keyboardEnabled = it },
-                            onAction = onKeyAction,
-                            onAutocompleteDismiss = { autocompleteDismissed = true },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        Column(
-                            Modifier
-                                .clipToBounds()
-                                .shrinkHeightAbsolute(offsetY.value.toInt())
-                                .onGloballyPositioned {
-                                    maxOffset = it.size.height.toFloat()
-                                }
-                                .padding(horizontal = 3.dp)
-                        ) {
-                            AnimatedVisibility(!keyboardEnabled) {
-                                GridLayout(
-                                    3,
-                                    5,
-                                    horizontalSpacing = 3.dp,
-                                    verticalSpacing = 3.dp,
-                                    aspectRatio = 0.5f,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    secondaryKeypad.forEach {
-                                        item(it.row, it.col, it.rowSpan, it.colSpan) {
-                                            Key(
-                                                it.keySpec,
-                                                onKeyAction = onKeyAction
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                            Spacer(Modifier.height(3.dp))
-                            GridLayout(
-                                4,
-                                7,
-                                horizontalSpacing = 3.dp,
-                                verticalSpacing = 3.dp,
-                                aspectRatio = if (imeFullyHidden) 0.9f else 0.6f,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                primaryKeypad.forEach {
-                                    item(it.row, it.col, it.rowSpan, it.colSpan) {
-                                        Key(
-                                            it.keySpec,
-                                            onKeyAction = onKeyAction
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        Spacer(Modifier.height(3.dp))
-                        Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
-
-                    }
-                }
+                Keypad(
+                    keypads,
+                    activeKeypad,
+                    Modifier.clipToBounds()
+                        .shrinkHeightAbsolute(offsetY.value.toInt())
+                        .onGloballyPositioned { maxOffset = it.size.height.toFloat() }
+                )
 
             }
         }
@@ -413,33 +343,26 @@ fun CalculatorScreenContent(
 }
 
 
-@Preview(showSystemUi = true, device = Devices.DEFAULT)
+@Preview(name = "Light Mode", showSystemUi = true, device = Devices.DEFAULT)
+@Preview(name = "Dark Mode", showSystemUi = true, device = Devices.DEFAULT, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DefaultPreview() {
-
-    CalculatorScreenContent(
-        TextFieldValue("c"),
-        "SpeedOfLight",
-        "299.792 458 Km/ms",
-        userPreferences = UserPreferences(),
-        onUserPreferencesChanged = {},
-        autocompleteResult = AutocompleteResult(),
-        undoState = UndoState<TextFieldValue>(),
-        calculationHistory = listOf(
-            CalculationHistoryItemData(
-                0, "1+1", "1+1", "2", LocalDateTime.now()
-            ),
-//            CalculationHistoryItemData(
-//                1, "2+2", "2+2", "4", LocalDateTime.now()
-//            ),
-//            CalculationHistoryItemData(
-//                2, "2+2", "2+2", "4", LocalDateTime.now()
-//            ),
-//            CalculationHistoryItemData(
-//                3, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
-//            )
+    QalculateTheme() {
+        CalculatorScreenContent(
+            TextFieldValue("c"),
+            "SpeedOfLight",
+            "299.792 458 Km/ms",
+            userPreferences = UserPreferences(),
+            onUserPreferencesChanged = {},
+            autocompleteResult = AutocompleteResult(),
+            undoState = UndoState<TextFieldValue>(),
+            calculationHistory = listOf(
+                CalculationHistoryItemData(
+                    0, "1+1", "1+1", "2", LocalDateTime.now()
+                )
+            )
         )
-    )
+    }
 }
 
 
@@ -447,60 +370,64 @@ private fun DefaultPreview() {
 @Composable
 private fun ManyHistoryItemsPreview() {
 
-    CalculatorScreenContent(
-        TextFieldValue("c"),
-        "SpeedOfLight",
-        "299.792 458 Km/ms",
-        userPreferences = UserPreferences(),
-        onUserPreferencesChanged = {},
-        autocompleteResult = AutocompleteResult(),
-        undoState = UndoState<TextFieldValue>(),
-        calculationHistory = listOf(
-            CalculationHistoryItemData(
-                0, "1+1", "1+1", "2", LocalDateTime.now()
-            ),
-            CalculationHistoryItemData(
-                1, "2+2", "2+2", "4", LocalDateTime.now()
-            ),
-            CalculationHistoryItemData(
-                2, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
-            ),
-            CalculationHistoryItemData(
-                3, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
-            ),
-            CalculationHistoryItemData(
-                4, "2+2", "2+2", "4", LocalDateTime.now().minusDays(2)
-            ),
-            CalculationHistoryItemData(
-                5, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
-            ),
-            CalculationHistoryItemData(
-                6, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
-            ),
-            CalculationHistoryItemData(
-                7, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
-            ),
-            CalculationHistoryItemData(
-                8, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
-            ),
-            CalculationHistoryItemData(
-                9, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+    QalculateTheme() {
+        CalculatorScreenContent(
+            TextFieldValue("c"),
+            "SpeedOfLight",
+            "299.792 458 Km/ms",
+            userPreferences = UserPreferences(),
+            onUserPreferencesChanged = {},
+            autocompleteResult = AutocompleteResult(),
+            undoState = UndoState<TextFieldValue>(),
+            calculationHistory = listOf(
+                CalculationHistoryItemData(
+                    0, "1+1", "1+1", "2", LocalDateTime.now()
+                ),
+                CalculationHistoryItemData(
+                    1, "2+2", "2+2", "4", LocalDateTime.now()
+                ),
+                CalculationHistoryItemData(
+                    2, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
+                ),
+                CalculationHistoryItemData(
+                    3, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
+                ),
+                CalculationHistoryItemData(
+                    4, "2+2", "2+2", "4", LocalDateTime.now().minusDays(2)
+                ),
+                CalculationHistoryItemData(
+                    5, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+                ),
+                CalculationHistoryItemData(
+                    6, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+                ),
+                CalculationHistoryItemData(
+                    7, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+                ),
+                CalculationHistoryItemData(
+                    8, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+                ),
+                CalculationHistoryItemData(
+                    9, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
+                )
             )
         )
-    )
+    }
 }
 
 @Preview(showSystemUi = true, device = Devices.DEFAULT)
 @Composable
 private fun EmptyHistoryPreview() {
-    CalculatorScreenContent(
-        TextFieldValue("c"),
-        "SpeedOfLight",
-        "299.792 458 Km/ms",
-        userPreferences = UserPreferences(),
-        onUserPreferencesChanged = {},
-        autocompleteResult = AutocompleteResult(),
-        undoState = UndoState<TextFieldValue>(),
-        calculationHistory = emptyList()
-    )
+    QalculateTheme() {
+        CalculatorScreenContent(
+            TextFieldValue("c"),
+            "SpeedOfLight",
+            "299.792 458 Km/ms",
+            userPreferences = UserPreferences(),
+            onUserPreferencesChanged = {},
+            autocompleteResult = AutocompleteResult(),
+            undoState = UndoState<TextFieldValue>(),
+            calculationHistory = emptyList()
+        )
+    }
 }
