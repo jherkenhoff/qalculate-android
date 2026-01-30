@@ -15,4 +15,123 @@
     <string name="clear_history_dialog_title">Clear calculation history?</string>
     <string name="dialog_clear_button">Clear</string>
     <string name="dialog_cancel_button">Cancel</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_general">General</string>
+    <string name="settings_decimal_separator">Decimal separator</string>
+    <string name="settings_dot">Dot</string>
+    <string name="settings_comma">Comma</string>
+    <string name="settings_multiplication_sign">Multiplication sign</string>
+    <string name="settings_times">Times</string>
+    <string name="settings_asterisk">Asterisk</string>
+    <string name="settings_alt_dot">Alt. dot</string>
+    <string name="settings_division_sign">Division sign</string>
+    <string name="settings_division_slash">Division slash</string>
+    <string name="settings_slash">Slash</string>
+    <string name="settings_division">Division</string>
+    <string name="settings_calculation">Calculation</string>
+    <string name="settings_preserve_structure">Preserve structure</string>
+    <string name="settings_preserve_structure_summary">Preserve the input structure as much as possible</string>
+    <string name="settings_output">Output</string>
+    <string name="settings_negative_exponents">Negative exponents</string>
+    <string name="settings_negative_exponents_summary">Print A%1$sB⁻¹ instead of A%2$sB</string>
+    <string name="settings_abbreviate_names">Abbreviate names</string>
+    <string name="settings_abbreviate_names_summary">Print m instead of meter</string>
+    <string name="settings_spacious_output">Spacious output</string>
+    <string name="settings_spacious_output_summary">Use more spaces to improve readability</string>
+    <string name="settings_allow_prefix_denominator">Allow prefix in denominator</string>
+    <string name="settings_allow_prefix_denominator_summary">Print km%1$sms instead of Mm%1$ss</string>
+    <string name="settings_isolate_units">Isolate units</string>
+    <string name="settings_isolate_units_summary">Place units at the end of the result</string>
+    <string name="settings_exp_display">Exp display</string>
+    <string name="settings_interval_display">Interval display</string>
+    <string name="settings_interval_concise">Concise</string>
+    <string name="settings_interval_interval">Interval</string>
+    <string name="settings_interval_plus_minus">Plus minus</string>
+    <string name="settings_interval_midpoint">Midpoint</string>
+    <string name="settings_interval_relative">Relative</string>
+    <string name="settings_interval_significant_digits">Significant digits</string>
+
+    <!-- Units -->
+    <string name="units_title">Units</string>
+    <string name="units_search_placeholder">search units</string>
+    <string name="units_filter_light">Light</string>
+    <string name="units_filter_system">System</string>
+    <string name="units_filter_favorite">Favorite</string>
+    <string name="units_filter_custom">Custom</string>
+    <string name="units_menu_up">Up</string>
+    <string name="units_menu_settings">Settings</string>
+    <string name="units_menu_radiance">Radiance</string>
+    <string name="cd_add_unit">Add unit icon</string>
+    <string name="cd_search">Search icon</string>
+    <string name="cd_sort">Sort icon</string>
+    <string name="cd_unit_system">Unit system icon</string>
+
+    <!-- History -->
+    <string name="history_empty_title">No calculations yet</string>
+    <string name="history_empty_subtitle">Your calculation history will appear here</string>
+    <string name="history_today">Today</string>
+    <string name="history_yesterday">Yesterday</string>
+    <string name="action_delete">Delete</string>
+
+    <!-- Keys -->
+    <string name="key_abs">Abs.</string>
+    <string name="key_arg">Arg.</string>
+    <string name="key_real">Real</string>
+    <string name="key_imag">Imag.</string>
+    <string name="key_conj">Conj.</string>
+    <string name="key_return">Return</string>
+    <string name="key_backspace">Backspace</string>
+    <string name="key_nan">NaN</string>
+    <string name="key_inf">Infinity</string>
+
+    <!-- About -->
+    <string name="about_app_version">App version %1$s</string>
+    <string name="about_lib_version">libqalculate version %1$s</string>
+    <string name="about_check_out">Check out on </string>
+    <string name="about_github">GitHub</string>
+    <string name="about_license_intro">This program comes with absolutely no warranty. See the </string>
+    <string name="about_license_name">GNU General Public License, version 2 or later</string>
+    <string name="about_license_details"> for details.</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_open_nav_menu">Open navigation menu</string>
+    <string name="cd_move_cursor_left">Move cursor to the left</string>
+    <string name="cd_move_cursor_right">Move cursor to the right</string>
+    <string name="cd_undo">Undo</string>
+    <string name="cd_redo">Redo</string>
+
+    <!-- Units and Prefixes -->
+    <string name="unit_giga">giga</string>
+    <string name="unit_mega">mega</string>
+    <string name="unit_kilo">kilo</string>
+    <string name="unit_milli">milli</string>
+    <string name="unit_micro">micro</string>
+    <string name="unit_nano">nano</string>
+    <string name="unit_pico">pico</string>
+
+    <string name="unit_ampere">Ampere</string>
+    <string name="unit_gram">Gram</string>
+    <string name="unit_joule">Joule</string>
+    <string name="unit_kelvin">Kelvin</string>
+    <string name="unit_liter">Liter</string>
+    <string name="unit_meter">Meter</string>
+    <string name="unit_newton">Newton</string>
+    <string name="unit_ohm">Ohm</string>
+    <string name="unit_pascal">Pascal</string>
+    <string name="unit_second">Second</string>
+    <string name="unit_volt">Volt</string>
+    <string name="unit_watt">Watt</string>
+
+    <string name="unit_thou">thou</string>
+    <string name="unit_inch">inch</string>
+    <string name="unit_foot">foot</string>
+    <string name="unit_yard">yard</string>
+    <string name="unit_mile">mile</string>
+
+    <string name="unit_grain">grain</string>
+    <string name="unit_ounce">ounce</string>
+    <string name="unit_pound">pound</string>
+    <string name="unit_stone">stone</string>
 </resources>

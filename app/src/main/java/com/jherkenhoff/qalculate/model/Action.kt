@@ -7,7 +7,8 @@ sealed class ActionLabel {
     data class Text(val text: AnnotatedString) : ActionLabel() {
         constructor(text: String) : this(AnnotatedString(text))
     }
-    data class Icon(val icon: ImageVector, val description: String?) : ActionLabel()
+    data class Resource(val resId: Int) : ActionLabel()
+    data class Icon(val icon: ImageVector, val description: String? = null, val descriptionRes: Int? = null) : ActionLabel()
 }
 
 

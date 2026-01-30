@@ -16,6 +16,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.em
+import com.jherkenhoff.qalculate.R
 import kotlin.Int.Companion.MAX_VALUE
 import kotlin.Int.Companion.MIN_VALUE
 
@@ -144,11 +145,11 @@ object Keys {
     )
     val keySpecEuler = KeySpec.DefaultKeySpec(clickAction = Action.InsertText(ActionLabel.Text("e"), "e"), role = KeyRole.OPERATOR)
     val keySpecReturn = KeySpec.DefaultKeySpec(
-        clickAction = Action.Return(ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardReturn, "Return")),
+        clickAction = Action.Return(ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardReturn, descriptionRes = R.string.key_return)),
         longClickAction = Action.InsertText(ActionLabel.Text("ans"), "ans"),
         role = KeyRole.SYSTEM
     )
-    val keySpecBackspace = KeySpec.DefaultKeySpec(clickAction = Action.Backspace(ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardBackspace, "Backspace")), role = KeyRole.SYSTEM)
+    val keySpecBackspace = KeySpec.DefaultKeySpec(clickAction = Action.Backspace(ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardBackspace, descriptionRes = R.string.key_backspace)), role = KeyRole.SYSTEM)
     val keySpecClearAll = KeySpec.DefaultKeySpec(clickAction = Action.ClearAll(ActionLabel.Text("AC")), role = KeyRole.SYSTEM)
 
     val keySpecIntegral = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.function(ActionLabel.Text("∫"), "integral"), role = KeyRole.OPERATOR)
@@ -170,11 +171,11 @@ object Keys {
     )
     val keySpecComplexOperators = KeySpec.SelectorKeySpec(
         listOf(
-            Action.InsertText.function(ActionLabel.Text("Abs."), "abs"),
-            Action.InsertText.function(ActionLabel.Text("Arg."), "arg"),
-            Action.InsertText.function(ActionLabel.Text("Real"), "re"),
-            Action.InsertText.function(ActionLabel.Text("Imag."), "im"),
-            Action.InsertText.function(ActionLabel.Text("Conj."), "conj")
+            Action.InsertText.function(ActionLabel.Resource(R.string.key_abs), "abs"),
+            Action.InsertText.function(ActionLabel.Resource(R.string.key_arg), "arg"),
+            Action.InsertText.function(ActionLabel.Resource(R.string.key_real), "re"),
+            Action.InsertText.function(ActionLabel.Resource(R.string.key_imag), "im"),
+            Action.InsertText.function(ActionLabel.Resource(R.string.key_conj), "conj")
         ),
         2,
         role = KeyRole.OPERATOR
@@ -246,11 +247,11 @@ object Keys {
 
     val keySpecImperialLength = KeySpec.SelectorKeySpec(
         listOf(
-            Action.InsertText.operator(ActionLabel.Text("thou"), "thou "),
-            Action.InsertText.operator(ActionLabel.Text("inch"), "in "),
-            Action.InsertText.operator(ActionLabel.Text("foot"), "ft "),
-            Action.InsertText.operator(ActionLabel.Text("yard"), "yd "),
-            Action.InsertText.operator(ActionLabel.Text("mile"), "mile "),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_thou), "thou "),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_inch), "in "),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_foot), "ft "),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_yard), "yd "),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_mile), "mile "),
         ),
         1,
         role= KeyRole.OPERATOR
@@ -258,10 +259,10 @@ object Keys {
 
     val keySpecImperialWeight = KeySpec.SelectorKeySpec(
         listOf(
-            Action.InsertText.operator(ActionLabel.Text("grain"), "gr "),
-            Action.InsertText.operator(ActionLabel.Text("ounce"), "oz "),
-            Action.InsertText.operator(ActionLabel.Text("pound"), "lb "),
-            Action.InsertText.operator(ActionLabel.Text("stone"), "stone "),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_grain), "gr "),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_ounce), "oz "),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_pound), "lb "),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_stone), "stone "),
         ),
         2,
         role= KeyRole.OPERATOR
@@ -283,13 +284,13 @@ object Keys {
 
     val keySpecSiPrefix = KeySpec.SelectorKeySpec(
         listOf(
-            Action.InsertText.operator(ActionLabel.Text("giga"), "G"),
-            Action.InsertText.operator(ActionLabel.Text("mega"), "M"),
-            Action.InsertText.operator(ActionLabel.Text("kilo"), "k"),
-            Action.InsertText.operator(ActionLabel.Text("milli"), "m"),
-            Action.InsertText.operator(ActionLabel.Text("micro"), "µ"),
-            Action.InsertText.operator(ActionLabel.Text("nano"), "n"),
-            Action.InsertText.operator(ActionLabel.Text("pico"), "p"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_giga), "G"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_mega), "M"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_kilo), "k"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_milli), "m"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_micro), "µ"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_nano), "n"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_pico), "p"),
         ),
         2,
         role= KeyRole.OPERATOR
@@ -297,18 +298,18 @@ object Keys {
 
     val keySpecBasicUnits = KeySpec.SelectorKeySpec(
         listOf(
-            Action.InsertText.operator(ActionLabel.Text("Ampere"), "A"),
-            Action.InsertText.operator(ActionLabel.Text("Gram"), "g"),
-            Action.InsertText.operator(ActionLabel.Text("Joule"), "J"),
-            Action.InsertText.operator(ActionLabel.Text("Kelvin"), "K"),
-            Action.InsertText.operator(ActionLabel.Text("Liter"), "L"),
-            Action.InsertText.operator(ActionLabel.Text("Meter"), "m"),
-            Action.InsertText.operator(ActionLabel.Text("Newton"), "N"),
-            Action.InsertText.operator(ActionLabel.Text("Ohm"), "Ω"),
-            Action.InsertText.operator(ActionLabel.Text("Pascal"), "Pa"),
-            Action.InsertText.operator(ActionLabel.Text("Second"), "s"),
-            Action.InsertText.operator(ActionLabel.Text("Volt"), "V"),
-            Action.InsertText.operator(ActionLabel.Text("Watt"), "W"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_ampere), "A"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_gram), "g"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_joule), "J"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_kelvin), "K"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_liter), "L"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_meter), "m"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_newton), "N"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_ohm), "Ω"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_pascal), "Pa"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_second), "s"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_volt), "V"),
+            Action.InsertText.operator(ActionLabel.Resource(R.string.unit_watt), "W"),
         ),
         5,
         role= KeyRole.OPERATOR

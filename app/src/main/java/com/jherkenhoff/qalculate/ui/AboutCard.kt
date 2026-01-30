@@ -65,12 +65,12 @@ fun AboutCard(
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
-                        Text(text = "Qalculate!", style = MaterialTheme.typography.headlineSmall)
+                        Text(text = stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall)
                         Text(
-                            text = "App version " + BuildConfig.VERSION_NAME
+                            text = stringResource(R.string.about_app_version, BuildConfig.VERSION_NAME)
                         )
                         Text(
-                            text = "libqalculate version $libqalculateVersion"
+                            text = stringResource(R.string.about_lib_version, libqalculateVersion)
                         )
                     }
                 }
@@ -95,16 +95,18 @@ fun GithubText(
     modifier: Modifier = Modifier
 ) {
     // Display a link in the text
+    val checkOutText = stringResource(R.string.about_check_out)
+    val githubText = stringResource(R.string.about_github)
     Text(
         buildAnnotatedString {
-            append("Check out on ")
+            append(checkOutText)
             withLink(
                 LinkAnnotation.Url(
                     "https://github.com/jherkenhoff/qalculate-android",
                     TextLinkStyles(style = SpanStyle(textDecoration = TextDecoration.Underline))
                 )
             ) {
-                append("GitHub")
+                append(githubText)
             }
         },
         textAlign = TextAlign.Center,
@@ -116,18 +118,21 @@ fun GithubText(
 @Composable
 fun LicenseText() {
     // Display a link in the text
+    val licenseIntro = stringResource(R.string.about_license_intro)
+    val licenseName = stringResource(R.string.about_license_name)
+    val licenseDetails = stringResource(R.string.about_license_details)
     Text(
         buildAnnotatedString {
-            append("This program comes with absolutely no warranty. See the ")
+            append(licenseIntro)
             withLink(
                 LinkAnnotation.Url(
                     "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
                     TextLinkStyles(style = SpanStyle(textDecoration = TextDecoration.Underline))
                 )
             ) {
-                append("GNU General Public License, version 2 or later")
+                append(licenseName)
             }
-            append(" for details.")
+            append(licenseDetails)
         },
         textAlign = TextAlign.Center
     )

@@ -42,9 +42,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jherkenhoff.qalculate.R
 
 data class UnitDefinition(
     val title: String,
@@ -83,13 +85,13 @@ fun UnitsScreenContent(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(text = "Units")
+                    Text(text = stringResource(R.string.units_title))
                 },
                 navigationIcon = {
                     IconButton(onClick = openDrawer) {
                         Icon(
                             imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
+                            contentDescription = stringResource(R.string.cd_open_nav_menu)
                         )
                     }
 
@@ -98,7 +100,7 @@ fun UnitsScreenContent(
                     IconButton(onClick = {   }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Sort,
-                            contentDescription = "Sort icon"
+                            contentDescription = stringResource(R.string.cd_sort)
                         )
                     }
                 }
@@ -111,7 +113,7 @@ fun UnitsScreenContent(
                 containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                 elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
             ) {
-                Icon(Icons.Filled.Add, "Add unit icon")
+                Icon(Icons.Filled.Add, stringResource(R.string.cd_add_unit))
             }
         },
         modifier = Modifier.imePadding(),
@@ -124,9 +126,9 @@ fun UnitsScreenContent(
 
             SearchBar(
                 query = searchString,
-                placeholder = { Text("search units") },
+                placeholder = { Text(stringResource(R.string.units_search_placeholder)) },
                 active = false,
-                trailingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search icon") },
+                trailingIcon = { Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.cd_search)) },
                 onActiveChange = {  },
                 onQueryChange = onSearchInputUpdate,
                 onSearch = {},
@@ -151,27 +153,27 @@ fun UnitsScreenContent(
                     FilterChip(
                         selected = true,
                         onClick = { expanded = true },
-                        label = { Text("Light") },
+                        label = { Text(stringResource(R.string.units_filter_light)) },
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Filled.ArrowDropDown,
-                                contentDescription = "Unit system icon"
+                                contentDescription = stringResource(R.string.cd_unit_system)
                             )
                         }
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         DropdownMenuItem(
-                            text = { Text("Up") },
+                            text = { Text(stringResource(R.string.units_menu_up)) },
                             onClick = { /* Handle edit! */ },
                             leadingIcon = { Icon(Icons.AutoMirrored.Outlined.ArrowLeft, contentDescription = null) }
                         )
                         HorizontalDivider()
                         DropdownMenuItem(
-                            text = { Text("Settings") },
+                            text = { Text(stringResource(R.string.units_menu_settings)) },
                             onClick = { /* Handle settings! */ },
                         )
                         DropdownMenuItem(
-                            text = { Text("Radiance") },
+                            text = { Text(stringResource(R.string.units_menu_radiance)) },
                             onClick = { /* Handle send feedback! */ },
                         )
                     }
@@ -179,23 +181,23 @@ fun UnitsScreenContent(
                 FilterChip(
                     selected = false,
                     onClick = { /*TODO*/ },
-                    label = { Text("System") },
+                    label = { Text(stringResource(R.string.units_filter_system)) },
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "Unit system icon"
+                            contentDescription = stringResource(R.string.cd_unit_system)
                         )
                     }
                 )
                 FilterChip(
                     selected = false,
                     onClick = { /*TODO*/ },
-                    label = { Text("Favorite") }
+                    label = { Text(stringResource(R.string.units_filter_favorite)) }
                 )
                 FilterChip(
                     selected = false,
                     onClick = { /*TODO*/ },
-                    label = { Text("Custom") }
+                    label = { Text(stringResource(R.string.units_filter_custom)) }
                 )
             }
 

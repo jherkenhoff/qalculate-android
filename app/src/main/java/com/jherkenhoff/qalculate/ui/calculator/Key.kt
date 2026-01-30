@@ -566,10 +566,18 @@ fun KeyLabel(
                 modifier = modifier.padding(4.dp, 0.dp)
             )
 
+        is ActionLabel.Resource ->
+            Text(
+                text = androidx.compose.ui.res.stringResource(label.resId),
+                color = color,
+                style = style,
+                modifier = modifier.padding(4.dp, 0.dp)
+            )
+
         is ActionLabel.Icon ->
             Icon(
                 label.icon,
-                label.description,
+                label.description ?: label.descriptionRes?.let { androidx.compose.ui.res.stringResource(it) },
                 tint = color,
                 modifier = modifier.padding(2.dp).size(style.fontSize.toDp())
             )

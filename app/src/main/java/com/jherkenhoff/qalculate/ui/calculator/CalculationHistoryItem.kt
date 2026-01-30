@@ -32,8 +32,10 @@ import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jherkenhoff.qalculate.R
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
 import kotlinx.coroutines.launch
@@ -175,7 +177,7 @@ private fun Menu(
         onDismissRequest = onDismissRequest
     ) {
         DropdownMenuItem(
-            text = { Text("Delete") },
+            text = { Text(stringResource(R.string.action_delete)) },
             leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null) },
             onClick = { onDismissRequest(); onDeleteClick() }
         )
