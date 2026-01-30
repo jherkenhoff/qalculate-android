@@ -85,6 +85,8 @@
     <string name="key_backspace">退格</string>
     <string name="key_nan">非數</string>
     <string name="key_inf">無窮大</string>
+    <string name="key_ans">Ans</string>
+    <string name="key_clear_all">AC</string>
 
     <!-- About -->
     <string name="about_app_version">應用版本 %1$s</string>

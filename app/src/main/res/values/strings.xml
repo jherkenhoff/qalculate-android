@@ -85,6 +85,8 @@
     <string name="key_backspace">Backspace</string>
     <string name="key_nan">NaN</string>
     <string name="key_inf">Infinity</string>
+    <string name="key_ans">ans</string>
+    <string name="key_clear_all">AC</string>
 
     <!-- About -->
     <string name="about_app_version">App version %1$s</string>

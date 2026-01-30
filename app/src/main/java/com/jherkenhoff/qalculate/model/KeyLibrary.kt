@@ -146,11 +146,11 @@ object Keys {
     val keySpecEuler = KeySpec.DefaultKeySpec(clickAction = Action.InsertText(ActionLabel.Text("e"), "e"), role = KeyRole.OPERATOR)
     val keySpecReturn = KeySpec.DefaultKeySpec(
         clickAction = Action.Return(ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardReturn, descriptionRes = R.string.key_return)),
-        longClickAction = Action.InsertText(ActionLabel.Text("ans"), "ans"),
+        longClickAction = Action.InsertText(ActionLabel.Resource(R.string.key_ans), "ans"),
         role = KeyRole.SYSTEM
     )
     val keySpecBackspace = KeySpec.DefaultKeySpec(clickAction = Action.Backspace(ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardBackspace, descriptionRes = R.string.key_backspace)), role = KeyRole.SYSTEM)
-    val keySpecClearAll = KeySpec.DefaultKeySpec(clickAction = Action.ClearAll(ActionLabel.Text("AC")), role = KeyRole.SYSTEM)
+    val keySpecClearAll = KeySpec.DefaultKeySpec(clickAction = Action.ClearAll(ActionLabel.Resource(R.string.key_clear_all)), role = KeyRole.SYSTEM)
 
     val keySpecIntegral = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.function(ActionLabel.Text("∫"), "integral"), role = KeyRole.OPERATOR)
     val keySpecDifferential = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.function(ActionLabel.Text("dx"), "diff"), role = KeyRole.OPERATOR)
