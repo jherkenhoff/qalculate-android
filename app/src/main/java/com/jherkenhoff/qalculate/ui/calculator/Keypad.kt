@@ -34,15 +34,18 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jherkenhoff.qalculate.model.Action
-import com.jherkenhoff.qalculate.model.KeypadSpec
+import com.jherkenhoff.qalculate.model.CalcAction
+import com.jherkenhoff.qalculate.model.KeypadDefinition
+import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 
 @Composable
 fun Keypad(
-    keypads: List<KeypadSpec>,
+    keypads: List<KeypadDefinition>,
     activeKeypadIndex: Int,
+    calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
-    onKeyAction: (Action) -> Unit = {},
+    onKeyAction: (CalcAction) -> Unit = {},
     onActiveKeypadChanged: (Int) -> Unit = {},
 ) {
     val activeKeypad = keypads[activeKeypadIndex]
@@ -181,6 +184,7 @@ fun Keypad(
                                 item(it.first.row, it.first.col, it.first.rowSpan, it.first.colSpan) {
                                     Key(
                                         it.second,
+                                        calcActionLabelMapper,
                                         onKeyAction = onKeyAction
                                     )
                                 }
@@ -201,6 +205,7 @@ fun Keypad(
 private fun DefaultPreview() {
     Keypad(
         emptyList(),
-        0
+        0,
+        CalcActionLabelMapper(UserPreferences.Default)
     )
 }

@@ -2,7 +2,6 @@ package com.jherkenhoff.qalculate.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-
 data class KeyPositionSpec(
     val row: Int,
     val col: Int,
@@ -13,11 +12,11 @@ data class KeyPositionSpec(
 data class KeypadSection(
     val rows: Int,
     val cols: Int,
-    val keys: List<Pair<KeyPositionSpec, KeySpec>>,
+    val keys: List<Pair<KeyPositionSpec, CalcKey>>,
     val aspectRatio: Float
 )
 
-data class KeypadSpec(
+data class KeypadDefinition(
     val name: String,
     val icon: ImageVector?,
     val sections: List<KeypadSection>,

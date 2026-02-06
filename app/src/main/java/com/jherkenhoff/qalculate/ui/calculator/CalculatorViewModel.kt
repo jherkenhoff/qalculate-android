@@ -16,8 +16,8 @@ import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
-import com.jherkenhoff.qalculate.model.Action
 import com.jherkenhoff.qalculate.model.AutocompleteItem
+import com.jherkenhoff.qalculate.model.CalcAction
 import com.jherkenhoff.qalculate.model.UndoManager
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
@@ -138,17 +138,25 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    fun handleKeyAction(action: Action) {
+    fun handleKeyAction(action: CalcAction) {
         when (action) {
-            is Action.InsertText -> insertText(action)
-            is Action.Backspace -> removeChars(action.nChars)
-            is Action.Return -> submitCalculation()
-            is Action.ClearAll -> clearInput()
-            is Action.MoveCursor -> moveCursor(action.chars)
-            is Action.Undo -> undo()
-            is Action.Redo -> redo()
-            is Action.StoreAsVariable -> null
+            is CalcAction.InsertText -> insertText(action)
+            is CalcAction.DeleteChars -> removeChars(action.nChars)
+            is CalcAction.SubmitCalculation -> submitCalculation()
+            is CalcAction.ClearAll -> clearInput()
+            is CalcAction.MoveCursor -> moveCursor(action.nChars)
+            is CalcAction.TraverseHistory -> traverseHistory(action.nEntries)
+            is CalcAction.StoreAsVariable -> null
+            is CalcAction.InsertDecimalSymbol -> insertText(userPreferences.value.getDecimalSeparatorString())
+            is CalcAction.InsertDivisionSymbol -> insertText(userPreferences.value.getDivisionSignString())
+            is CalcAction.InsertMultiplicationSymbol -> insertText(userPreferences.value.getMultiplicationSignString())
         }
+    }
+
+    fun traverseHistory(nEntries: Int) {
+        if (nEntries == -1) undo()
+        else if (nEntries == 1) redo()
+        else throw IllegalArgumentException("Travering history by more then one entry is not supported.")
     }
 
     fun undo() {
@@ -181,7 +189,7 @@ class CalculatorViewModel @Inject constructor(
         updateInput(TextFieldValue(""))
     }
 
-    fun insertText(action: Action.InsertText) {
+    fun insertText(action: CalcAction.InsertText) {
         val maxChars = inputTextFieldValue.value.text.length
         val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
         val selectedText = inputTextFieldValue.value.getSelectedText()
@@ -190,15 +198,15 @@ class CalculatorViewModel @Inject constructor(
         with(action) {
             if (selectedText.isNotEmpty()) {
                     val newText = when (selectionPolicy) {
-                        Action.InsertText.SelectionPolicy.REPLACE -> "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
-                        Action.InsertText.SelectionPolicy.SURROUND -> "$textBeforeSelection$preCursorText$selectedText$postCursorText$textAfterSelection"
-                        Action.InsertText.SelectionPolicy.PARENTHESES -> "$textBeforeSelection($selectedText)$preCursorText$postCursorText$textAfterSelection"
+                        CalcAction.InsertText.SelectionPolicy.REPLACE -> "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
+                        CalcAction.InsertText.SelectionPolicy.SURROUND -> "$textBeforeSelection$preCursorText$selectedText$postCursorText$textAfterSelection"
+                        CalcAction.InsertText.SelectionPolicy.PARENTHESES -> "$textBeforeSelection($selectedText)$preCursorText$postCursorText$textAfterSelection"
                     }
 
                     val newSelection = when (selectionPolicy) {
-                        Action.InsertText.SelectionPolicy.REPLACE -> TextRange(textBeforeSelection.length + preCursorText.length)
-                        Action.InsertText.SelectionPolicy.SURROUND -> TextRange(textBeforeSelection.length, newText.length - textAfterSelection.length)
-                        Action.InsertText.SelectionPolicy.PARENTHESES -> TextRange(newText.length - postCursorText.length - textAfterSelection.length)
+                        CalcAction.InsertText.SelectionPolicy.REPLACE -> TextRange(textBeforeSelection.length + preCursorText.length)
+                        CalcAction.InsertText.SelectionPolicy.SURROUND -> TextRange(textBeforeSelection.length, newText.length - textAfterSelection.length)
+                        CalcAction.InsertText.SelectionPolicy.PARENTHESES -> TextRange(newText.length - postCursorText.length - textAfterSelection.length)
                     }
 
                     updateInput(TextFieldValue(

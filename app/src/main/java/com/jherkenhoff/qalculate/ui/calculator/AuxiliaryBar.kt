@@ -31,20 +31,21 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
-import com.jherkenhoff.qalculate.model.Action
 import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.ActionLabel
-import com.jherkenhoff.qalculate.model.Keys
+import com.jherkenhoff.qalculate.model.CalcAction
+import com.jherkenhoff.qalculate.model.CalcActionLabel
+import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 
 @Composable
 fun AuxiliaryBar(
     autocompleteResult: AutocompleteResult,
     keyboardEnable: Boolean,
-    auxiliaryActions: List<Action>,
+    auxiliaryActions: List<CalcAction>,
+    calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     onKeyboardEnableChange: (Boolean) -> Unit = { },
-    onAction: (Action) -> Unit = { },
+    onAction: (CalcAction) -> Unit = { },
     onAutocompleteDismiss: () -> Unit = { },
 ) {
     val fadeWidth = 40f
@@ -93,14 +94,14 @@ fun AuxiliaryBar(
                         Icon(Icons.Filled.Keyboard, null)
                     }
                     for (action in auxiliaryActions) {
-                        IconButton({ onAction(action) }, enabled = action.enabled) {
-                            when (val label = action.label) {
-                                is ActionLabel.Text -> Text(
+                        IconButton({ onAction(action) }) {
+                            when (val label = calcActionLabelMapper(action)) {
+                                is CalcActionLabel.Text -> Text(
                                     label.text,
                                     style = MaterialTheme.typography.labelLarge
                                 )
 
-                                is ActionLabel.Icon -> Icon(
+                                is CalcActionLabel.Icon -> Icon(
                                     label.icon,
                                     label.description,
                                     modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())

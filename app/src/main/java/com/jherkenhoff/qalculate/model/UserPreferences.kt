@@ -37,18 +37,25 @@ data class UserPreferences(
 
     fun getDivisionSignString(): String {
         return when (this.divisionSign) {
-            UserPreferences.DivisionSign.DIVISION -> "÷"
-            UserPreferences.DivisionSign.DIVISION_SLASH -> "∕"
-            UserPreferences.DivisionSign.SLASH -> "/"
+            DivisionSign.DIVISION -> "÷"
+            DivisionSign.DIVISION_SLASH -> "∕"
+            DivisionSign.SLASH -> "/"
         }
     }
 
     fun getMultiplicationSignString(): String {
         return when (this.multiplicationSign) {
-            UserPreferences.MultiplicationSign.DOT -> "·"
-            UserPreferences.MultiplicationSign.X -> "×"
-            UserPreferences.MultiplicationSign.ASTERISK -> "*"
-            UserPreferences.MultiplicationSign.ALTDOT -> "."
+            MultiplicationSign.DOT -> "·"
+            MultiplicationSign.X -> "×"
+            MultiplicationSign.ASTERISK -> "*"
+            MultiplicationSign.ALTDOT -> "."
+        }
+    }
+
+    fun getDecimalSeparatorString(): String {
+        return when (this.decimalSeparator) {
+            DecimalSeparator.DOT -> "·"
+            DecimalSeparator.COMMA -> ","
         }
     }
 }

@@ -59,11 +59,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.jherkenhoff.qalculate.model.Action
-import com.jherkenhoff.qalculate.model.ActionLabel
+import com.jherkenhoff.qalculate.model.CalcAction
+import com.jherkenhoff.qalculate.model.CalcActionLabel
+import com.jherkenhoff.qalculate.model.CalcKey
+import com.jherkenhoff.qalculate.model.KeyLibrary
 import com.jherkenhoff.qalculate.model.KeyRole
-import com.jherkenhoff.qalculate.model.KeySpec
-import com.jherkenhoff.qalculate.model.Keys
+import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -77,35 +79,38 @@ object KeyDefaults {
 
 @Composable
 fun Key(
-    keySpec: KeySpec,
+    calcKey: CalcKey,
+    calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (Action) -> Unit = {}
+    onKeyAction: (CalcAction) -> Unit = {}
 ) {
 
-    val containerColor = when (keySpec.role) {
+    val containerColor = when (calcKey.role) {
         KeyRole.NUMBER -> MaterialTheme.colorScheme.surfaceBright
         KeyRole.OPERATOR -> MaterialTheme.colorScheme.surfaceContainerHigh
         KeyRole.SYSTEM -> MaterialTheme.colorScheme.tertiaryContainer
     }
 
-    val labelColor = when (keySpec.role) {
+    val labelColor = when (calcKey.role) {
         KeyRole.NUMBER -> MaterialTheme.colorScheme.onSurface
         KeyRole.OPERATOR -> MaterialTheme.colorScheme.onSurface
         KeyRole.SYSTEM -> MaterialTheme.colorScheme.onTertiaryContainer
     }
 
-    when (keySpec) {
-        is KeySpec.DefaultKeySpec -> DefaultKey(
-            keySpec,
+    when (calcKey) {
+        is CalcKey.Default -> DefaultKey(
+            calcKey,
+            calcActionLabelMapper,
             onKeyAction = onKeyAction,
             labelColor = labelColor,
             containerColor = containerColor,
             shape = shape,
             modifier = modifier
         )
-        is KeySpec.SelectorKeySpec -> SelectorKey(
-            keySpec,
+        is CalcKey.Selector -> SelectorKey(
+            calcKey,
+            calcActionLabelMapper,
             onKeyAction = onKeyAction,
             labelColor = labelColor,
             containerColor = containerColor,
@@ -113,8 +118,9 @@ fun Key(
             modifier = modifier
         )
 
-        is KeySpec.CornerDragKeySpec -> CornerDragKey(
-            keySpec,
+        is CalcKey.CornerDrag -> CornerDragKey(
+            calcKey,
+            calcActionLabelMapper,
             onKeyAction = onKeyAction,
             labelColor = labelColor,
             containerColor = containerColor,
@@ -126,10 +132,11 @@ fun Key(
 
 @Composable
 fun DefaultKey(
-    keySpec: KeySpec.DefaultKeySpec,
+    calcKey: CalcKey.Default,
+    calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (Action) -> Unit = {},
+    onKeyAction: (CalcAction) -> Unit = {},
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
@@ -140,6 +147,9 @@ fun DefaultKey(
 
     var showPopup by remember { mutableStateOf(false) }
     var popupSecondary by remember { mutableStateOf(false) }
+
+    val clickActionLabel = calcActionLabelMapper(calcKey.clickAction)
+    val longClickActionLabel = calcKey.longClickAction?.let { calcActionLabelMapper(it) }
 
     Box(
         modifier = modifier.clickable { }
@@ -153,7 +163,7 @@ fun DefaultKey(
                         var isLongPress = false
 
                         val longPressDetectionJob = coroutineScope.launch {
-                            if (keySpec.longClickAction != null) {
+                            if (calcKey.longClickAction != null) {
                                 delay(longPressTimeout)
                                 popupSecondary = true
                                 isLongPress = true
@@ -168,13 +178,13 @@ fun DefaultKey(
 
                         if ( up?.changedToUp() == true) {
                             if (isLongPress) {
-                                keySpec.longClickAction?.let {
+                                calcKey.longClickAction?.let {
                                     //haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     onKeyAction(it)
                                 }
                             } else {
                                 haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                                onKeyAction(keySpec.clickAction)
+                                onKeyAction(calcKey.clickAction)
                             }
                         }
 
@@ -197,7 +207,7 @@ fun DefaultKey(
                             contentAlignment = Alignment.Center
                         ) {
                             AnimatedContent(popupSecondary) {
-                                val label = if (it && keySpec.longClickAction != null) keySpec.longClickAction.popupLabel else keySpec.clickAction.popupLabel
+                                val label = if (it && calcKey.longClickAction != null) longClickActionLabel else clickActionLabel
                                 label?.let {
                                     KeyLabel(
                                         label = label,
@@ -225,16 +235,16 @@ fun DefaultKey(
         ) {
             Box {
                 KeyLabel(
-                    label = keySpec.clickAction.label,
+                    label = clickActionLabel,
                     color = labelColor,
                     modifier = Modifier.align(Alignment.Center)
                 )
-                keySpec.longClickAction?.let {
+                calcKey.longClickAction?.let {
                     KeyLabel(
-                        label = it.label,
+                        label = longClickActionLabel,
                         color = labelColor.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.align(if (it.label != null) Alignment.TopEnd else Alignment.TopEnd)
+                        modifier = Modifier.align(if (longClickActionLabel != null) Alignment.TopEnd else Alignment.TopEnd)
                     )
                 }
             }
@@ -246,10 +256,11 @@ fun DefaultKey(
 
 @Composable
 fun CornerDragKey(
-    keySpec: KeySpec.CornerDragKeySpec,
+    calcKey: CalcKey.CornerDrag,
+    calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (Action) -> Unit = {},
+    onKeyAction: (CalcAction) -> Unit = {},
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
@@ -260,50 +271,50 @@ fun CornerDragKey(
 
     var dragOffset by remember { mutableStateOf(Offset(0f, 0f)) }
 
-    var selectedAction by remember { mutableStateOf<Action?>(null) }
+    var selectedCalcAction by remember { mutableStateOf<CalcAction?>(null) }
 
     Box(
         modifier = modifier.pointerInput(Unit) {
             awaitPointerEventScope {
                 while (true) {
                     val down = awaitFirstDown()
-                    selectedAction = keySpec.centerAction
+                    selectedCalcAction = calcKey.centerAction
                     dragOffset = Offset(0f, 0f)
 
                     drag(down.id) { change ->
                         dragOffset += change.positionChange()
 
-                        var newSelectedAction : Action = keySpec.centerAction
+                        var newSelectedCalcAction : CalcAction = calcKey.centerAction
 
                         if (dragOffset.getDistance() >= dragThreshold) {
-                            if (dragOffset.x > 0 && dragOffset.y < 0 && keySpec.topRightAction != null) {
-                                newSelectedAction = keySpec.topRightAction
-                            } else if (dragOffset.x < 0 && dragOffset.y < 0 && keySpec.topLeftAction != null) {
-                                newSelectedAction = keySpec.topLeftAction
-                            } else if (dragOffset.x > 0 && dragOffset.y > 0 && keySpec.bottomRightAction != null) {
-                                newSelectedAction = keySpec.bottomRightAction
-                            } else if (dragOffset.x < 0 && dragOffset.y > 0 && keySpec.bottomLeftAction != null) {
-                                newSelectedAction = keySpec.bottomLeftAction
+                            if (dragOffset.x > 0 && dragOffset.y < 0 && calcKey.topRightAction != null) {
+                                newSelectedCalcAction = calcKey.topRightAction
+                            } else if (dragOffset.x < 0 && dragOffset.y < 0 && calcKey.topLeftAction != null) {
+                                newSelectedCalcAction = calcKey.topLeftAction
+                            } else if (dragOffset.x > 0 && dragOffset.y > 0 && calcKey.bottomRightAction != null) {
+                                newSelectedCalcAction = calcKey.bottomRightAction
+                            } else if (dragOffset.x < 0 && dragOffset.y > 0 && calcKey.bottomLeftAction != null) {
+                                newSelectedCalcAction = calcKey.bottomLeftAction
                             }
                         }
 
-                        if (newSelectedAction != selectedAction) {
+                        if (newSelectedCalcAction != selectedCalcAction) {
                             haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
                         }
-                        selectedAction = newSelectedAction
+                        selectedCalcAction = newSelectedCalcAction
 
                         change.consume()
                     }
 
                     haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                    selectedAction?.let(onKeyAction)
-                    selectedAction = null
+                    selectedCalcAction?.let(onKeyAction)
+                    selectedCalcAction = null
                 }
             }
         }
     ) {
 
-        selectedAction?.let {
+        selectedCalcAction?.let { action ->
             Layout(
                 content = {
                     Surface(
@@ -316,9 +327,9 @@ fun CornerDragKey(
                             modifier = Modifier.wrapContentSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            AnimatedContent(it) {
+                            AnimatedContent(action) {
                                 KeyLabel(
-                                    label = it.popupLabel,
+                                    label = calcActionLabelMapper(it),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(horizontal = 8.dp)
                                 )
@@ -341,37 +352,37 @@ fun CornerDragKey(
         ) {
             Box {
                 KeyLabel(
-                    label = keySpec.centerAction.label,
+                    label = calcActionLabelMapper(calcKey.centerAction),
                     color = labelColor,
                     modifier = Modifier.align(Alignment.Center)
                 )
-                keySpec.topLeftAction?.let {
+                calcKey.topLeftAction?.let {
                     KeyLabel(
-                        label = it.label,
+                        label = calcActionLabelMapper(it),
                         color = labelColor.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier.align(Alignment.TopStart)
                     )
                 }
-                keySpec.topRightAction?.let {
+                calcKey.topRightAction?.let {
                     KeyLabel(
-                        label = it.label,
+                        label = calcActionLabelMapper(it),
                         color = labelColor.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier.align(Alignment.TopEnd)
                     )
                 }
-                keySpec.bottomLeftAction?.let {
+                calcKey.bottomLeftAction?.let {
                     KeyLabel(
-                        label = it.label,
+                        label = calcActionLabelMapper(it),
                         color = labelColor.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier.align(Alignment.BottomStart)
                     )
                 }
-                keySpec.bottomRightAction?.let {
+                calcKey.bottomRightAction?.let {
                     KeyLabel(
-                        label = it.label,
+                        label = calcActionLabelMapper(it),
                         color = labelColor.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier.align(Alignment.BottomEnd)
@@ -384,10 +395,11 @@ fun CornerDragKey(
 
 @Composable
 fun SelectorKey(
-    keySpec: KeySpec.SelectorKeySpec,
+    calcKey: CalcKey.Selector,
+    calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (Action) -> Unit = {},
+    onKeyAction: (CalcAction) -> Unit = {},
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
@@ -395,7 +407,7 @@ fun SelectorKey(
 
     val itemHeight = 40.dp
     val itemHeightPx = with(LocalDensity.current) { itemHeight.toPx() }
-    val minOffset = -(keySpec.actions.size - nItems/2 - 1) * itemHeightPx
+    val minOffset = -(calcKey.actions.size - nItems/2 - 1) * itemHeightPx
     val maxOffset = (nItems/2) * itemHeightPx
 
     var isSelecting by remember { mutableStateOf(false) }
@@ -403,7 +415,7 @@ fun SelectorKey(
     var dragOffset by remember { mutableFloatStateOf(0f) }
     var scrollOffset by remember { mutableFloatStateOf(0f) }
 
-    var selectedAction by remember { mutableStateOf(keySpec.actions[keySpec.initialSelectedIndex]) }
+    var selectedCalcAction by remember { mutableStateOf(calcKey.actions[calcKey.initialSelectedIndex]) }
 
     val coroutineScope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
@@ -414,7 +426,7 @@ fun SelectorKey(
                 awaitPointerEventScope {
                     while (true) {
                         val down = awaitFirstDown()
-                        dragOffset = (keySpec.actions.size/2 - keySpec.initialSelectedIndex - 1) * itemHeightPx
+                        dragOffset = (calcKey.actions.size/2 - calcKey.initialSelectedIndex - 1) * itemHeightPx
                         scrollOffset = dragOffset
 
                         val touchSlop = viewConfiguration.touchSlop
@@ -440,15 +452,15 @@ fun SelectorKey(
 
                                 // Translate drag offset to scroll offset and apply non-linear transfer function for snappy feeling
                                 val dragOffsetItemIndex = floor(dragOffset/itemHeightPx).toInt()
-                                val dragOffsetFractionalIndex = (dragOffset/itemHeightPx - floor(dragOffset/itemHeightPx))
-                                scrollOffset = dragOffsetItemIndex*itemHeightPx + EaseInOutQuart.transform(dragOffsetFractionalIndex)*itemHeightPx
+                                val dragOffsetFrCalcActionalIndex = (dragOffset/itemHeightPx - floor(dragOffset/itemHeightPx))
+                                scrollOffset = dragOffsetItemIndex*itemHeightPx + EaseInOutQuart.transform(dragOffsetFrCalcActionalIndex)*itemHeightPx
 
-                                val selectedIndex = (nItems/2 - scrollOffset / itemHeightPx).roundToInt().coerceIn(0, keySpec.actions.lastIndex)
-                                val newSelectedAction = keySpec.actions[selectedIndex]
-                                if (newSelectedAction != selectedAction) {
+                                val selectedIndex = (nItems/2 - scrollOffset / itemHeightPx).roundToInt().coerceIn(0, calcKey.actions.lastIndex)
+                                val newSelectedCalcAction = calcKey.actions[selectedIndex]
+                                if (newSelectedCalcAction != selectedCalcAction) {
                                     haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
                                 }
-                                selectedAction = newSelectedAction
+                                selectedCalcAction = newSelectedCalcAction
                             }
 
                             change.consume()
@@ -457,7 +469,7 @@ fun SelectorKey(
 
                         isSelecting = false
                         haptic.performHapticFeedback(HapticFeedbackType.GestureEnd)
-                        onKeyAction(selectedAction)
+                        onKeyAction(selectedCalcAction)
                     }
                 }
             },
@@ -479,7 +491,7 @@ fun SelectorKey(
                     modifier = Modifier.align(Alignment.TopCenter).size(12.dp)
                 )
                 KeyLabel(
-                    selectedAction.label,
+                    calcActionLabelMapper(selectedCalcAction),
                     color = labelColor,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -513,13 +525,13 @@ fun SelectorKey(
                             .offset(y = scrollOffset.toDp()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        for ((index, action) in keySpec.actions.withIndex()) {
+                        for ((index, action) in calcKey.actions.withIndex()) {
                             val distanceFromCenter = abs(index*itemHeightPx + scrollOffset - centerOffsetPx + itemHeightPx/2)/itemHeightPx
                             val alpha = 1f - (distanceFromCenter * 0.3f)
                             val scale = 1f - (distanceFromCenter * 0.1f)
 
                             KeyLabel(
-                                action.label,
+                                calcActionLabelMapper(action),
                                 color = Color.White.copy(alpha.coerceIn(0.5f, 1f)),
                                 modifier = Modifier.height(itemHeight).scale(scale.coerceIn(0.5f, 1f))
                             )
@@ -544,7 +556,7 @@ fun SelectorKey(
 
 @Composable
 fun KeyLabel(
-    label: ActionLabel?,
+    label: CalcActionLabel?,
     color: Color = MaterialTheme.colorScheme.onSurface,
     style: TextStyle = MaterialTheme.typography.labelLarge,
     modifier: Modifier = Modifier
@@ -558,7 +570,7 @@ fun KeyLabel(
                     .background(MaterialTheme.colorScheme.secondary, CircleShape)
             )
 
-        is ActionLabel.Text ->
+        is CalcActionLabel.Text ->
             Text(
                 text = label.text,
                 color = color,
@@ -566,7 +578,7 @@ fun KeyLabel(
                 modifier = modifier.padding(4.dp, 0.dp)
             )
 
-        is ActionLabel.Icon ->
+        is CalcActionLabel.Icon ->
             Icon(
                 label.icon,
                 label.description,
@@ -579,32 +591,10 @@ fun KeyLabel(
 
 @Preview
 @Composable
-private fun SingleActionDefaultKeyPreview() {
+private fun SingleCalcActionDefaultKeyPreview() {
     Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Key(Keys.keySpec0, Modifier.weight(1f))
-        Key(Keys.keySpecBackspace, Modifier.weight(1f))
-        Key(Keys.keySpecPi, Modifier.weight(1f))
-    }
-}
-
-@Preview
-@Composable
-private fun DualActionDefaultKeyPreview() {
-    Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Key(Keys.keySpecSin, Modifier.weight(1f))
-        Key(Keys.keySpecCos, Modifier.weight(1f))
-        Key(Keys.keySpecTan, Modifier.weight(1f))
-    }
-}
-
-
-
-@Preview
-@Composable
-private fun SelectionKeyPreview() {
-    Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Key(Keys.keySpecSiLength, Modifier.weight(1f))
-        Key(Keys.keySpecImperialLength, Modifier.weight(1f))
-        Key(Keys.keySpecSiLength, Modifier.weight(1f))
+        Key(KeyLibrary.NUMBER_0, CalcActionLabelMapper(UserPreferences.Default), Modifier.weight(1f))
+        Key(KeyLibrary.BACKSPACE, CalcActionLabelMapper(UserPreferences.Default), Modifier.weight(1f))
+        Key(KeyLibrary.NUMBER_PI, CalcActionLabelMapper(UserPreferences.Default), Modifier.weight(1f))
     }
 }

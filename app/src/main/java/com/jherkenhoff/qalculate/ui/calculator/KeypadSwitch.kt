@@ -20,11 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.jherkenhoff.qalculate.model.KeypadSpec
+import com.jherkenhoff.qalculate.model.KeypadDefinition
 
 @Composable
 fun KeypadSwitch(
-    keypads: List<KeypadSpec>,
+    keypads: List<KeypadDefinition>,
     activeKeypad: Int,
     modifier: Modifier = Modifier,
     onKeypadChanged: (Int) -> Unit = {},
@@ -65,7 +65,7 @@ fun KeypadSwitch(
 @Composable
 private fun DefaultPreview() {
     KeypadSwitch(
-        listOf(KeypadSpec(
+        listOf(KeypadDefinition(
             name = "Advanced",
             icon = Icons.Default.Science,
             sections = emptyList(),

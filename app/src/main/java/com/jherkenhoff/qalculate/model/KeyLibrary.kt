@@ -1,23 +1,11 @@
 package com.jherkenhoff.qalculate.model
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowLeft
-import androidx.compose.material.icons.automirrored.filled.ArrowRight
-import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.automirrored.filled.KeyboardBackspace
-import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
-import androidx.compose.material.icons.automirrored.filled.Redo
-import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.em
-import kotlin.Int.Companion.MAX_VALUE
-import kotlin.Int.Companion.MIN_VALUE
 
 private fun superscriptSymbol(base: String, superscript: String) : AnnotatedString {
     return buildAnnotatedString {
@@ -28,287 +16,266 @@ private fun superscriptSymbol(base: String, superscript: String) : AnnotatedStri
     }
 }
 
-object Keys {
-    val keySpec0 = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("0"), "0"),
-        longClickAction = Action.InsertText.operator(ActionLabel.Text(superscriptSymbol("x", "0")), "⁰"),
+object KeyLibrary {
+    val NUMBER_0 = CalcKey.Default(
+        clickAction = CalcAction.InsertText("0"),
+        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "0"), "⁰"),
         role = KeyRole.NUMBER
     )
-    val keySpec1 = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("1"), "1"),
-        longClickAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "1")), "¹"),
+    val NUMBER_1 = CalcKey.Default(
+        clickAction = CalcAction.InsertText("1"),
+        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "1"), "¹"),
         role = KeyRole.NUMBER
     )
-
-    val keySpec2 = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("2"), "2"),
-        longClickAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "2")), "²"),
+    val NUMBER_2 = CalcKey.Default(
+        clickAction = CalcAction.InsertText("2"),
+        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "2"), "²"),
         role = KeyRole.NUMBER
     )
-
-    val keySpec3 = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("3"), "3"),
-        longClickAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "3")), "³"),
+    val NUMBER_3 = CalcKey.Default(
+        clickAction = CalcAction.InsertText("3"),
+        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "3"), "³"),
         role = KeyRole.NUMBER
     )
-
-    val keySpec4 = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("4"), "4"),
-        longClickAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "4")), "⁴"),
+    val NUMBER_4 = CalcKey.Default(
+        clickAction = CalcAction.InsertText("4"),
+        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "4"), "⁴"),
         role = KeyRole.NUMBER
     )
-
-    val keySpec5 = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("5"), "5"),
-        longClickAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "5")), "⁵"),
+    val NUMBER_5 = CalcKey.Default(
+        clickAction = CalcAction.InsertText("5"),
+        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "5"), "⁵"),
         role = KeyRole.NUMBER
     )
-
-    val keySpec6 = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("6"), "6"),
-        longClickAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "6")), "⁶"),
+    val NUMBER_6 = CalcKey.Default(
+        clickAction = CalcAction.InsertText("6"),
+        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "6"), "⁶"),
         role = KeyRole.NUMBER
     )
-
-    val keySpec7 = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("7"), "7"),
-        longClickAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "7")), "⁷"),
+    val NUMBER_7 = CalcKey.Default(
+        clickAction = CalcAction.InsertText("7"),
+        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "7"), "⁷"),
         role = KeyRole.NUMBER
     )
-    val keySpec8 = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("8"), "8"),
-        longClickAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "8")), "⁸"),
+    val NUMBER_8 = CalcKey.Default(
+        clickAction = CalcAction.InsertText("8"),
+        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "8"), "⁸"),
         role = KeyRole.NUMBER
     )
-
-    val keySpec9 = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("9"), "9"),
-        longClickAction = Action.InsertText.operator( ActionLabel.Text(superscriptSymbol("x", "9")), "⁹"),
+    val NUMBER_9 = CalcKey.Default(
+        clickAction = CalcAction.InsertText("9"),
+        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "9"), "⁹"),
         role = KeyRole.NUMBER
     )
 
-    val keySpecLn = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText.function(ActionLabel.Text("ln"), "ln"),
-        longClickAction = Action.InsertText.function(ActionLabel.Text("log"), "log10"),
+    val FUNCTION_LN = CalcKey.Default(
+        clickAction = CalcAction.InsertText.function("ln"),
+        longClickAction = CalcAction.InsertText.function("ln"),
         role = KeyRole.OPERATOR
     )
 
-    val keySpecBracketOpen = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("("), "("),
-        longClickAction = Action.InsertText(ActionLabel.Text("["), "["),
+    val BRACKET_OPEN = CalcKey.Default(
+        clickAction = CalcAction.InsertText("("),
+        longClickAction = CalcAction.InsertText("["),
         role = KeyRole.OPERATOR
     )
-    val keySpecBracketClose = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text(")"), ")"),
-        longClickAction = Action.InsertText(ActionLabel.Text("]"), "]"),
+    val BRACKET_CLOSE = CalcKey.Default(
+        clickAction = CalcAction.InsertText(")"),
+        longClickAction = CalcAction.InsertText("]"),
         role = KeyRole.OPERATOR
     )
-    val keySpecPlus = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText.operator(ActionLabel.Text("+"), "+"),
-        role = KeyRole.OPERATOR
-    )
-    val keySpecMinus = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.operator(ActionLabel.Text("-"), "-"), role = KeyRole.OPERATOR)
-
-    val keySpecPower = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText.operator(ActionLabel.Text(superscriptSymbol("x", "y")), "^"),
-        role = KeyRole.OPERATOR
-    )
-    val keySpecSqrt = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText.function(ActionLabel.Text("√"), "sqrt"),
+    val OPERATOR_PLUS = CalcKey.Default(
+        clickAction = CalcAction.InsertText.operator("+"),
         role = KeyRole.OPERATOR
     )
 
-    val keySpecPlusMinus = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("±"), "±"),
+    val OPERATOR_MINUS = CalcKey.Default(
+        clickAction = CalcAction.InsertText.operator("-"),
         role = KeyRole.OPERATOR
     )
-    val keySpecUnderscore = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("_"), "_"),
-        longClickAction = Action.InsertText(ActionLabel.Text(";"), ";"),
+
+    val OPERATOR_MULTIPLY = CalcKey.Default(
+        clickAction = CalcAction.InsertMultiplicationSymbol
+    )
+
+    val OPERATOR_DIVISION = CalcKey.Default(
+        clickAction = CalcAction.InsertDivisionSymbol
+    )
+
+    val NUMBER_DECIMAL = CalcKey.Default(
+        clickAction = CalcAction.InsertDecimalSymbol,
+        longClickAction = CalcAction.InsertText(label = "␣", " "),
+    )
+
+    val OPERATOR_POWER = CalcKey.Default(
+        clickAction = CalcAction.InsertText.operator(superscriptSymbol("x", "y"), "^"),
         role = KeyRole.OPERATOR
     )
-    val keySpecEqual = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("="), "="),
-        longClickAction = Action.InsertText(ActionLabel.Text(","), ","),
+    val OPERATOR_SQRT = CalcKey.Default(
+        clickAction = CalcAction.InsertText.function("√", "sqrt"),
         role = KeyRole.OPERATOR
     )
-    val keySpecPi = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("π"), "π"),
-        longClickAction = Action.InsertText(ActionLabel.Text("e"), "e"),
+
+    val OPERATOR_PLUS_MINUS = CalcKey.Default(
+        clickAction = CalcAction.InsertText.operator("±"),
         role = KeyRole.OPERATOR
     )
-    val keySpecFactorial = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("∞"), "∞"),
-        longClickAction = Action.InsertText.operator(ActionLabel.Text("!"), "!"),
+    val calcKeyUnderscore = CalcKey.Default(
+        clickAction = CalcAction.InsertText("_"),
+        longClickAction = CalcAction.InsertText(";"),
         role = KeyRole.OPERATOR
     )
-    val keySpecEuler = KeySpec.DefaultKeySpec(clickAction = Action.InsertText(ActionLabel.Text("e"), "e"), role = KeyRole.OPERATOR)
-    val keySpecReturn = KeySpec.DefaultKeySpec(
-        clickAction = Action.Return(ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardReturn, "Return")),
-        longClickAction = Action.InsertText(ActionLabel.Text("ans"), "ans"),
+    val OPERATOR_EQUAL = CalcKey.Default(
+        clickAction = CalcAction.InsertText("="),
+        longClickAction = CalcAction.InsertText(","),
+        role = KeyRole.OPERATOR
+    )
+    val NUMBER_PI = CalcKey.Default(
+        clickAction = CalcAction.InsertText("π"),
+        longClickAction = CalcAction.InsertText("e"),
+        role = KeyRole.OPERATOR
+    )
+    val RETURN = CalcKey.Default(
+        clickAction = CalcAction.SubmitCalculation,
+        longClickAction = CalcAction.InsertText("ans"),
         role = KeyRole.SYSTEM
     )
-    val keySpecBackspace = KeySpec.DefaultKeySpec(clickAction = Action.Backspace(ActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardBackspace, "Backspace")), role = KeyRole.SYSTEM)
-    val keySpecClearAll = KeySpec.DefaultKeySpec(clickAction = Action.ClearAll(ActionLabel.Text("AC")), role = KeyRole.SYSTEM)
+    val BACKSPACE = CalcKey.Default(clickAction = CalcAction.DeleteChars(-1), role = KeyRole.SYSTEM)
+    val CLEAR_ALL = CalcKey.Default(clickAction = CalcAction.ClearAll, role = KeyRole.SYSTEM)
 
-    val keySpecIntegral = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.function(ActionLabel.Text("∫"), "integral"), role = KeyRole.OPERATOR)
-    val keySpecDifferential = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.function(ActionLabel.Text("dx"), "diff"), role = KeyRole.OPERATOR)
-    val keySpecSum = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText.function(ActionLabel.Text("Σ"), "sum"),
-        longClickAction = Action.InsertText.function(ActionLabel.Text("Π"), "product"),
+    val FUNCTION_INTEGRAL = CalcKey.Default(clickAction = CalcAction.InsertText.function("∫", "integral"), role = KeyRole.OPERATOR)
+    val FUNCTION_DIFFERENTIAL = CalcKey.Default(clickAction = CalcAction.InsertText.function("dx", "diff"), role = KeyRole.OPERATOR)
+    val FUNCTION_SUM = CalcKey.Default(
+        clickAction = CalcAction.InsertText.function("Σ", "sum"),
+        longClickAction = CalcAction.InsertText.function("Π", "product"),
         role = KeyRole.OPERATOR
     )
-    val keySpecInfinity = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("∞"), "∞"),
-        longClickAction = Action.InsertText(ActionLabel.Text("!"), "!"),
+    val NUMBER_INFINITY = CalcKey.Default(
+        clickAction = CalcAction.InsertText("∞"),
+        longClickAction = CalcAction.InsertText("!"),
         role = KeyRole.OPERATOR
     )
-    val keySpecImaginary = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("i"), "i"),
-        longClickAction = Action.InsertText(ActionLabel.Text("∠"), "∠"),
+    val NUMBER_IMAGINARY = CalcKey.Default(
+        clickAction = CalcAction.InsertText("i"),
+        longClickAction = CalcAction.InsertText("∠"),
         role = KeyRole.OPERATOR
     )
-    val keySpecComplexOperators = KeySpec.SelectorKeySpec(
+    val OPERATOR_COMPLEX = CalcKey.Selector(
         listOf(
-            Action.InsertText.function(ActionLabel.Text("Abs."), "abs"),
-            Action.InsertText.function(ActionLabel.Text("Arg."), "arg"),
-            Action.InsertText.function(ActionLabel.Text("Real"), "re"),
-            Action.InsertText.function(ActionLabel.Text("Imag."), "im"),
-            Action.InsertText.function(ActionLabel.Text("Conj."), "conj")
+            CalcAction.InsertText.function("Abs.", "abs"),
+            CalcAction.InsertText.function("Arg.", "arg"),
+            CalcAction.InsertText.function("Real", "re"),
+            CalcAction.InsertText.function("Imag.", "im"),
+            CalcAction.InsertText.function("Conj.", "conj")
         ),
         2,
         role = KeyRole.OPERATOR
     )
-    val keySpecPercent = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText.operator(ActionLabel.Text("%"), "%"),
-        longClickAction = Action.InsertText.operator(ActionLabel.Text("±"), "±"),
+    val NUMBER_PERCENT = CalcKey.Default(
+        clickAction = CalcAction.InsertText.operator("%"),
+        longClickAction = CalcAction.InsertText.operator("±"),
         role = KeyRole.OPERATOR
     )
-    val keySpecX = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("X"), "x"),
-        longClickAction = Action.StoreAsVariable(ActionLabel.Text("→x"), ActionLabel.Text("→x"), "x"),
+    val VARIABLE_X = CalcKey.Default(
+        clickAction = CalcAction.InsertText("X", "x"),
+        longClickAction = CalcAction.StoreAsVariable("x"),
         role= KeyRole.OPERATOR
     )
-    val keySpecY = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("Y"), "y"),
-        longClickAction = Action.StoreAsVariable(ActionLabel.Text("→y"), ActionLabel.Text("→y"), "x"),
+    val VARIABLE_Y = CalcKey.Default(
+        clickAction = CalcAction.InsertText("Y", "y"),
+        longClickAction = CalcAction.StoreAsVariable("y"),
         role = KeyRole.OPERATOR
     )
-    val keySpecZ = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text("Z"), "z"),
-        longClickAction = Action.StoreAsVariable(ActionLabel.Text("→z"), ActionLabel.Text("→z"), "z"),
+    val VARIABLE_Z = CalcKey.Default(
+        clickAction = CalcAction.InsertText("Z", "z"),
+        longClickAction = CalcAction.StoreAsVariable("z"),
         role = KeyRole.OPERATOR
     )
-    val keySpecExp = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText.operator(ActionLabel.Text("E"), "E"),
-        role = KeyRole.OPERATOR
-    )
-
-    //    val keySin = Key.CornerDragKey(
-//        clickAction = KeyAction.InsertText(label = KeyLabel.Text("sin"), preCursorText = "sin(", postCursorText = ")"),
-//        longClickAction = KeyAction.InsertText(label = KeyLabel.Text("sin⁻¹"), preCursorText = "arcsin(", postCursorText = ")"),
-//        role = KeyRole.OPERATOR
-//    )
-    val keySpecSin = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText.function(ActionLabel.Text("sin"), "sin"),
-        longClickAction = Action.InsertText.function(label = ActionLabel.Text(superscriptSymbol("sin", "-1")), "asin"),
-//        bottomLeftAction = KeyAction.InsertText(label = KeyLabel.Text("sinh"), preCursorText = "sinh(", postCursorText = ")"),
-//        bottomRightAction = KeyAction.InsertText(label = KeyLabel.Text(superscriptSymbol("sinh", "-1")), preCursorText = "asinh(", postCursorText = ")"),
-        role = KeyRole.OPERATOR
-    )
-    val keySpecCos = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText.function(label = ActionLabel.Text("cos"), "cos"),
-        longClickAction = Action.InsertText.function(label = ActionLabel.Text(superscriptSymbol("cos", "-1")), "acos"),
-//        bottomLeftAction = KeyAction.InsertText(label = KeyLabel.Text("cosh"), preCursorText = "cosh(", postCursorText = ")"),
-//        bottomRightAction = KeyAction.InsertText(label = KeyLabel.Text(superscriptSymbol("cosh", "-1")), preCursorText = "acosh(", postCursorText = ")"),
-        role = KeyRole.OPERATOR
-    )
-    val keySpecTan = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText.function(label = ActionLabel.Text("tan"), "tan"),
-        longClickAction = Action.InsertText.function(label = ActionLabel.Text(superscriptSymbol("tan", "-1")), "atan"),
-//        bottomLeftAction = KeyAction.InsertText(label = KeyLabel.Text("tanh"), preCursorText = "tanh(", postCursorText = ")"),
-//        bottomRightAction = KeyAction.InsertText(label = KeyLabel.Text(superscriptSymbol("tanh", "-1")), preCursorText = "atanh(", postCursorText = ")"),
+    val OPERATOR_E = CalcKey.Default(
+        clickAction = CalcAction.InsertText.operator("E"),
         role = KeyRole.OPERATOR
     )
 
-    val keySpecSiLength = KeySpec.SelectorKeySpec(
+    val FUNCTION_SIN = CalcKey.Default(
+        clickAction = CalcAction.InsertText.function("sin"),
+        longClickAction = CalcAction.InsertText.function(superscriptSymbol("sin", "-1"), "asin"),
+        role = KeyRole.OPERATOR
+    )
+    val FUNCTION_COS = CalcKey.Default(
+        clickAction = CalcAction.InsertText.function("cos"),
+        longClickAction = CalcAction.InsertText.function(superscriptSymbol("cos", "-1"), "acos"),
+        role = KeyRole.OPERATOR
+    )
+    val FUNCTION_TAN = CalcKey.Default(
+        clickAction = CalcAction.InsertText.function("tan"),
+        longClickAction = CalcAction.InsertText.function(superscriptSymbol("tan", "-1"), "atan"),
+        role = KeyRole.OPERATOR
+    )
+
+    val calcKeySiLength = CalcKey.Selector(
         listOf(
-            Action.InsertText.operator(ActionLabel.Text("nm"), "nm "),
-            Action.InsertText.operator(ActionLabel.Text("um"), "um "),
-            Action.InsertText.operator(ActionLabel.Text("mm"), "mm "),
-            Action.InsertText.operator(ActionLabel.Text("cm"), "cm "),
-            Action.InsertText.operator(ActionLabel.Text("m"), "m "),
-            Action.InsertText.operator(ActionLabel.Text("km"), "km "),
+            CalcAction.InsertText.operator("nm "),
+            CalcAction.InsertText.operator("um "),
+            CalcAction.InsertText.operator("mm "),
+            CalcAction.InsertText.operator("cm "),
+            CalcAction.InsertText.operator("m "),
+            CalcAction.InsertText.operator("km "),
         ),
         4,
         role= KeyRole.OPERATOR
     )
 
-    val keySpecImperialLength = KeySpec.SelectorKeySpec(
+    val calcKeyImperialLength = CalcKey.Selector(
         listOf(
-            Action.InsertText.operator(ActionLabel.Text("thou"), "thou "),
-            Action.InsertText.operator(ActionLabel.Text("inch"), "in "),
-            Action.InsertText.operator(ActionLabel.Text("foot"), "ft "),
-            Action.InsertText.operator(ActionLabel.Text("yard"), "yd "),
-            Action.InsertText.operator(ActionLabel.Text("mile"), "mile "),
+            CalcAction.InsertText.operator("thou "),
+            CalcAction.InsertText.operator("in "),
+            CalcAction.InsertText.operator("ft "),
+            CalcAction.InsertText.operator("yd "),
+            CalcAction.InsertText.operator("mile "),
         ),
         1,
         role= KeyRole.OPERATOR
     )
 
-    val keySpecImperialWeight = KeySpec.SelectorKeySpec(
+    val calcKeyImperialWeight = CalcKey.Selector(
         listOf(
-            Action.InsertText.operator(ActionLabel.Text("grain"), "gr "),
-            Action.InsertText.operator(ActionLabel.Text("ounce"), "oz "),
-            Action.InsertText.operator(ActionLabel.Text("pound"), "lb "),
-            Action.InsertText.operator(ActionLabel.Text("stone"), "stone "),
+            CalcAction.InsertText.operator("gr "),
+            CalcAction.InsertText.operator("oz "),
+            CalcAction.InsertText.operator("lb "),
+            CalcAction.InsertText.operator("stone "),
         ),
         2,
         role= KeyRole.OPERATOR
     )
 
-    val keySpecSiWeight = KeySpec.SelectorKeySpec(
+    val SI_PREFIX = CalcKey.Selector(
         listOf(
-            Action.InsertText.operator(ActionLabel.Text("pg"), "pg "),
-            Action.InsertText.operator(ActionLabel.Text("ng"), "ng "),
-            Action.InsertText.operator(ActionLabel.Text("µg"), "µg "),
-            Action.InsertText.operator(ActionLabel.Text("mg"), "mg "),
-            Action.InsertText.operator(ActionLabel.Text("g"), "g "),
-            Action.InsertText.operator(ActionLabel.Text("kg"), "kg "),
-            Action.InsertText.operator(ActionLabel.Text("t"), "t "),
-        ),
-        5,
-        role= KeyRole.OPERATOR
-    )
-
-    val keySpecSiPrefix = KeySpec.SelectorKeySpec(
-        listOf(
-            Action.InsertText.operator(ActionLabel.Text("giga"), "G"),
-            Action.InsertText.operator(ActionLabel.Text("mega"), "M"),
-            Action.InsertText.operator(ActionLabel.Text("kilo"), "k"),
-            Action.InsertText.operator(ActionLabel.Text("milli"), "m"),
-            Action.InsertText.operator(ActionLabel.Text("micro"), "µ"),
-            Action.InsertText.operator(ActionLabel.Text("nano"), "n"),
-            Action.InsertText.operator(ActionLabel.Text("pico"), "p"),
+            CalcAction.InsertText.operator("G"),
+            CalcAction.InsertText.operator("M"),
+            CalcAction.InsertText.operator("k"),
+            CalcAction.InsertText.operator("m"),
+            CalcAction.InsertText.operator("µ"),
+            CalcAction.InsertText.operator("n"),
+            CalcAction.InsertText.operator("p"),
         ),
         2,
         role= KeyRole.OPERATOR
     )
 
-    val keySpecBasicUnits = KeySpec.SelectorKeySpec(
+    val SI_UNITS = CalcKey.Selector(
         listOf(
-            Action.InsertText.operator(ActionLabel.Text("Ampere"), "A"),
-            Action.InsertText.operator(ActionLabel.Text("Gram"), "g"),
-            Action.InsertText.operator(ActionLabel.Text("Joule"), "J"),
-            Action.InsertText.operator(ActionLabel.Text("Kelvin"), "K"),
-            Action.InsertText.operator(ActionLabel.Text("Liter"), "L"),
-            Action.InsertText.operator(ActionLabel.Text("Meter"), "m"),
-            Action.InsertText.operator(ActionLabel.Text("Newton"), "N"),
-            Action.InsertText.operator(ActionLabel.Text("Ohm"), "Ω"),
-            Action.InsertText.operator(ActionLabel.Text("Pascal"), "Pa"),
-            Action.InsertText.operator(ActionLabel.Text("Second"), "s"),
-            Action.InsertText.operator(ActionLabel.Text("Volt"), "V"),
-            Action.InsertText.operator(ActionLabel.Text("Watt"), "W"),
+            CalcAction.InsertText.operator("A"),
+            CalcAction.InsertText.operator("g"),
+            CalcAction.InsertText.operator("J"),
+            CalcAction.InsertText.operator("K"),
+            CalcAction.InsertText.operator("L"),
+            CalcAction.InsertText.operator("m"),
+            CalcAction.InsertText.operator("N"),
+            CalcAction.InsertText.operator("Ω"),
+            CalcAction.InsertText.operator("Pa"),
+            CalcAction.InsertText.operator("s"),
+            CalcAction.InsertText.operator("V"),
+            CalcAction.InsertText.operator("W"),
         ),
         5,
         role= KeyRole.OPERATOR

@@ -16,9 +16,6 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.Science
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -51,40 +48,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
-import com.jherkenhoff.qalculate.model.Action
-import com.jherkenhoff.qalculate.model.ActionLabel
 import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.KeyPositionSpec
-import com.jherkenhoff.qalculate.model.KeyRole
-import com.jherkenhoff.qalculate.model.KeySpec
-import com.jherkenhoff.qalculate.model.KeypadSection
-import com.jherkenhoff.qalculate.model.KeypadSpec
-import com.jherkenhoff.qalculate.model.Keys
+import com.jherkenhoff.qalculate.model.CalcAction
 import com.jherkenhoff.qalculate.model.UndoState
 import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-
-private val secondaryKeypad: List<Pair<KeyPositionSpec, KeySpec>> = listOf(
-    Pair(KeyPositionSpec(0, 0), Keys.keySpecX),
-    Pair(KeyPositionSpec(0, 1), Keys.keySpecY),
-    Pair(KeyPositionSpec(0, 2), Keys.keySpecZ),
-    Pair(KeyPositionSpec(0, 3), Keys.keySpecSiPrefix),
-    Pair(KeyPositionSpec(0, 4), Keys.keySpecBasicUnits),
-
-    Pair(KeyPositionSpec(1, 0), Keys.keySpecIntegral),
-    Pair(KeyPositionSpec(1, 1), Keys.keySpecDifferential),
-    Pair(KeyPositionSpec(1, 2), Keys.keySpecSum),
-    Pair(KeyPositionSpec(1, 3), Keys.keySpecImaginary),
-    Pair(KeyPositionSpec(1, 4), Keys.keySpecComplexOperators),
-
-    Pair(KeyPositionSpec(2, 0), Keys.keySpecSin),
-    Pair(KeyPositionSpec(2, 1), Keys.keySpecCos),
-    Pair(KeyPositionSpec(2, 2), Keys.keySpecTan),
-    Pair(KeyPositionSpec(2, 3), Keys.keySpecLn),
-    Pair(KeyPositionSpec(2, 4), Keys.keySpecInfinity)
-)
 
 
 @Composable
@@ -135,7 +106,7 @@ fun CalculatorScreenContent(
     calculationHistory: List<CalculationHistoryItemData> = emptyList(),
     autocompleteResult: AutocompleteResult,
     undoState: UndoState<TextFieldValue>,
-    onKeyAction: (Action) -> Unit = { },
+    onKeyAction: (CalcAction) -> Unit = { },
     onInputFieldValueChange: (TextFieldValue) -> Unit = { },
     onDeleteCalculation: (CalculationHistoryItemData) -> Unit = { },
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
@@ -154,82 +125,6 @@ fun CalculatorScreenContent(
     }
 
     val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
-
-    // TODO: Move dynamic decimal selection to some sort of key-factory
-    val decimalChar = when (userPreferences.decimalSeparator) {
-        UserPreferences.DecimalSeparator.DOT -> "."
-        UserPreferences.DecimalSeparator.COMMA -> ","
-    }
-    val otherChar = when (userPreferences.decimalSeparator) {
-        UserPreferences.DecimalSeparator.DOT -> ","
-        UserPreferences.DecimalSeparator.COMMA -> "."
-    }
-
-    val keySpecDecimal = KeySpec.DefaultKeySpec(
-        clickAction = Action.InsertText(ActionLabel.Text(decimalChar), decimalChar),
-        longClickAction = Action.InsertText(ActionLabel.Text("␣"), " "),
-        role = KeyRole.NUMBER
-    )
-
-    // TODO: Move dynamic multiplication and division selection to some sort of key-factory
-    val multiplicationChar = userPreferences.getMultiplicationSignString()
-    val keySpecMultiply = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.operator(ActionLabel.Text(multiplicationChar), multiplicationChar), role = KeyRole.OPERATOR)
-
-    val divisionChar = userPreferences.getDivisionSignString()
-    val keySpecDivision = KeySpec.DefaultKeySpec(clickAction = Action.InsertText.operator(ActionLabel.Text(divisionChar), divisionChar), role = KeyRole.OPERATOR)
-
-    val primaryKeypad : List<Pair<KeyPositionSpec, KeySpec>> = listOf(
-        Pair(KeyPositionSpec(0, 0), Keys.keySpecPercent),
-        Pair(KeyPositionSpec(0, 1), Keys.keySpecPi),
-        Pair(KeyPositionSpec(0, 2), Keys.keySpec7),
-        Pair(KeyPositionSpec(0, 3), Keys.keySpec8),
-        Pair(KeyPositionSpec(0, 4), Keys.keySpec9),
-        Pair(KeyPositionSpec(0, 5), Keys.keySpecBackspace),
-        Pair(KeyPositionSpec(0, 6), Keys.keySpecClearAll),
-
-        Pair(KeyPositionSpec(1, 0), Keys.keySpecSqrt),
-        Pair(KeyPositionSpec(1, 1), Keys.keySpecPower),
-        Pair(KeyPositionSpec(1, 2), Keys.keySpec4),
-        Pair(KeyPositionSpec(1, 3), Keys.keySpec5),
-        Pair(KeyPositionSpec(1, 4), Keys.keySpec6),
-        Pair(KeyPositionSpec(1, 5), keySpecMultiply),
-        Pair(KeyPositionSpec(1, 6), keySpecDivision),
-
-        Pair(KeyPositionSpec(2, 0), Keys.keySpecBracketOpen),
-        Pair(KeyPositionSpec(2, 1), Keys.keySpecBracketClose),
-        Pair(KeyPositionSpec(2, 2), Keys.keySpec1),
-        Pair(KeyPositionSpec(2, 3), Keys.keySpec2),
-        Pair(KeyPositionSpec(2, 4), Keys.keySpec3),
-        Pair(KeyPositionSpec(2, 5), Keys.keySpecPlus),
-        Pair(KeyPositionSpec(2, 6), Keys.keySpecMinus),
-
-        Pair(KeyPositionSpec(3, 0), Keys.keySpecUnderscore),
-        Pair(KeyPositionSpec(3, 1), Keys.keySpecEqual),
-        Pair(KeyPositionSpec(3, 2), Keys.keySpec0),
-        Pair(KeyPositionSpec(3, 3), keySpecDecimal),
-        Pair(KeyPositionSpec(3, 4), Keys.keySpecExp),
-        Pair(KeyPositionSpec(3, 5, 1, 2), Keys.keySpecReturn),
-    )
-
-    val keypads = listOf(
-        KeypadSpec(
-            name = "Keyboard",
-            icon = Icons.Default.Keyboard,
-            sections = listOf(
-                KeypadSection(4, 7, primaryKeypad, 0.6f)
-            ),
-            imeEnabled = true
-        ),
-        KeypadSpec(
-            name = "Advanced",
-            icon = Icons.Default.Science,
-            sections = listOf(
-                KeypadSection(3, 5, secondaryKeypad, 0.5f),
-                KeypadSection(4, 7, primaryKeypad, 0.9f)
-            ),
-            imeEnabled = false
-        )
-    )
 
     var activeKeypad by remember { mutableIntStateOf(0) }
 
@@ -332,11 +227,11 @@ fun CalculatorScreenContent(
                 Keypad(
                     keypads,
                     activeKeypad,
+                    CalcActionLabelMapper(userPreferences),
                     Modifier.clipToBounds()
                         .shrinkHeightAbsolute(offsetY.value.toInt())
                         .onGloballyPositioned { maxOffset = it.size.height.toFloat() }
                 )
-
             }
         }
     }
@@ -351,7 +246,7 @@ private fun DefaultPreview() {
         CalculatorScreenContent(
             TextFieldValue("c"),
             "SpeedOfLight",
-            "299.792 458 Km/ms",
+            "299.792 458 km/ms",
             userPreferences = UserPreferences(),
             onUserPreferencesChanged = {},
             autocompleteResult = AutocompleteResult(),
@@ -374,7 +269,7 @@ private fun ManyHistoryItemsPreview() {
         CalculatorScreenContent(
             TextFieldValue("c"),
             "SpeedOfLight",
-            "299.792 458 Km/ms",
+            "299.792 458 km/ms",
             userPreferences = UserPreferences(),
             onUserPreferencesChanged = {},
             autocompleteResult = AutocompleteResult(),
@@ -422,7 +317,7 @@ private fun EmptyHistoryPreview() {
         CalculatorScreenContent(
             TextFieldValue("c"),
             "SpeedOfLight",
-            "299.792 458 Km/ms",
+            "299.792 458 km/ms",
             userPreferences = UserPreferences(),
             onUserPreferencesChanged = {},
             autocompleteResult = AutocompleteResult(),
