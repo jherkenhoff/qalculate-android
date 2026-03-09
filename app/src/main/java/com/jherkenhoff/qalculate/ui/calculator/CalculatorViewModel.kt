@@ -17,7 +17,7 @@ import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
 import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.CalcAction
+import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.model.UndoManager
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
@@ -101,6 +101,8 @@ class CalculatorViewModel @Inject constructor(
     private val _autocompleteDismissed = MutableStateFlow(false)
     val autocompleteDismissed = _autocompleteDismissed.asStateFlow()
 
+
+
     fun clearCalculationHistory() {
         viewModelScope.launch {
             calculationHistoryStore.deleteAll()
@@ -138,18 +140,18 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    fun handleKeyAction(action: CalcAction) {
+    fun handleKeyAction(action: CalculatorAction) {
         when (action) {
-            is CalcAction.InsertText -> insertText(action)
-            is CalcAction.DeleteChars -> removeChars(action.nChars)
-            is CalcAction.SubmitCalculation -> submitCalculation()
-            is CalcAction.ClearAll -> clearInput()
-            is CalcAction.MoveCursor -> moveCursor(action.nChars)
-            is CalcAction.TraverseHistory -> traverseHistory(action.nEntries)
-            is CalcAction.StoreAsVariable -> null
-            is CalcAction.InsertDecimalSymbol -> insertText(userPreferences.value.getDecimalSeparatorString())
-            is CalcAction.InsertDivisionSymbol -> insertText(userPreferences.value.getDivisionSignString())
-            is CalcAction.InsertMultiplicationSymbol -> insertText(userPreferences.value.getMultiplicationSignString())
+            is CalculatorAction.InsertText -> insertText(action)
+            is CalculatorAction.DeleteChars -> removeChars(action.nChars)
+            is CalculatorAction.SubmitCalculation -> submitCalculation()
+            is CalculatorAction.ClearAll -> clearInput()
+            is CalculatorAction.MoveCursor -> moveCursor(action.nChars)
+            is CalculatorAction.TraverseHistory -> traverseHistory(action.nEntries)
+            is CalculatorAction.StoreAsVariable -> null
+            is CalculatorAction.InsertDecimalSymbol -> insertText(userPreferences.value.getDecimalSeparatorString())
+            is CalculatorAction.InsertDivisionSymbol -> insertText(userPreferences.value.getDivisionSignString())
+            is CalculatorAction.InsertMultiplicationSymbol -> insertText(userPreferences.value.getMultiplicationSignString())
         }
     }
 
@@ -189,7 +191,7 @@ class CalculatorViewModel @Inject constructor(
         updateInput(TextFieldValue(""))
     }
 
-    fun insertText(action: CalcAction.InsertText) {
+    fun insertText(action: CalculatorAction.InsertText) {
         val maxChars = inputTextFieldValue.value.text.length
         val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
         val selectedText = inputTextFieldValue.value.getSelectedText()
@@ -198,15 +200,15 @@ class CalculatorViewModel @Inject constructor(
         with(action) {
             if (selectedText.isNotEmpty()) {
                     val newText = when (selectionPolicy) {
-                        CalcAction.InsertText.SelectionPolicy.REPLACE -> "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
-                        CalcAction.InsertText.SelectionPolicy.SURROUND -> "$textBeforeSelection$preCursorText$selectedText$postCursorText$textAfterSelection"
-                        CalcAction.InsertText.SelectionPolicy.PARENTHESES -> "$textBeforeSelection($selectedText)$preCursorText$postCursorText$textAfterSelection"
+                        CalculatorAction.InsertText.SelectionPolicy.REPLACE -> "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
+                        CalculatorAction.InsertText.SelectionPolicy.SURROUND -> "$textBeforeSelection$preCursorText$selectedText$postCursorText$textAfterSelection"
+                        CalculatorAction.InsertText.SelectionPolicy.PARENTHESES -> "$textBeforeSelection($selectedText)$preCursorText$postCursorText$textAfterSelection"
                     }
 
                     val newSelection = when (selectionPolicy) {
-                        CalcAction.InsertText.SelectionPolicy.REPLACE -> TextRange(textBeforeSelection.length + preCursorText.length)
-                        CalcAction.InsertText.SelectionPolicy.SURROUND -> TextRange(textBeforeSelection.length, newText.length - textAfterSelection.length)
-                        CalcAction.InsertText.SelectionPolicy.PARENTHESES -> TextRange(newText.length - postCursorText.length - textAfterSelection.length)
+                        CalculatorAction.InsertText.SelectionPolicy.REPLACE -> TextRange(textBeforeSelection.length + preCursorText.length)
+                        CalculatorAction.InsertText.SelectionPolicy.SURROUND -> TextRange(textBeforeSelection.length, newText.length - textAfterSelection.length)
+                        CalculatorAction.InsertText.SelectionPolicy.PARENTHESES -> TextRange(newText.length - postCursorText.length - textAfterSelection.length)
                     }
 
                     updateInput(TextFieldValue(

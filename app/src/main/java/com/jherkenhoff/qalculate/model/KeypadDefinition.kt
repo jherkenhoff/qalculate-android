@@ -18,7 +18,7 @@ data class KeypadSection(
 
 data class KeypadDefinition(
     val name: String,
-    val icon: ImageVector?,
+    val icon: ImageVector,
     val sections: List<KeypadSection>,
     val imeEnabled: Boolean
 )

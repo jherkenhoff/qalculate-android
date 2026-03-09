@@ -32,20 +32,19 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.CalcAction
-import com.jherkenhoff.qalculate.model.CalcActionLabel
+import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 
 @Composable
 fun AuxiliaryBar(
     autocompleteResult: AutocompleteResult,
     keyboardEnable: Boolean,
-    auxiliaryActions: List<CalcAction>,
+    auxiliaryActions: List<CalculatorAction>,
     calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     onKeyboardEnableChange: (Boolean) -> Unit = { },
-    onAction: (CalcAction) -> Unit = { },
+    onAction: (CalculatorAction) -> Unit = { },
     onAutocompleteDismiss: () -> Unit = { },
 ) {
     val fadeWidth = 40f
@@ -96,12 +95,12 @@ fun AuxiliaryBar(
                     for (action in auxiliaryActions) {
                         IconButton({ onAction(action) }) {
                             when (val label = calcActionLabelMapper(action)) {
-                                is CalcActionLabel.Text -> Text(
+                                is CalculatorKeyButtonActionLabel.Text -> Text(
                                     label.text,
                                     style = MaterialTheme.typography.labelLarge
                                 )
 
-                                is CalcActionLabel.Icon -> Icon(
+                                is CalculatorKeyButtonActionLabel.Icon -> Icon(
                                     label.icon,
                                     label.description,
                                     modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())

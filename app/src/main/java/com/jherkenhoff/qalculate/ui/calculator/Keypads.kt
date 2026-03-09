@@ -1,11 +1,56 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Science
 import com.jherkenhoff.qalculate.model.KeyLibrary
 import com.jherkenhoff.qalculate.model.KeyPositionSpec
 import com.jherkenhoff.qalculate.model.KeypadSection
 import com.jherkenhoff.qalculate.model.KeypadDefinition
+
+val basicKeypadSectionNumpad = KeypadSection(
+    rows = 1,
+    cols = 6,
+    keys = listOf(
+        Pair(KeyPositionSpec(0, 0), KeyLibrary.FUNCTION_SIN),
+        Pair(KeyPositionSpec(0, 1), KeyLibrary.FUNCTION_COS),
+        Pair(KeyPositionSpec(0, 2), KeyLibrary.FUNCTION_TAN),
+        Pair(KeyPositionSpec(0, 3), KeyLibrary.FUNCTION_LN)
+    ),
+    aspectRatio = 0.6f
+)
+
+
+val basicKeypadSectionExtended = KeypadSection(
+    rows = 4,
+    cols = 5,
+    keys = listOf(
+        Pair(KeyPositionSpec(0, 0), KeyLibrary.NUMBER_7),
+        Pair(KeyPositionSpec(0, 1), KeyLibrary.NUMBER_8),
+        Pair(KeyPositionSpec(0, 2), KeyLibrary.NUMBER_9),
+        Pair(KeyPositionSpec(0, 3), KeyLibrary.BACKSPACE),
+        Pair(KeyPositionSpec(0, 4), KeyLibrary.CLEAR_ALL),
+
+        Pair(KeyPositionSpec(1, 0), KeyLibrary.NUMBER_4),
+        Pair(KeyPositionSpec(1, 1), KeyLibrary.NUMBER_5),
+        Pair(KeyPositionSpec(1, 2), KeyLibrary.NUMBER_6),
+        Pair(KeyPositionSpec(1, 3), KeyLibrary.OPERATOR_MULTIPLY),
+        Pair(KeyPositionSpec(1, 4), KeyLibrary.OPERATOR_DIVISION),
+
+        Pair(KeyPositionSpec(2, 0), KeyLibrary.NUMBER_1),
+        Pair(KeyPositionSpec(2, 1), KeyLibrary.NUMBER_2),
+        Pair(KeyPositionSpec(2, 2), KeyLibrary.NUMBER_3),
+        Pair(KeyPositionSpec(2, 3), KeyLibrary.OPERATOR_PLUS),
+        Pair(KeyPositionSpec(2, 4), KeyLibrary.OPERATOR_MINUS),
+
+        Pair(KeyPositionSpec(3, 0), KeyLibrary.NUMBER_0),
+        Pair(KeyPositionSpec(3, 1), KeyLibrary.NUMBER_DECIMAL),
+        Pair(KeyPositionSpec(3, 2), KeyLibrary.OPERATOR_E),
+        Pair(KeyPositionSpec(3, 3, 1, 2), KeyLibrary.RETURN)
+    ),
+    aspectRatio = 0.8f
+)
 
 val primaryKeypadSection = KeypadSection(
     rows = 4,
@@ -73,8 +118,14 @@ val secondaryKeypadSection =
 
 val keypads = listOf(
     KeypadDefinition(
+        name = "Basic",
+        icon = Icons.Default.Calculate,
+        sections = listOf(basicKeypadSectionNumpad, basicKeypadSectionExtended),
+        imeEnabled = false
+    ),
+    KeypadDefinition(
         name = "Keyboard",
-        icon = Icons.Default.Science,
+        icon = Icons.Default.Keyboard,
         sections = listOf(
             primaryKeypadSection.copy(aspectRatio = 0.6f)
         ),

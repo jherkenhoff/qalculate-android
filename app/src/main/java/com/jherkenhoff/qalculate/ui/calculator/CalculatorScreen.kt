@@ -1,16 +1,21 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -46,10 +51,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.util.TableInfo
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.CalcAction
+import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.model.UndoState
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
@@ -106,7 +112,7 @@ fun CalculatorScreenContent(
     calculationHistory: List<CalculationHistoryItemData> = emptyList(),
     autocompleteResult: AutocompleteResult,
     undoState: UndoState<TextFieldValue>,
-    onKeyAction: (CalcAction) -> Unit = { },
+    onKeyAction: (CalculatorAction) -> Unit = { },
     onInputFieldValueChange: (TextFieldValue) -> Unit = { },
     onDeleteCalculation: (CalculationHistoryItemData) -> Unit = { },
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
@@ -224,14 +230,38 @@ fun CalculatorScreenContent(
                         )
                 )
 
-                Keypad(
-                    keypads,
-                    activeKeypad,
-                    CalcActionLabelMapper(userPreferences),
-                    Modifier.clipToBounds()
+
+                Column(
+                    modifier = Modifier.clipToBounds()
                         .shrinkHeightAbsolute(offsetY.value.toInt())
                         .onGloballyPositioned { maxOffset = it.size.height.toFloat() }
-                )
+                ) {
+                    KeypadSwitch2(
+                        keypads,
+                        activeKeypad,
+                        onKeypadChanged = { activeKeypad = it }
+                    )
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    ) {
+                        AnimatedContent(
+                            activeKeypad
+                        ) {
+                            Column {
+                                Keypad(
+                                    keypads[it].sections,
+                                    CalcActionLabelMapper(userPreferences),
+                                    onKeyAction = onKeyAction,
+                                    onActiveKeypadChanged = { newActiveKeypad ->
+                                        activeKeypad = newActiveKeypad
+                                    },
+                                )
+                                Spacer(Modifier.height(6.dp))
+                                Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
+                            }
+                        }
+                    }
+                }
             }
         }
     }

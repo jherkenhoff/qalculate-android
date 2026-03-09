@@ -34,167 +34,48 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jherkenhoff.qalculate.model.CalcAction
+import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.model.KeypadDefinition
+import com.jherkenhoff.qalculate.model.KeypadSection
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 
 @Composable
 fun Keypad(
-    keypads: List<KeypadDefinition>,
-    activeKeypadIndex: Int,
+    keypadSections: List<KeypadSection>,
     calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
-    onKeyAction: (CalcAction) -> Unit = {},
+    onKeyAction: (CalculatorAction) -> Unit = {},
     onActiveKeypadChanged: (Int) -> Unit = {},
 ) {
-    val activeKeypad = keypads[activeKeypadIndex]
 
-    Column(modifier) {
-        Row(verticalAlignment = Alignment.Bottom) {
-            val c = MaterialTheme.colorScheme.surfaceContainerHighest
+    Column() {
+        Spacer(Modifier.height(6.dp))
 
-            Box(modifier = Modifier.drawBehind {
-                val radius = size.height/2
-                val path = Path().apply {
-                    moveTo(0f, size.height)
-                    lineTo(0f, 0f)
-                    lineTo(size.width-radius, 0f)
-                    arcTo(
-                        rect = Rect(
-                            center = Offset(size.width-radius, radius),
-                            radius = radius
-                        ),
-                        -90f,
-                        90f,
-                        false
-                    )
-                    lineTo(size.width, size.height-radius)
-                    arcTo(
-                        rect = Rect(
-                            center = Offset(size.width+radius, size.height-radius),
-                            radius = radius
-                        ),
-                        180f,
-                        -90f,
-                        false
-                    )
-                }
-                drawPath(path, c)
-            }
-                .padding(horizontal = 8.dp)
-            ) {
-                KeypadSwitch(
-                    keypads,
-                    activeKeypadIndex,
-                    onKeypadChanged = onActiveKeypadChanged
-                )
-            }
-            Spacer(Modifier.weight(1f))
-            AnimatedContent(false) {
-                if (it) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        SuggestionChip(
-                            label = { Text("Moin") },
-                            onClick = {}
-                        )
-                        SuggestionChip(
-                            label = { Text("Moin") },
-                            onClick = {}
-                        )
-                        IconButton({}) {
-                            Icon(Icons.Default.Close, "Dismiss autocomplete suggestions")
-                        }
-                    }
-                } else {
-                    Row(horizontalArrangement = Arrangement.End) {
-                        IconButton({}, enabled = false) {
-                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null)
-                        }
-                        IconButton({}, enabled = false) {
-                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
-                        }
-                        IconButton({}, enabled = false) {
-                            Icon(Icons.AutoMirrored.Filled.Undo, null)
-                        }
-                        IconButton({}, enabled = false) {
-                            Icon(Icons.AutoMirrored.Filled.Redo, null)
-                        }
-                    }
-                    Spacer(Modifier.width(16.dp))
-                }
-            }
-        }
-
-        Surface(
-            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+        Column(
+            Modifier
+                .padding(horizontal = 3.dp),
+            verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
-            Column() {
-                Spacer(Modifier.height(6.dp))
-
-//                val auxiliaryActions = listOf(
-//                    Action.MoveCursor(
-//                        ActionLabel.Icon(Icons.Default.ChevronLeft, "Move cursor to the left"),
-//                        -1,
-//                        enabled = (inputTextFieldValue.selection.end != 0)
-//                    ),
-//                    Action.MoveCursor(
-//                        ActionLabel.Icon(Icons.Default.ChevronRight, "Move cursor to the right"),
-//                        1,
-//                        enabled = (inputTextFieldValue.selection.end != inputTextFieldValue.text.length)
-//                    ),
-//                    Action.Undo(
-//                        ActionLabel.Icon(Icons.AutoMirrored.Filled.Undo, "Undo"),
-//                        enabled = undoState.canUndo
-//                    ),
-//                    Action.Redo(
-//                        ActionLabel.Icon(Icons.AutoMirrored.Filled.Redo, "Redo"),
-//                        enabled = undoState.canRedo
-//                    ),
-//                )
-
-//                        AuxiliaryBar(
-//                            autocompleteResult = internalAutocompleteResult,
-//                            keyboardEnable = keyboardEnabled,
-//                            auxiliaryActions = auxiliaryActions,
-//                            onAutocompleteClick = onAutocompleteClick,
-//                            onKeyboardEnableChange = { keyboardEnabled = it },
-//                            onAction = onKeyAction,
-//                            onAutocompleteDismiss = { autocompleteDismissed = true },
-//                            modifier = Modifier.fillMaxWidth()
-//                        )
-
-                Column(
-                    Modifier
-                        .padding(horizontal = 3.dp),
-                    verticalArrangement = Arrangement.spacedBy(3.dp)
+            keypadSections.forEach { keypad ->
+                GridLayout(
+                    keypad.rows,
+                    keypad.cols,
+                    horizontalSpacing = 3.dp,
+                    verticalSpacing = 3.dp,
+                    aspectRatio = keypad.aspectRatio,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    activeKeypad.sections.map { keypad ->
-                        GridLayout(
-                            keypad.rows,
-                            keypad.cols,
-                            horizontalSpacing = 3.dp,
-                            verticalSpacing = 3.dp,
-                            aspectRatio = keypad.aspectRatio,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            keypad.keys.forEach {
-                                item(it.first.row, it.first.col, it.first.rowSpan, it.first.colSpan) {
-                                    Key(
-                                        it.second,
-                                        calcActionLabelMapper,
-                                        onKeyAction = onKeyAction
-                                    )
-                                }
-                            }
+                    keypad.keys.forEach {
+                        item(it.first.row, it.first.col, it.first.rowSpan, it.first.colSpan) {
+                            CalculatorKeyButton(
+                                it.second,
+                                calcActionLabelMapper,
+                                onKeyAction = onKeyAction
+                            )
                         }
                     }
                 }
-
-                Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
-
             }
         }
     }
@@ -205,7 +86,6 @@ fun Keypad(
 private fun DefaultPreview() {
     Keypad(
         emptyList(),
-        0,
         CalcActionLabelMapper(UserPreferences.Default)
     )
 }

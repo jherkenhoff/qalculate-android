@@ -2,13 +2,13 @@ package com.jherkenhoff.qalculate.model
 
 import androidx.compose.ui.text.AnnotatedString
 
-sealed interface CalcAction {
+sealed interface CalculatorAction {
     data class InsertText(
         val label: AnnotatedString,
         val preCursorText: String,
         val postCursorText: String = "",
         val selectionPolicy: SelectionPolicy = SelectionPolicy.REPLACE
-    ) : CalcAction {
+    ) : CalculatorAction {
         enum class SelectionPolicy{REPLACE, SURROUND, PARENTHESES}
 
         constructor(label: String, preCursorText: String, postCursorText: String = "", selectionPolicy: SelectionPolicy = SelectionPolicy.REPLACE)
@@ -36,13 +36,13 @@ sealed interface CalcAction {
         }
     }
 
-    data object InsertMultiplicationSymbol : CalcAction
-    data object InsertDivisionSymbol : CalcAction
-    data object InsertDecimalSymbol : CalcAction
-    data class DeleteChars(val nChars: Int) : CalcAction
-    data object ClearAll: CalcAction
-    data object SubmitCalculation: CalcAction
-    data class MoveCursor(val nChars: Int): CalcAction
-    data class TraverseHistory(val nEntries: Int): CalcAction
-    data class StoreAsVariable(val name: String): CalcAction
+    data object InsertMultiplicationSymbol : CalculatorAction
+    data object InsertDivisionSymbol : CalculatorAction
+    data object InsertDecimalSymbol : CalculatorAction
+    data class DeleteChars(val nChars: Int) : CalculatorAction
+    data object ClearAll: CalculatorAction
+    data object SubmitCalculation: CalculatorAction
+    data class MoveCursor(val nChars: Int): CalculatorAction
+    data class TraverseHistory(val nEntries: Int): CalculatorAction
+    data class StoreAsVariable(val name: String): CalculatorAction
 }

@@ -236,9 +236,9 @@ fun SettingsScreenContent(
                     "Exp display",
                     enumLabelMap = {
                         when (it) {
-                            UserPreferences.ExpDisplay.POWER_OF_10 -> "2${userPreferences.getMultiplicationSignString()}10³"
-                            UserPreferences.ExpDisplay.LOWERCASE_E -> "XeY"
-                            UserPreferences.ExpDisplay.UPPERCASE_E -> "2E3"
+                            UserPreferences.ExpDisplay.POWER_OF_10 -> "2.3${userPreferences.getMultiplicationSignString()}10³"
+                            UserPreferences.ExpDisplay.LOWERCASE_E -> "2.3e3"
+                            UserPreferences.ExpDisplay.UPPERCASE_E -> "2.3E3"
                         }
                     },
                     currentSelection = userPreferences.expDisplay,

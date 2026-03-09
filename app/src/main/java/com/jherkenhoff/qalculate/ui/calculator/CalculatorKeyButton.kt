@@ -59,8 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.jherkenhoff.qalculate.model.CalcAction
-import com.jherkenhoff.qalculate.model.CalcActionLabel
+import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.model.CalcKey
 import com.jherkenhoff.qalculate.model.KeyLibrary
 import com.jherkenhoff.qalculate.model.KeyRole
@@ -78,12 +77,12 @@ object KeyDefaults {
 }
 
 @Composable
-fun Key(
+fun CalculatorKeyButton(
     calcKey: CalcKey,
     calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (CalcAction) -> Unit = {}
+    onKeyAction: (CalculatorAction) -> Unit = {}
 ) {
 
     val containerColor = when (calcKey.role) {
@@ -136,7 +135,7 @@ fun DefaultKey(
     calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (CalcAction) -> Unit = {},
+    onKeyAction: (CalculatorAction) -> Unit = {},
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
@@ -260,7 +259,7 @@ fun CornerDragKey(
     calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (CalcAction) -> Unit = {},
+    onKeyAction: (CalculatorAction) -> Unit = {},
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
@@ -271,50 +270,50 @@ fun CornerDragKey(
 
     var dragOffset by remember { mutableStateOf(Offset(0f, 0f)) }
 
-    var selectedCalcAction by remember { mutableStateOf<CalcAction?>(null) }
+    var selectedCalculatorAction by remember { mutableStateOf<CalculatorAction?>(null) }
 
     Box(
         modifier = modifier.pointerInput(Unit) {
             awaitPointerEventScope {
                 while (true) {
                     val down = awaitFirstDown()
-                    selectedCalcAction = calcKey.centerAction
+                    selectedCalculatorAction = calcKey.centerAction
                     dragOffset = Offset(0f, 0f)
 
                     drag(down.id) { change ->
                         dragOffset += change.positionChange()
 
-                        var newSelectedCalcAction : CalcAction = calcKey.centerAction
+                        var newSelectedCalculatorAction : CalculatorAction = calcKey.centerAction
 
                         if (dragOffset.getDistance() >= dragThreshold) {
                             if (dragOffset.x > 0 && dragOffset.y < 0 && calcKey.topRightAction != null) {
-                                newSelectedCalcAction = calcKey.topRightAction
+                                newSelectedCalculatorAction = calcKey.topRightAction
                             } else if (dragOffset.x < 0 && dragOffset.y < 0 && calcKey.topLeftAction != null) {
-                                newSelectedCalcAction = calcKey.topLeftAction
+                                newSelectedCalculatorAction = calcKey.topLeftAction
                             } else if (dragOffset.x > 0 && dragOffset.y > 0 && calcKey.bottomRightAction != null) {
-                                newSelectedCalcAction = calcKey.bottomRightAction
+                                newSelectedCalculatorAction = calcKey.bottomRightAction
                             } else if (dragOffset.x < 0 && dragOffset.y > 0 && calcKey.bottomLeftAction != null) {
-                                newSelectedCalcAction = calcKey.bottomLeftAction
+                                newSelectedCalculatorAction = calcKey.bottomLeftAction
                             }
                         }
 
-                        if (newSelectedCalcAction != selectedCalcAction) {
+                        if (newSelectedCalculatorAction != selectedCalculatorAction) {
                             haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
                         }
-                        selectedCalcAction = newSelectedCalcAction
+                        selectedCalculatorAction = newSelectedCalculatorAction
 
                         change.consume()
                     }
 
                     haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
-                    selectedCalcAction?.let(onKeyAction)
-                    selectedCalcAction = null
+                    selectedCalculatorAction?.let(onKeyAction)
+                    selectedCalculatorAction = null
                 }
             }
         }
     ) {
 
-        selectedCalcAction?.let { action ->
+        selectedCalculatorAction?.let { action ->
             Layout(
                 content = {
                     Surface(
@@ -399,7 +398,7 @@ fun SelectorKey(
     calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     shape: Shape = KeyDefaults.Shape,
-    onKeyAction: (CalcAction) -> Unit = {},
+    onKeyAction: (CalculatorAction) -> Unit = {},
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
@@ -556,7 +555,7 @@ fun SelectorKey(
 
 @Composable
 fun KeyLabel(
-    label: CalcActionLabel?,
+    label: CalculatorKeyButtonActionLabel?,
     color: Color = MaterialTheme.colorScheme.onSurface,
     style: TextStyle = MaterialTheme.typography.labelLarge,
     modifier: Modifier = Modifier
@@ -570,7 +569,7 @@ fun KeyLabel(
                     .background(MaterialTheme.colorScheme.secondary, CircleShape)
             )
 
-        is CalcActionLabel.Text ->
+        is CalculatorKeyButtonActionLabel.Text ->
             Text(
                 text = label.text,
                 color = color,
@@ -578,7 +577,7 @@ fun KeyLabel(
                 modifier = modifier.padding(4.dp, 0.dp)
             )
 
-        is CalcActionLabel.Icon ->
+        is CalculatorKeyButtonActionLabel.Icon ->
             Icon(
                 label.icon,
                 label.description,
@@ -591,10 +590,10 @@ fun KeyLabel(
 
 @Preview
 @Composable
-private fun SingleCalcActionDefaultKeyPreview() {
+private fun SingleCalcActionDefaultCalculatorKeyButtonPreview() {
     Row(Modifier.height(54.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Key(KeyLibrary.NUMBER_0, CalcActionLabelMapper(UserPreferences.Default), Modifier.weight(1f))
-        Key(KeyLibrary.BACKSPACE, CalcActionLabelMapper(UserPreferences.Default), Modifier.weight(1f))
-        Key(KeyLibrary.NUMBER_PI, CalcActionLabelMapper(UserPreferences.Default), Modifier.weight(1f))
+        CalculatorKeyButton(KeyLibrary.NUMBER_0, CalcActionLabelMapper(UserPreferences.Default), Modifier.weight(1f))
+        CalculatorKeyButton(KeyLibrary.BACKSPACE, CalcActionLabelMapper(UserPreferences.Default), Modifier.weight(1f))
+        CalculatorKeyButton(KeyLibrary.NUMBER_PI, CalcActionLabelMapper(UserPreferences.Default), Modifier.weight(1f))
     }
 }

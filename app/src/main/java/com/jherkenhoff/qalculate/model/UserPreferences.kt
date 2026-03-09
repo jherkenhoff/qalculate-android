@@ -54,7 +54,7 @@ data class UserPreferences(
 
     fun getDecimalSeparatorString(): String {
         return when (this.decimalSeparator) {
-            DecimalSeparator.DOT -> "·"
+            DecimalSeparator.DOT -> "."
             DecimalSeparator.COMMA -> ","
         }
     }

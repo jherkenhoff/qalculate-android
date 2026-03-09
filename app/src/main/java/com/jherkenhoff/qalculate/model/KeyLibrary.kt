@@ -18,208 +18,210 @@ private fun superscriptSymbol(base: String, superscript: String) : AnnotatedStri
 
 object KeyLibrary {
     val NUMBER_0 = CalcKey.Default(
-        clickAction = CalcAction.InsertText("0"),
-        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "0"), "⁰"),
+        clickAction = CalculatorAction.InsertText("0"),
+        longClickAction = CalculatorAction.InsertText(superscriptSymbol("x", "0"), "⁰"),
         role = KeyRole.NUMBER
     )
     val NUMBER_1 = CalcKey.Default(
-        clickAction = CalcAction.InsertText("1"),
-        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "1"), "¹"),
+        clickAction = CalculatorAction.InsertText("1"),
+        longClickAction = CalculatorAction.InsertText(superscriptSymbol("x", "1"), "¹"),
         role = KeyRole.NUMBER
     )
     val NUMBER_2 = CalcKey.Default(
-        clickAction = CalcAction.InsertText("2"),
-        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "2"), "²"),
+        clickAction = CalculatorAction.InsertText("2"),
+        longClickAction = CalculatorAction.InsertText(superscriptSymbol("x", "2"), "²"),
         role = KeyRole.NUMBER
     )
     val NUMBER_3 = CalcKey.Default(
-        clickAction = CalcAction.InsertText("3"),
-        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "3"), "³"),
+        clickAction = CalculatorAction.InsertText("3"),
+        longClickAction = CalculatorAction.InsertText(superscriptSymbol("x", "3"), "³"),
         role = KeyRole.NUMBER
     )
     val NUMBER_4 = CalcKey.Default(
-        clickAction = CalcAction.InsertText("4"),
-        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "4"), "⁴"),
+        clickAction = CalculatorAction.InsertText("4"),
+        longClickAction = CalculatorAction.InsertText(superscriptSymbol("x", "4"), "⁴"),
         role = KeyRole.NUMBER
     )
     val NUMBER_5 = CalcKey.Default(
-        clickAction = CalcAction.InsertText("5"),
-        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "5"), "⁵"),
+        clickAction = CalculatorAction.InsertText("5"),
+        longClickAction = CalculatorAction.InsertText(superscriptSymbol("x", "5"), "⁵"),
         role = KeyRole.NUMBER
     )
     val NUMBER_6 = CalcKey.Default(
-        clickAction = CalcAction.InsertText("6"),
-        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "6"), "⁶"),
+        clickAction = CalculatorAction.InsertText("6"),
+        longClickAction = CalculatorAction.InsertText(superscriptSymbol("x", "6"), "⁶"),
         role = KeyRole.NUMBER
     )
     val NUMBER_7 = CalcKey.Default(
-        clickAction = CalcAction.InsertText("7"),
-        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "7"), "⁷"),
+        clickAction = CalculatorAction.InsertText("7"),
+        longClickAction = CalculatorAction.InsertText(superscriptSymbol("x", "7"), "⁷"),
         role = KeyRole.NUMBER
     )
     val NUMBER_8 = CalcKey.Default(
-        clickAction = CalcAction.InsertText("8"),
-        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "8"), "⁸"),
+        clickAction = CalculatorAction.InsertText("8"),
+        longClickAction = CalculatorAction.InsertText(superscriptSymbol("x", "8"), "⁸"),
         role = KeyRole.NUMBER
     )
     val NUMBER_9 = CalcKey.Default(
-        clickAction = CalcAction.InsertText("9"),
-        longClickAction = CalcAction.InsertText(superscriptSymbol("x", "9"), "⁹"),
+        clickAction = CalculatorAction.InsertText("9"),
+        longClickAction = CalculatorAction.InsertText(superscriptSymbol("x", "9"), "⁹"),
         role = KeyRole.NUMBER
     )
 
     val FUNCTION_LN = CalcKey.Default(
-        clickAction = CalcAction.InsertText.function("ln"),
-        longClickAction = CalcAction.InsertText.function("ln"),
+        clickAction = CalculatorAction.InsertText.function("ln"),
+        longClickAction = CalculatorAction.InsertText.function("log"),
         role = KeyRole.OPERATOR
     )
 
     val BRACKET_OPEN = CalcKey.Default(
-        clickAction = CalcAction.InsertText("("),
-        longClickAction = CalcAction.InsertText("["),
+        clickAction = CalculatorAction.InsertText("("),
+        longClickAction = CalculatorAction.InsertText("["),
         role = KeyRole.OPERATOR
     )
     val BRACKET_CLOSE = CalcKey.Default(
-        clickAction = CalcAction.InsertText(")"),
-        longClickAction = CalcAction.InsertText("]"),
+        clickAction = CalculatorAction.InsertText(")"),
+        longClickAction = CalculatorAction.InsertText("]"),
         role = KeyRole.OPERATOR
     )
     val OPERATOR_PLUS = CalcKey.Default(
-        clickAction = CalcAction.InsertText.operator("+"),
+        clickAction = CalculatorAction.InsertText.operator("+"),
         role = KeyRole.OPERATOR
     )
 
     val OPERATOR_MINUS = CalcKey.Default(
-        clickAction = CalcAction.InsertText.operator("-"),
+        clickAction = CalculatorAction.InsertText.operator("-"),
         role = KeyRole.OPERATOR
     )
 
     val OPERATOR_MULTIPLY = CalcKey.Default(
-        clickAction = CalcAction.InsertMultiplicationSymbol
+        clickAction = CalculatorAction.InsertMultiplicationSymbol,
+        role = KeyRole.OPERATOR
     )
 
     val OPERATOR_DIVISION = CalcKey.Default(
-        clickAction = CalcAction.InsertDivisionSymbol
+        clickAction = CalculatorAction.InsertDivisionSymbol,
+        role = KeyRole.OPERATOR
     )
 
     val NUMBER_DECIMAL = CalcKey.Default(
-        clickAction = CalcAction.InsertDecimalSymbol,
-        longClickAction = CalcAction.InsertText(label = "␣", " "),
+        clickAction = CalculatorAction.InsertDecimalSymbol,
+        longClickAction = CalculatorAction.InsertText(label = "␣", " "),
     )
 
     val OPERATOR_POWER = CalcKey.Default(
-        clickAction = CalcAction.InsertText.operator(superscriptSymbol("x", "y"), "^"),
+        clickAction = CalculatorAction.InsertText.operator(superscriptSymbol("x", "y"), "^"),
         role = KeyRole.OPERATOR
     )
     val OPERATOR_SQRT = CalcKey.Default(
-        clickAction = CalcAction.InsertText.function("√", "sqrt"),
+        clickAction = CalculatorAction.InsertText.function("√", "sqrt"),
         role = KeyRole.OPERATOR
     )
 
     val OPERATOR_PLUS_MINUS = CalcKey.Default(
-        clickAction = CalcAction.InsertText.operator("±"),
+        clickAction = CalculatorAction.InsertText.operator("±"),
         role = KeyRole.OPERATOR
     )
     val calcKeyUnderscore = CalcKey.Default(
-        clickAction = CalcAction.InsertText("_"),
-        longClickAction = CalcAction.InsertText(";"),
+        clickAction = CalculatorAction.InsertText("_"),
+        longClickAction = CalculatorAction.InsertText(";"),
         role = KeyRole.OPERATOR
     )
     val OPERATOR_EQUAL = CalcKey.Default(
-        clickAction = CalcAction.InsertText("="),
-        longClickAction = CalcAction.InsertText(","),
+        clickAction = CalculatorAction.InsertText("="),
+        longClickAction = CalculatorAction.InsertText(","),
         role = KeyRole.OPERATOR
     )
     val NUMBER_PI = CalcKey.Default(
-        clickAction = CalcAction.InsertText("π"),
-        longClickAction = CalcAction.InsertText("e"),
+        clickAction = CalculatorAction.InsertText("π"),
+        longClickAction = CalculatorAction.InsertText("e"),
         role = KeyRole.OPERATOR
     )
     val RETURN = CalcKey.Default(
-        clickAction = CalcAction.SubmitCalculation,
-        longClickAction = CalcAction.InsertText("ans"),
+        clickAction = CalculatorAction.SubmitCalculation,
+        longClickAction = CalculatorAction.InsertText("ans"),
         role = KeyRole.SYSTEM
     )
-    val BACKSPACE = CalcKey.Default(clickAction = CalcAction.DeleteChars(-1), role = KeyRole.SYSTEM)
-    val CLEAR_ALL = CalcKey.Default(clickAction = CalcAction.ClearAll, role = KeyRole.SYSTEM)
+    val BACKSPACE = CalcKey.Default(clickAction = CalculatorAction.DeleteChars(-1), role = KeyRole.SYSTEM)
+    val CLEAR_ALL = CalcKey.Default(clickAction = CalculatorAction.ClearAll, role = KeyRole.SYSTEM)
 
-    val FUNCTION_INTEGRAL = CalcKey.Default(clickAction = CalcAction.InsertText.function("∫", "integral"), role = KeyRole.OPERATOR)
-    val FUNCTION_DIFFERENTIAL = CalcKey.Default(clickAction = CalcAction.InsertText.function("dx", "diff"), role = KeyRole.OPERATOR)
+    val FUNCTION_INTEGRAL = CalcKey.Default(clickAction = CalculatorAction.InsertText.function("∫", "integral"), role = KeyRole.OPERATOR)
+    val FUNCTION_DIFFERENTIAL = CalcKey.Default(clickAction = CalculatorAction.InsertText.function("dx", "diff"), role = KeyRole.OPERATOR)
     val FUNCTION_SUM = CalcKey.Default(
-        clickAction = CalcAction.InsertText.function("Σ", "sum"),
-        longClickAction = CalcAction.InsertText.function("Π", "product"),
+        clickAction = CalculatorAction.InsertText.function("Σ", "sum"),
+        longClickAction = CalculatorAction.InsertText.function("Π", "product"),
         role = KeyRole.OPERATOR
     )
     val NUMBER_INFINITY = CalcKey.Default(
-        clickAction = CalcAction.InsertText("∞"),
-        longClickAction = CalcAction.InsertText("!"),
+        clickAction = CalculatorAction.InsertText("∞"),
+        longClickAction = CalculatorAction.InsertText("!"),
         role = KeyRole.OPERATOR
     )
     val NUMBER_IMAGINARY = CalcKey.Default(
-        clickAction = CalcAction.InsertText("i"),
-        longClickAction = CalcAction.InsertText("∠"),
+        clickAction = CalculatorAction.InsertText("i"),
+        longClickAction = CalculatorAction.InsertText("∠"),
         role = KeyRole.OPERATOR
     )
     val OPERATOR_COMPLEX = CalcKey.Selector(
         listOf(
-            CalcAction.InsertText.function("Abs.", "abs"),
-            CalcAction.InsertText.function("Arg.", "arg"),
-            CalcAction.InsertText.function("Real", "re"),
-            CalcAction.InsertText.function("Imag.", "im"),
-            CalcAction.InsertText.function("Conj.", "conj")
+            CalculatorAction.InsertText.function("Abs.", "abs"),
+            CalculatorAction.InsertText.function("Arg.", "arg"),
+            CalculatorAction.InsertText.function("Real", "re"),
+            CalculatorAction.InsertText.function("Imag.", "im"),
+            CalculatorAction.InsertText.function("Conj.", "conj")
         ),
         2,
         role = KeyRole.OPERATOR
     )
     val NUMBER_PERCENT = CalcKey.Default(
-        clickAction = CalcAction.InsertText.operator("%"),
-        longClickAction = CalcAction.InsertText.operator("±"),
+        clickAction = CalculatorAction.InsertText.operator("%"),
+        longClickAction = CalculatorAction.InsertText.operator("±"),
         role = KeyRole.OPERATOR
     )
     val VARIABLE_X = CalcKey.Default(
-        clickAction = CalcAction.InsertText("X", "x"),
-        longClickAction = CalcAction.StoreAsVariable("x"),
+        clickAction = CalculatorAction.InsertText("X", "x"),
+        longClickAction = CalculatorAction.StoreAsVariable("x"),
         role= KeyRole.OPERATOR
     )
     val VARIABLE_Y = CalcKey.Default(
-        clickAction = CalcAction.InsertText("Y", "y"),
-        longClickAction = CalcAction.StoreAsVariable("y"),
+        clickAction = CalculatorAction.InsertText("Y", "y"),
+        longClickAction = CalculatorAction.StoreAsVariable("y"),
         role = KeyRole.OPERATOR
     )
     val VARIABLE_Z = CalcKey.Default(
-        clickAction = CalcAction.InsertText("Z", "z"),
-        longClickAction = CalcAction.StoreAsVariable("z"),
+        clickAction = CalculatorAction.InsertText("Z", "z"),
+        longClickAction = CalculatorAction.StoreAsVariable("z"),
         role = KeyRole.OPERATOR
     )
     val OPERATOR_E = CalcKey.Default(
-        clickAction = CalcAction.InsertText.operator("E"),
+        clickAction = CalculatorAction.InsertText.operator("E"),
         role = KeyRole.OPERATOR
     )
 
     val FUNCTION_SIN = CalcKey.Default(
-        clickAction = CalcAction.InsertText.function("sin"),
-        longClickAction = CalcAction.InsertText.function(superscriptSymbol("sin", "-1"), "asin"),
+        clickAction = CalculatorAction.InsertText.function("sin"),
+        longClickAction = CalculatorAction.InsertText.function(superscriptSymbol("sin", "-1"), "asin"),
         role = KeyRole.OPERATOR
     )
     val FUNCTION_COS = CalcKey.Default(
-        clickAction = CalcAction.InsertText.function("cos"),
-        longClickAction = CalcAction.InsertText.function(superscriptSymbol("cos", "-1"), "acos"),
+        clickAction = CalculatorAction.InsertText.function("cos"),
+        longClickAction = CalculatorAction.InsertText.function(superscriptSymbol("cos", "-1"), "acos"),
         role = KeyRole.OPERATOR
     )
     val FUNCTION_TAN = CalcKey.Default(
-        clickAction = CalcAction.InsertText.function("tan"),
-        longClickAction = CalcAction.InsertText.function(superscriptSymbol("tan", "-1"), "atan"),
+        clickAction = CalculatorAction.InsertText.function("tan"),
+        longClickAction = CalculatorAction.InsertText.function(superscriptSymbol("tan", "-1"), "atan"),
         role = KeyRole.OPERATOR
     )
 
     val calcKeySiLength = CalcKey.Selector(
         listOf(
-            CalcAction.InsertText.operator("nm "),
-            CalcAction.InsertText.operator("um "),
-            CalcAction.InsertText.operator("mm "),
-            CalcAction.InsertText.operator("cm "),
-            CalcAction.InsertText.operator("m "),
-            CalcAction.InsertText.operator("km "),
+            CalculatorAction.InsertText.operator("nm "),
+            CalculatorAction.InsertText.operator("um "),
+            CalculatorAction.InsertText.operator("mm "),
+            CalculatorAction.InsertText.operator("cm "),
+            CalculatorAction.InsertText.operator("m "),
+            CalculatorAction.InsertText.operator("km "),
         ),
         4,
         role= KeyRole.OPERATOR
@@ -227,11 +229,11 @@ object KeyLibrary {
 
     val calcKeyImperialLength = CalcKey.Selector(
         listOf(
-            CalcAction.InsertText.operator("thou "),
-            CalcAction.InsertText.operator("in "),
-            CalcAction.InsertText.operator("ft "),
-            CalcAction.InsertText.operator("yd "),
-            CalcAction.InsertText.operator("mile "),
+            CalculatorAction.InsertText.operator("thou "),
+            CalculatorAction.InsertText.operator("in "),
+            CalculatorAction.InsertText.operator("ft "),
+            CalculatorAction.InsertText.operator("yd "),
+            CalculatorAction.InsertText.operator("mile "),
         ),
         1,
         role= KeyRole.OPERATOR
@@ -239,10 +241,10 @@ object KeyLibrary {
 
     val calcKeyImperialWeight = CalcKey.Selector(
         listOf(
-            CalcAction.InsertText.operator("gr "),
-            CalcAction.InsertText.operator("oz "),
-            CalcAction.InsertText.operator("lb "),
-            CalcAction.InsertText.operator("stone "),
+            CalculatorAction.InsertText.operator("gr "),
+            CalculatorAction.InsertText.operator("oz "),
+            CalculatorAction.InsertText.operator("lb "),
+            CalculatorAction.InsertText.operator("stone "),
         ),
         2,
         role= KeyRole.OPERATOR
@@ -250,13 +252,13 @@ object KeyLibrary {
 
     val SI_PREFIX = CalcKey.Selector(
         listOf(
-            CalcAction.InsertText.operator("G"),
-            CalcAction.InsertText.operator("M"),
-            CalcAction.InsertText.operator("k"),
-            CalcAction.InsertText.operator("m"),
-            CalcAction.InsertText.operator("µ"),
-            CalcAction.InsertText.operator("n"),
-            CalcAction.InsertText.operator("p"),
+            CalculatorAction.InsertText.operator("G"),
+            CalculatorAction.InsertText.operator("M"),
+            CalculatorAction.InsertText.operator("k"),
+            CalculatorAction.InsertText.operator("m"),
+            CalculatorAction.InsertText.operator("µ"),
+            CalculatorAction.InsertText.operator("n"),
+            CalculatorAction.InsertText.operator("p"),
         ),
         2,
         role= KeyRole.OPERATOR
@@ -264,18 +266,18 @@ object KeyLibrary {
 
     val SI_UNITS = CalcKey.Selector(
         listOf(
-            CalcAction.InsertText.operator("A"),
-            CalcAction.InsertText.operator("g"),
-            CalcAction.InsertText.operator("J"),
-            CalcAction.InsertText.operator("K"),
-            CalcAction.InsertText.operator("L"),
-            CalcAction.InsertText.operator("m"),
-            CalcAction.InsertText.operator("N"),
-            CalcAction.InsertText.operator("Ω"),
-            CalcAction.InsertText.operator("Pa"),
-            CalcAction.InsertText.operator("s"),
-            CalcAction.InsertText.operator("V"),
-            CalcAction.InsertText.operator("W"),
+            CalculatorAction.InsertText.operator("A"),
+            CalculatorAction.InsertText.operator("g"),
+            CalculatorAction.InsertText.operator("J"),
+            CalculatorAction.InsertText.operator("K"),
+            CalculatorAction.InsertText.operator("L"),
+            CalculatorAction.InsertText.operator("m"),
+            CalculatorAction.InsertText.operator("N"),
+            CalculatorAction.InsertText.operator("Ω"),
+            CalculatorAction.InsertText.operator("Pa"),
+            CalculatorAction.InsertText.operator("s"),
+            CalculatorAction.InsertText.operator("V"),
+            CalculatorAction.InsertText.operator("W"),
         ),
         5,
         role= KeyRole.OPERATOR
