@@ -101,7 +101,7 @@ fun InputSheet(
             IconButton(onClick = onMenuClick) {
                 Icon(
                     imageVector = Icons.Filled.Menu,
-                    contentDescription = "Open navigation menu"
+                    contentDescription = stringResource(R.string.cd_open_nav_menu)
                 )
             }
             Spacer(Modifier.weight(1f))

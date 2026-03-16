@@ -323,21 +323,21 @@ fun CalculatorScreenContent(
 
                         val auxiliaryActions = listOf(
                             Action.MoveCursor(
-                                ActionLabel.Icon(Icons.Default.ChevronLeft, "Move cursor to the left"),
+                                ActionLabel.Icon(Icons.Default.ChevronLeft, descriptionRes = R.string.cd_move_cursor_left),
                                 -1,
                                 enabled = (inputTextFieldValue.selection.end != 0)
                             ),
                             Action.MoveCursor(
-                                ActionLabel.Icon(Icons.Default.ChevronRight, "Move cursor to the right"),
+                                ActionLabel.Icon(Icons.Default.ChevronRight, descriptionRes = R.string.cd_move_cursor_right),
                                 1,
                                 enabled = (inputTextFieldValue.selection.end != inputTextFieldValue.text.length)
                             ),
                             Action.Undo(
-                                ActionLabel.Icon(Icons.AutoMirrored.Filled.Undo, "Undo"),
+                                ActionLabel.Icon(Icons.AutoMirrored.Filled.Undo, descriptionRes = R.string.cd_undo),
                                 enabled = undoState.canUndo
                             ),
                             Action.Redo(
-                                ActionLabel.Icon(Icons.AutoMirrored.Filled.Redo, "Redo"),
+                                ActionLabel.Icon(Icons.AutoMirrored.Filled.Redo, descriptionRes = R.string.cd_redo),
                                 enabled = undoState.canRedo
                             ),
                         )

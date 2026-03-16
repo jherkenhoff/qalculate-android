@@ -1,0 +1,139 @@
+<resources>
+    <string name="app_name">Qalculate!</string>
+    <string name="textfield_hint">输入表达式</string>
+    <string name="about_qalculate_text">基于全能的 Qalculate! 桌面计算器的强大且多功能的计算器。</string>
+    <string name="navigation_calculator">计算器</string>
+    <string name="navigation_functions">函数</string>
+    <string name="navigation_variables">变量</string>
+    <string name="navigation_units">单位</string>
+    <string name="navigation_datasets">数据集</string>
+    <string name="navigation_about">关于</string>
+    <string name="navigation_settings">设置</string>
+    <string name="open_menu_content_description">打开菜单</string>
+    <string name="clear_history">清除历史</string>
+    <string name="clear_history_dialog_text">所有历史记录将被永久删除且无法恢复。</string>
+    <string name="clear_history_dialog_title">清除计算历史？</string>
+    <string name="dialog_clear_button">清除</string>
+    <string name="dialog_cancel_button">取消</string>
+
+    <!-- Settings -->
+    <string name="settings_title">设置</string>
+    <string name="settings_general">常规</string>
+    <string name="settings_decimal_separator">小数点</string>
+    <string name="settings_dot">点</string>
+    <string name="settings_comma">逗号</string>
+    <string name="settings_multiplication_sign">乘号</string>
+    <string name="settings_times">叉号 (×)</string>
+    <string name="settings_asterisk">星号 (*)</string>
+    <string name="settings_alt_dot">中点 (·)</string>
+    <string name="settings_division_sign">除号</string>
+    <string name="settings_division_slash">除法斜杠 (∕)</string>
+    <string name="settings_slash">斜杠 (/)</string>
+    <string name="settings_division">除号 (÷)</string>
+    <string name="settings_calculation">计算</string>
+    <string name="settings_preserve_structure">保留结构</string>
+    <string name="settings_preserve_structure_summary">尽可能保留输入的结构</string>
+    <string name="settings_output">输出</string>
+    <string name="settings_negative_exponents">负指数</string>
+    <string name="settings_negative_exponents_summary">显示 A%1$sB⁻¹ 而非 A%2$sB</string>
+    <string name="settings_abbreviate_names">缩写名称</string>
+    <string name="settings_abbreviate_names_summary">显示 m 而非 meter</string>
+    <string name="settings_spacious_output">宽敞输出</string>
+    <string name="settings_spacious_output_summary">使用更多空格以提高可读性</string>
+    <string name="settings_allow_prefix_denominator">允许分母前缀</string>
+    <string name="settings_allow_prefix_denominator_summary">显示 km%1$sms 而非 Mm%1$ss</string>
+    <string name="settings_isolate_units">分离单位</string>
+    <string name="settings_isolate_units_summary">将单位置于结果末尾</string>
+    <string name="settings_exp_display">指数显示</string>
+    <string name="settings_interval_display">区间显示</string>
+    <string name="settings_interval_concise">简洁</string>
+    <string name="settings_interval_interval">区间</string>
+    <string name="settings_interval_plus_minus">加减</string>
+    <string name="settings_interval_midpoint">中点</string>
+    <string name="settings_interval_relative">相对</string>
+    <string name="settings_interval_significant_digits">有效数字</string>
+
+    <!-- Units -->
+    <string name="units_title">单位</string>
+    <string name="units_search_placeholder">搜索单位</string>
+    <string name="units_filter_light">光</string>
+    <string name="units_filter_system">系统</string>
+    <string name="units_filter_favorite">收藏</string>
+    <string name="units_filter_custom">自定义</string>
+    <string name="units_menu_up">向上</string>
+    <string name="units_menu_settings">设置</string>
+    <string name="units_menu_radiance">辐射</string>
+    <string name="cd_add_unit">添加单位图标</string>
+    <string name="cd_search">搜索图标</string>
+    <string name="cd_sort">排序图标</string>
+    <string name="cd_unit_system">单位系统图标</string>
+
+    <!-- History -->
+    <string name="history_empty_title">暂无计算记录</string>
+    <string name="history_empty_subtitle">您的计算历史将显示在这里</string>
+    <string name="history_today">今天</string>
+    <string name="history_yesterday">昨天</string>
+    <string name="action_delete">删除</string>
+
+    <!-- Keys -->
+    <string name="key_abs">绝对值</string>
+    <string name="key_arg">辐角</string>
+    <string name="key_real">实部</string>
+    <string name="key_imag">虚部</string>
+    <string name="key_conj">共轭</string>
+    <string name="key_return">回车</string>
+    <string name="key_backspace">退格</string>
+    <string name="key_nan">非数值</string>
+    <string name="key_inf">无穷大</string>
+    <string name="key_ans">Ans</string>
+    <string name="key_clear_all">AC</string>
+
+    <!-- About -->
+    <string name="about_app_version">应用版本 %1$s</string>
+    <string name="about_lib_version">libqalculate 版本 %1$s</string>
+    <string name="about_check_out">查看 </string>
+    <string name="about_github">GitHub</string>
+    <string name="about_license_intro">本程序不提供任何担保。详情请参阅 </string>
+    <string name="about_license_name">GNU 通用公共许可证，版本 2 或更高版本</string>
+    <string name="about_license_details">。</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_open_nav_menu">打开导航菜单</string>
+    <string name="cd_move_cursor_left">向左移动光标</string>
+    <string name="cd_move_cursor_right">向右移动光标</string>
+    <string name="cd_undo">撤销</string>
+    <string name="cd_redo">重做</string>
+
+    <!-- Units and Prefixes -->
+    <string name="unit_giga">吉</string>
+    <string name="unit_mega">兆</string>
+    <string name="unit_kilo">千</string>
+    <string name="unit_milli">毫</string>
+    <string name="unit_micro">微</string>
+    <string name="unit_nano">纳</string>
+    <string name="unit_pico">皮</string>
+
+    <string name="unit_ampere">安培</string>
+    <string name="unit_gram">克</string>
+    <string name="unit_joule">焦耳</string>
+    <string name="unit_kelvin">开尔文</string>
+    <string name="unit_liter">升</string>
+    <string name="unit_meter">米</string>
+    <string name="unit_newton">牛顿</string>
+    <string name="unit_ohm">欧姆</string>
+    <string name="unit_pascal">帕斯卡</string>
+    <string name="unit_second">秒</string>
+    <string name="unit_volt">伏特</string>
+    <string name="unit_watt">瓦特</string>
+
+    <string name="unit_thou">千分之一英寸</string>
+    <string name="unit_inch">英寸</string>
+    <string name="unit_foot">英尺</string>
+    <string name="unit_yard">码</string>
+    <string name="unit_mile">英里</string>
+
+    <string name="unit_grain">格令</string>
+    <string name="unit_ounce">盎司</string>
+    <string name="unit_pound">磅</string>
+    <string name="unit_stone">英石</string>
+</resources>
