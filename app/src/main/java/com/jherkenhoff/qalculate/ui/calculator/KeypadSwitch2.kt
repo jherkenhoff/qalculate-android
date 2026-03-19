@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -65,39 +66,39 @@ fun KeypadSwitch2(
     Row(verticalAlignment = Alignment.Bottom) {
         val c = MaterialTheme.colorScheme.surfaceContainerHighest
 
-        Box(modifier = Modifier.drawBehind {
-            val radius = size.height/2
-            val path = Path().apply {
-                moveTo(0f, size.height)
-                lineTo(0f, 0f)
-                lineTo(size.width-radius, 0f)
-                arcTo(
-                    rect = Rect(
-                        center = Offset(size.width-radius, radius),
-                        radius = radius
-                    ),
-                    -90f,
-                    90f,
-                    false
-                )
-                lineTo(size.width, size.height-radius)
-                arcTo(
-                    rect = Rect(
-                        center = Offset(size.width+radius, size.height-radius),
-                        radius = radius
-                    ),
-                    180f,
-                    -90f,
-                    false
-                )
+        Box(
+            modifier = Modifier.drawBehind {
+                val radius = size.height/2
+                val path = Path().apply {
+                    moveTo(0f, size.height)
+                    lineTo(0f, 0f)
+                    lineTo(size.width-radius, 0f)
+                    arcTo(
+                        rect = Rect(
+                            center = Offset(size.width-radius, radius),
+                            radius = radius
+                        ),
+                        -90f,
+                        90f,
+                        false
+                    )
+                    lineTo(size.width, size.height-radius)
+                    arcTo(
+                        rect = Rect(
+                            center = Offset(size.width+radius, size.height-radius),
+                            radius = radius
+                        ),
+                        180f,
+                        -90f,
+                        false
+                    )
+                }
+                drawPath(path, c)
             }
-            drawPath(path, c)
-        }
             .padding(horizontal = 8.dp)
         ) {
 
             SharedTransitionLayout {
-
                 AnimatedContent(
                     targetState = expanded
                 ) { isExpanded ->

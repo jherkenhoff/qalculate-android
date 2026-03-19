@@ -142,7 +142,7 @@ object KeyLibrary {
         longClickAction = CalculatorAction.InsertText("ans"),
         role = KeyRole.SYSTEM
     )
-    val BACKSPACE = CalcKey.Default(clickAction = CalculatorAction.DeleteChars(-1), role = KeyRole.SYSTEM)
+    val BACKSPACE = CalcKey.Default(clickAction = CalculatorAction.DeleteChars(1), role = KeyRole.SYSTEM)
     val CLEAR_ALL = CalcKey.Default(clickAction = CalculatorAction.ClearAll, role = KeyRole.SYSTEM)
 
     val FUNCTION_INTEGRAL = CalcKey.Default(clickAction = CalculatorAction.InsertText.function("∫", "integral"), role = KeyRole.OPERATOR)

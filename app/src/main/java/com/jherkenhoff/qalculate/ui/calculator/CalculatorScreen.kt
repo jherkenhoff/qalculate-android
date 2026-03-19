@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -129,6 +132,8 @@ fun CalculatorScreenContent(
     if (autocompleteResult.relevantText.isEmpty()) {
         autocompleteDismissed = false
     }
+    
+    var keypadSelectionTabExpanded by remember { mutableStateOf(false) }
 
     val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
 
@@ -236,18 +241,19 @@ fun CalculatorScreenContent(
                         .shrinkHeightAbsolute(offsetY.value.toInt())
                         .onGloballyPositioned { maxOffset = it.size.height.toFloat() }
                 ) {
-                    KeypadSwitch2(
-                        keypads,
-                        activeKeypad,
-                        onKeypadChanged = { activeKeypad = it }
-                    )
-                    Surface(
+                    TabPanel(
+                        tabItems = keypads.map {
+                            { Text(it.name) }
+                        },
+                        activeTabItemIndex = activeKeypad,
+                        onTabClicked = { activeKeypad = it },
+                        trailingContent = {},
                         color = MaterialTheme.colorScheme.surfaceContainerHighest,
                     ) {
-                        AnimatedContent(
-                            activeKeypad
-                        ) {
-                            Column {
+                        Column {
+                            AnimatedContent(
+                                activeKeypad
+                            ) {
                                 Keypad(
                                     keypads[it].sections,
                                     CalcActionLabelMapper(userPreferences),
@@ -256,9 +262,9 @@ fun CalculatorScreenContent(
                                         activeKeypad = newActiveKeypad
                                     },
                                 )
-                                Spacer(Modifier.height(6.dp))
-                                Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
                             }
+                            Spacer(Modifier.height(6.dp))
+                            Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
                         }
                     }
                 }
