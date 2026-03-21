@@ -30,7 +30,6 @@ val basicKeypadSectionExtended = KeypadSection(
     aspectRatio = 0.6f
 )
 
-
 val basicKeypadSectionNumpad = KeypadSection(
     rows = 4,
     cols = 5,

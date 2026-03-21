@@ -3,6 +3,7 @@ package com.jherkenhoff.qalculate.ui.common
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -25,22 +26,20 @@ class CalcActionLabelMapper (
             }
             is CalculatorAction.InsertText -> CalculatorKeyButtonActionLabel.Text(action.label)
             is CalculatorAction.MoveCursor -> {
-                if (action.nChars < 0) CalculatorKeyButtonActionLabel.Icon(
-                    Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    null
-                )
-                else CalculatorKeyButtonActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null)
+                if (action.nChars < 0)
+                    CalculatorKeyButtonActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null)
+                else
+                    CalculatorKeyButtonActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
             }
             is CalculatorAction.SubmitCalculation -> CalculatorKeyButtonActionLabel.Icon(
                 Icons.AutoMirrored.Filled.KeyboardReturn,
                 null
             )
             is CalculatorAction.TraverseHistory -> {
-                if (action.nEntries < 0) CalculatorKeyButtonActionLabel.Icon(
-                    Icons.AutoMirrored.Filled.Undo,
-                    "Undo"
-                )
-                else CalculatorKeyButtonActionLabel.Icon(Icons.AutoMirrored.Filled.Redo, "Redo")
+                if (action.nEntries < 0)
+                    CalculatorKeyButtonActionLabel.Icon(Icons.AutoMirrored.Filled.Undo, "Undo")
+                else
+                    CalculatorKeyButtonActionLabel.Icon(Icons.AutoMirrored.Filled.Redo, "Redo")
             }
             is CalculatorAction.InsertDivisionSymbol -> CalculatorKeyButtonActionLabel.Text(userPreferences.getDivisionSignString())
             is CalculatorAction.InsertMultiplicationSymbol -> CalculatorKeyButtonActionLabel.Text(userPreferences.getMultiplicationSignString())

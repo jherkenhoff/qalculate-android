@@ -46,7 +46,6 @@ fun Keypad(
     calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     onKeyAction: (CalculatorAction) -> Unit = {},
-    onActiveKeypadChanged: (Int) -> Unit = {},
 ) {
 
     Column() {

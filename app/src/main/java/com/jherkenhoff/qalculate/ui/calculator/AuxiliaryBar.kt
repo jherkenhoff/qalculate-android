@@ -38,12 +38,10 @@ import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 @Composable
 fun AuxiliaryBar(
     autocompleteResult: AutocompleteResult,
-    keyboardEnable: Boolean,
     auxiliaryActions: List<CalculatorAction>,
     calcActionLabelMapper: CalcActionLabelMapper,
     modifier: Modifier = Modifier,
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
-    onKeyboardEnableChange: (Boolean) -> Unit = { },
     onAction: (CalculatorAction) -> Unit = { },
     onAutocompleteDismiss: () -> Unit = { },
 ) {
@@ -89,9 +87,6 @@ fun AuxiliaryBar(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    FilledIconToggleButton(keyboardEnable, onKeyboardEnableChange) {
-                        Icon(Icons.Filled.Keyboard, null)
-                    }
                     for (action in auxiliaryActions) {
                         IconButton({ onAction(action) }) {
                             when (val label = calcActionLabelMapper(action)) {

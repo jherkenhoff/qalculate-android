@@ -1,6 +1,7 @@
 package com.jherkenhoff.qalculate.model
 
 data class UserPreferences(
+    val activeKeypadIndex: Int = 0,
     val decimalSeparator: DecimalSeparator = DecimalSeparator.DOT,
     val angleUnit: AngleUnit = AngleUnit.RADIANS,
     val multiplicationSign: MultiplicationSign = MultiplicationSign.X,

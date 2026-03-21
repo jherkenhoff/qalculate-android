@@ -80,6 +80,7 @@ fun CalculatorScreen(
         inputTextFieldValue = viewModel.inputTextFieldValue.collectAsStateWithLifecycle().value,
         parsedString = viewModel.parsedString.collectAsStateWithLifecycle().value,
         resultString = viewModel.resultString.collectAsStateWithLifecycle().value,
+        activeKeypadIndex = viewModel.activeKeypadIndex.collectAsStateWithLifecycle().value,
         userPreferences = viewModel.userPreferences.collectAsStateWithLifecycle().value,
         onUserPreferencesChanged = viewModel::updateUserPreferences,
         calculationHistory = viewModel.calculationHistory.collectAsStateWithLifecycle().value,
@@ -90,7 +91,8 @@ fun CalculatorScreen(
         onDeleteCalculation = viewModel::deleteCalculation,
         onMenuClick = openDrawer,
         onSettingsClick = openSettings,
-        onAutocompleteClick = viewModel::acceptAutocomplete
+        onAutocompleteClick = viewModel::acceptAutocomplete,
+        onActiveKeypadIndexChanged = viewModel::setActiveKeypadIndex
     )
 }
 
@@ -113,6 +115,7 @@ fun CalculatorScreenContent(
     inputTextFieldValue: TextFieldValue,
     parsedString: String,
     resultString: String,
+    activeKeypadIndex: Int,
     userPreferences: UserPreferences,
     onUserPreferencesChanged : (UserPreferences) -> Unit,
     calculationHistory: List<CalculationHistoryItemData> = emptyList(),
@@ -124,6 +127,7 @@ fun CalculatorScreenContent(
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     onMenuClick: () -> Unit = {  },
     onSettingsClick: () -> Unit = {  },
+    onActiveKeypadIndexChanged: (Int) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val localDensity = LocalDensity.current
@@ -135,12 +139,7 @@ fun CalculatorScreenContent(
     if (autocompleteResult.relevantText.isEmpty()) {
         autocompleteDismissed = false
     }
-    
-    var keypadSelectionTabExpanded by remember { mutableStateOf(false) }
-
     val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
-
-    var activeKeypad by remember { mutableIntStateOf(0) }
 
     val historyListState = rememberLazyListState()
 
@@ -229,7 +228,7 @@ fun CalculatorScreenContent(
                     onValueChange = onInputFieldValueChange,
                     onUserPreferencesChanged = onUserPreferencesChanged,
                     onMenuClick = onMenuClick,
-                    interceptKeyboard = !keypads[activeKeypad].imeEnabled,
+                    interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
                     modifier = Modifier
                         .nestedScroll(nestedScrollConnectionInputSheet)
                         .scrollable(
@@ -245,32 +244,36 @@ fun CalculatorScreenContent(
                 ) {
                     TabPanel(
                         tabItems = keypads.map {
-                            {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Icon(it.icon, null)
-                                    Text(it.name)
-                                }
-                            }
+                            Pair(it.icon, it.name)
                         },
-                        activeTabItemIndex = activeKeypad,
-                        onTabClicked = { activeKeypad = it },
-                        trailingContent = {},
+                        activeTabItemIndex = activeKeypadIndex,
+                        collapse = internalAutocompleteResult.items.isNotEmpty(),
+                        onTabClicked = onActiveKeypadIndexChanged,
+                        trailingContent = {
+                            AuxiliaryBar(
+                                internalAutocompleteResult,
+                                auxiliaryActions = listOf(
+                                    CalculatorAction.MoveCursor(-1),
+                                    CalculatorAction.MoveCursor(+1),
+                                    CalculatorAction.TraverseHistory(-1),
+                                    CalculatorAction.TraverseHistory(+1),
+                                ),
+                                calcActionLabelMapper = CalcActionLabelMapper(userPreferences),
+                                onAction = onKeyAction,
+                                onAutocompleteClick = onAutocompleteClick,
+                                onAutocompleteDismiss = { autocompleteDismissed = true }
+                            )
+                        },
                         color = MaterialTheme.colorScheme.surfaceContainerHighest,
                     ) {
                         Column {
                             AnimatedContent(
-                                activeKeypad
+                                activeKeypadIndex
                             ) {
                                 Keypad(
                                     keypads[it].sections,
                                     CalcActionLabelMapper(userPreferences),
                                     onKeyAction = onKeyAction,
-                                    onActiveKeypadChanged = { newActiveKeypad ->
-                                        activeKeypad = newActiveKeypad
-                                    },
                                 )
                             }
                             Spacer(Modifier.height(6.dp))
@@ -288,11 +291,14 @@ fun CalculatorScreenContent(
 @Preview(name = "Dark Mode", showSystemUi = true, device = Devices.DEFAULT, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DefaultPreview() {
+    var activeKeypadIndex by remember { mutableIntStateOf(0) }
+
     QalculateTheme() {
         CalculatorScreenContent(
             TextFieldValue("c"),
             "SpeedOfLight",
             "299.792 458 km/ms",
+            activeKeypadIndex = activeKeypadIndex,
             userPreferences = UserPreferences(),
             onUserPreferencesChanged = {},
             autocompleteResult = AutocompleteResult(),
@@ -301,7 +307,8 @@ private fun DefaultPreview() {
                 CalculationHistoryItemData(
                     0, "1+1", "1+1", "2", LocalDateTime.now()
                 )
-            )
+            ),
+            onActiveKeypadIndexChanged = { activeKeypadIndex = it }
         )
     }
 }
@@ -316,6 +323,7 @@ private fun ManyHistoryItemsPreview() {
             TextFieldValue("c"),
             "SpeedOfLight",
             "299.792 458 km/ms",
+            activeKeypadIndex = 0,
             userPreferences = UserPreferences(),
             onUserPreferencesChanged = {},
             autocompleteResult = AutocompleteResult(),
@@ -364,6 +372,7 @@ private fun EmptyHistoryPreview() {
             TextFieldValue("c"),
             "SpeedOfLight",
             "299.792 458 km/ms",
+            activeKeypadIndex = 0,
             userPreferences = UserPreferences(),
             onUserPreferencesChanged = {},
             autocompleteResult = AutocompleteResult(),

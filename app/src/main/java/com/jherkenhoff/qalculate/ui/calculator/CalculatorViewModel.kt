@@ -97,13 +97,25 @@ class CalculatorViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
+    val activeKeypadIndex = userPreferences.map{
+        it.activeKeypadIndex
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        UserPreferences().activeKeypadIndex
+    )
+
     private val undoManager = UndoManager<TextFieldValue>()
     val undoState = undoManager.state
 
     private val _autocompleteDismissed = MutableStateFlow(false)
     val autocompleteDismissed = _autocompleteDismissed.asStateFlow()
 
-
+    fun setActiveKeypadIndex(i: Int) {
+        updateUserPreferences(
+            userPreferences.value.copy(activeKeypadIndex = i)
+        )
+    }
 
     fun clearCalculationHistory() {
         viewModelScope.launch {

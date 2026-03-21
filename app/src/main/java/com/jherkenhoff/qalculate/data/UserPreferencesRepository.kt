@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.jherkenhoff.qalculate.model.UserPreferences
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +15,7 @@ class UserPreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     private companion object {
+        val ACTIVE_KEYPAD_INDEX = intPreferencesKey("active_keypad_index")
         val DECIMAL_SEPARATOR_KEY = stringPreferencesKey("decimal_separator")
         val ANGLE_UNIT_KEY = stringPreferencesKey("angle_unit")
         val MULTIPLICATION_SIGN_KEY = stringPreferencesKey("multiplication_sign")
@@ -38,6 +40,7 @@ class UserPreferencesRepository @Inject constructor(
     val userPreferencesFlow: Flow<UserPreferences> = dataStore.data.map { preferences ->
 
         return@map UserPreferences(
+            activeKeypadIndex = preferences[ACTIVE_KEYPAD_INDEX] ?: 0,
             decimalSeparator = preferences[DECIMAL_SEPARATOR_KEY].toEnum<UserPreferences.DecimalSeparator>() ?: UserPreferences.Default.decimalSeparator,
             angleUnit = preferences[ANGLE_UNIT_KEY].toEnum<UserPreferences.AngleUnit>() ?: UserPreferences.Default.angleUnit,
             multiplicationSign = preferences[MULTIPLICATION_SIGN_KEY].toEnum<UserPreferences.MultiplicationSign>() ?: UserPreferences.Default.multiplicationSign,
@@ -58,6 +61,7 @@ class UserPreferencesRepository @Inject constructor(
 
     suspend fun updateUserPreferences(userPreferences: UserPreferences) {
         dataStore.edit {
+            it[ACTIVE_KEYPAD_INDEX] = userPreferences.activeKeypadIndex
             it[DECIMAL_SEPARATOR_KEY] = userPreferences.decimalSeparator.name
             it[ANGLE_UNIT_KEY] = userPreferences.angleUnit.name
             it[MULTIPLICATION_SIGN_KEY] = userPreferences.multiplicationSign.name
