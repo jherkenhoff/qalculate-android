@@ -10,9 +10,11 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -68,7 +70,8 @@ fun TabPanel(
                 AnimatedContent(expanded) {
                     if (it) {
                         LazyRow(
-                            Modifier
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier
                         ) {
                             itemsIndexed(tabItems) { i, item ->
                                 TextButton(
@@ -85,7 +88,9 @@ fun TabPanel(
                     } else {
                         TextButton(
                             onClick = { expanded = true },
-                            modifier = Modifier.sharedElement(
+                            modifier = Modifier
+                                .padding(horizontal = 6.dp)
+                                .sharedElement(
                                 rememberSharedContentState(activeTabItemIndex),
                                 animatedVisibilityScope = this@AnimatedContent
                             )
@@ -104,7 +109,6 @@ fun TabPanel(
 
         val tabRadius = tabHeight.toFloat()/2
 
-        val collapsedTabWidth = tabPlaceable.width
         val tabWidth = (1-f)*tabPlaceable.width + f*(constraints.maxWidth + tabRadius)
 
         val backgroundPlaceable = subcompose(SlotsEnum.BACKGROUND) {
@@ -121,7 +125,8 @@ fun TabPanel(
         layout(constraints.maxWidth, totalHeight) {
             backgroundPlaceable.place(0, 0)
 
-            tabPlaceable.place(0, 0)
+            val tabPlaceableX = f*(constraints.maxWidth-tabPlaceable.width)/2
+            tabPlaceable.place(tabPlaceableX.toInt(), 0)
             panelContentPlaceable.place(0, tabHeight)
         }
     }
