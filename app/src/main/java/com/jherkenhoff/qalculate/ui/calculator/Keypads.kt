@@ -9,20 +9,29 @@ import com.jherkenhoff.qalculate.model.KeyPositionSpec
 import com.jherkenhoff.qalculate.model.KeypadSection
 import com.jherkenhoff.qalculate.model.KeypadDefinition
 
-val basicKeypadSectionNumpad = KeypadSection(
-    rows = 1,
+val basicKeypadSectionExtended = KeypadSection(
+    rows = 2,
     cols = 6,
     keys = listOf(
         Pair(KeyPositionSpec(0, 0), KeyLibrary.FUNCTION_SIN),
         Pair(KeyPositionSpec(0, 1), KeyLibrary.FUNCTION_COS),
         Pair(KeyPositionSpec(0, 2), KeyLibrary.FUNCTION_TAN),
-        Pair(KeyPositionSpec(0, 3), KeyLibrary.FUNCTION_LN)
+        Pair(KeyPositionSpec(0, 3), KeyLibrary.FUNCTION_LN),
+        Pair(KeyPositionSpec(0, 4), KeyLibrary.NUMBER_PI),
+        Pair(KeyPositionSpec(0, 5), KeyLibrary.NUMBER_PERCENT),
+
+        Pair(KeyPositionSpec(1, 0), KeyLibrary.VARIABLE_SELECTOR),
+        Pair(KeyPositionSpec(1, 1), KeyLibrary.OPERATOR_EQUAL),
+        Pair(KeyPositionSpec(1, 2), KeyLibrary.BRACKET_OPEN),
+        Pair(KeyPositionSpec(1, 3), KeyLibrary.BRACKET_CLOSE),
+        Pair(KeyPositionSpec(1, 4), KeyLibrary.OPERATOR_POWER),
+        Pair(KeyPositionSpec(1, 5), KeyLibrary.OPERATOR_SQRT),
     ),
     aspectRatio = 0.6f
 )
 
 
-val basicKeypadSectionExtended = KeypadSection(
+val basicKeypadSectionNumpad = KeypadSection(
     rows = 4,
     cols = 5,
     keys = listOf(
@@ -120,7 +129,16 @@ val keypads = listOf(
     KeypadDefinition(
         name = "Basic",
         icon = Icons.Default.Calculate,
-        sections = listOf(basicKeypadSectionNumpad, basicKeypadSectionExtended),
+        sections = listOf(basicKeypadSectionExtended, basicKeypadSectionNumpad),
+        imeEnabled = false
+    ),
+    KeypadDefinition(
+        name = "Advanced",
+        icon = Icons.Default.Science,
+        sections = listOf(
+            secondaryKeypadSection.copy(aspectRatio = 0.5f),
+            primaryKeypadSection.copy(aspectRatio = 0.9f)
+        ),
         imeEnabled = false
     ),
     KeypadDefinition(
@@ -131,13 +149,4 @@ val keypads = listOf(
         ),
         imeEnabled = true
     ),
-    KeypadDefinition(
-        name = "Advanced",
-        icon = Icons.Default.Science,
-        sections = listOf(
-            secondaryKeypadSection.copy(aspectRatio = 0.5f),
-            primaryKeypadSection.copy(aspectRatio = 0.9f)
-        ),
-        imeEnabled = false
-    )
 )

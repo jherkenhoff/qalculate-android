@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 data class InternalTextFieldValue(
     val textFieldValue: TextFieldValue,
@@ -249,8 +251,17 @@ class CalculatorViewModel @Inject constructor(
 
     fun removeChars(nChars: Int) {
         val maxChars = inputTextFieldValue.value.text.length
-        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars).dropLast(nChars)
-        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
+        var textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars).text
+        var textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars).text
+
+        if (inputTextFieldValue.value.selection.length == 0) {
+            if (nChars > 0) {
+                textAfterSelection = textAfterSelection.drop(nChars.absoluteValue)
+            } else if (nChars < 0) {
+                textBeforeSelection = textBeforeSelection.dropLast(nChars.absoluteValue)
+            }
+        }
+
         val newText = "$textBeforeSelection$textAfterSelection"
         val newCursorPosition = textBeforeSelection.length
 

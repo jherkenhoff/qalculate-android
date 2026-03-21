@@ -142,7 +142,7 @@ object KeyLibrary {
         longClickAction = CalculatorAction.InsertText("ans"),
         role = KeyRole.SYSTEM
     )
-    val BACKSPACE = CalcKey.Default(clickAction = CalculatorAction.DeleteChars(1), role = KeyRole.SYSTEM)
+    val BACKSPACE = CalcKey.Default(clickAction = CalculatorAction.DeleteChars(-1), role = KeyRole.SYSTEM)
     val CLEAR_ALL = CalcKey.Default(clickAction = CalculatorAction.ClearAll, role = KeyRole.SYSTEM)
 
     val FUNCTION_INTEGRAL = CalcKey.Default(clickAction = CalculatorAction.InsertText.function("∫", "integral"), role = KeyRole.OPERATOR)
@@ -179,17 +179,17 @@ object KeyLibrary {
         role = KeyRole.OPERATOR
     )
     val VARIABLE_X = CalcKey.Default(
-        clickAction = CalculatorAction.InsertText("X", "x"),
+        clickAction = CalculatorAction.InsertText(label="X", preCursorText="x"),
         longClickAction = CalculatorAction.StoreAsVariable("x"),
         role= KeyRole.OPERATOR
     )
     val VARIABLE_Y = CalcKey.Default(
-        clickAction = CalculatorAction.InsertText("Y", "y"),
+        clickAction = CalculatorAction.InsertText(label="Y", preCursorText="y"),
         longClickAction = CalculatorAction.StoreAsVariable("y"),
         role = KeyRole.OPERATOR
     )
     val VARIABLE_Z = CalcKey.Default(
-        clickAction = CalculatorAction.InsertText("Z", "z"),
+        clickAction = CalculatorAction.InsertText(label="Z", preCursorText="z"),
         longClickAction = CalculatorAction.StoreAsVariable("z"),
         role = KeyRole.OPERATOR
     )
@@ -216,12 +216,12 @@ object KeyLibrary {
 
     val calcKeySiLength = CalcKey.Selector(
         listOf(
-            CalculatorAction.InsertText.operator("nm "),
-            CalculatorAction.InsertText.operator("um "),
-            CalculatorAction.InsertText.operator("mm "),
-            CalculatorAction.InsertText.operator("cm "),
-            CalculatorAction.InsertText.operator("m "),
-            CalculatorAction.InsertText.operator("km "),
+            CalculatorAction.InsertText.operator("nm"),
+            CalculatorAction.InsertText.operator("um"),
+            CalculatorAction.InsertText.operator("mm"),
+            CalculatorAction.InsertText.operator("cm"),
+            CalculatorAction.InsertText.operator("m"),
+            CalculatorAction.InsertText.operator("km"),
         ),
         4,
         role= KeyRole.OPERATOR
@@ -229,11 +229,11 @@ object KeyLibrary {
 
     val calcKeyImperialLength = CalcKey.Selector(
         listOf(
-            CalculatorAction.InsertText.operator("thou "),
-            CalculatorAction.InsertText.operator("in "),
-            CalculatorAction.InsertText.operator("ft "),
-            CalculatorAction.InsertText.operator("yd "),
-            CalculatorAction.InsertText.operator("mile "),
+            CalculatorAction.InsertText.operator("thou"),
+            CalculatorAction.InsertText.operator("in"),
+            CalculatorAction.InsertText.operator("ft"),
+            CalculatorAction.InsertText.operator("yd"),
+            CalculatorAction.InsertText.operator("mile"),
         ),
         1,
         role= KeyRole.OPERATOR
@@ -241,10 +241,10 @@ object KeyLibrary {
 
     val calcKeyImperialWeight = CalcKey.Selector(
         listOf(
-            CalculatorAction.InsertText.operator("gr "),
-            CalculatorAction.InsertText.operator("oz "),
-            CalculatorAction.InsertText.operator("lb "),
-            CalculatorAction.InsertText.operator("stone "),
+            CalculatorAction.InsertText.operator("gr"),
+            CalculatorAction.InsertText.operator("oz"),
+            CalculatorAction.InsertText.operator("lb"),
+            CalculatorAction.InsertText.operator("stone"),
         ),
         2,
         role= KeyRole.OPERATOR
@@ -261,6 +261,16 @@ object KeyLibrary {
             CalculatorAction.InsertText.operator("p"),
         ),
         2,
+        role= KeyRole.OPERATOR
+    )
+
+    val VARIABLE_SELECTOR = CalcKey.Selector(
+        listOf(
+            CalculatorAction.InsertText(label="X", preCursorText = "x"),
+            CalculatorAction.InsertText(label="Y", preCursorText = "y"),
+            CalculatorAction.InsertText(label="Z", preCursorText = "z"),
+        ),
+        0,
         role= KeyRole.OPERATOR
     )
 

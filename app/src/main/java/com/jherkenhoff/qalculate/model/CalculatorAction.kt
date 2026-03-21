@@ -44,5 +44,5 @@ sealed interface CalculatorAction {
     data object SubmitCalculation: CalculatorAction
     data class MoveCursor(val nChars: Int): CalculatorAction
     data class TraverseHistory(val nEntries: Int): CalculatorAction
-    data class StoreAsVariable(val name: String): CalculatorAction
+    data class StoreAsVariable(val name: String?): CalculatorAction
 }
