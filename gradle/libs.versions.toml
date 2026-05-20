@@ -15,7 +15,7 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.10.1"
-composeBom = "2026.01.01"
+composeBom = "2026.05.01"
 ksp = "2.0.20-1.0.25"
 qalculate = "5.8.2-2"
 
