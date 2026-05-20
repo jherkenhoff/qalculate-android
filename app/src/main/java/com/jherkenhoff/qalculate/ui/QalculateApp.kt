@@ -55,7 +55,8 @@ fun QalculateApp() {
                     onSettingsClick = { navController.navigate(NavDestinations.Settings); coroutineScope.launch { drawerState.close() } },
                     onClearCalculationHistoryClicked = { viewModel.clearCalculationHistory(); coroutineScope.launch { drawerState.close() }  }
                 )
-            }
+            },
+            gesturesEnabled = false
         ) {
             QalculateNavGraph(
                 navController = navController,
