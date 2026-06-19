@@ -18,8 +18,6 @@ activityCompose = "1.10.1"
 composeBom = "2026.05.01"
 ksp = "2.3.4"
 qalculate = "5.8.2-2"
-material3 = "1.5.0-alpha22"
-material3Version = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,10 +45,9 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3"}
 androidx-compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
-androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3"}
 qalculate = { group = "com.jherkenhoff", name = "libqalculate" , version.ref = "qalculate"}
-androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3Version" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
