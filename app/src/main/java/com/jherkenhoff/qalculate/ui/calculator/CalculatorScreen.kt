@@ -5,31 +5,18 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -54,16 +41,15 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.util.TableInfo
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.model.UndoState
 import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.ui.PreviewData
 import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
 import kotlinx.coroutines.launch
@@ -80,6 +66,7 @@ fun CalculatorScreen(
         inputTextFieldValue = viewModel.inputTextFieldValue.collectAsStateWithLifecycle().value,
         parsedString = viewModel.parsedString.collectAsStateWithLifecycle().value,
         resultString = viewModel.resultString.collectAsStateWithLifecycle().value,
+        activeCalculationId = viewModel.activeCalculationId.collectAsStateWithLifecycle().value,
         activeKeypadIndex = viewModel.activeKeypadIndex.collectAsStateWithLifecycle().value,
         userPreferences = viewModel.userPreferences.collectAsStateWithLifecycle().value,
         onUserPreferencesChanged = viewModel::updateUserPreferences,
@@ -92,7 +79,8 @@ fun CalculatorScreen(
         onMenuClick = openDrawer,
         onSettingsClick = openSettings,
         onAutocompleteClick = viewModel::acceptAutocomplete,
-        onActiveKeypadIndexChanged = viewModel::setActiveKeypadIndex
+        onActiveKeypadIndexChanged = viewModel::setActiveKeypadIndex,
+        onActiveCalculationChanged = viewModel::setActiveCalculationId
     )
 }
 
@@ -115,6 +103,7 @@ fun CalculatorScreenContent(
     inputTextFieldValue: TextFieldValue,
     parsedString: String,
     resultString: String,
+    activeCalculationId: Int,
     activeKeypadIndex: Int,
     userPreferences: UserPreferences,
     onUserPreferencesChanged : (UserPreferences) -> Unit,
@@ -127,7 +116,8 @@ fun CalculatorScreenContent(
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     onMenuClick: () -> Unit = {  },
     onSettingsClick: () -> Unit = {  },
-    onActiveKeypadIndexChanged: (Int) -> Unit = {}
+    onActiveKeypadIndexChanged: (Int) -> Unit = {},
+    onActiveCalculationChanged: (Int) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val localDensity = LocalDensity.current
@@ -203,82 +193,83 @@ fun CalculatorScreenContent(
     ) {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeContent))
         CalculationHistoryList(
-            calculationHistory,
+            calculations = calculationHistory,
+            activeCalculationIdx = activeCalculationId,
+            activeCalculationInput = inputTextFieldValue,
+            activeCalculationParsed = parsedString,
+            activeCalculationResult = resultString,
             onDeleteClick = onDeleteCalculation,
             scrollState = historyListState,
-            modifier = Modifier.weight(1f)
+            onActiveCalculationChanged = onActiveCalculationChanged,
+            interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
+            modifier = Modifier
+                .weight(1f)
                 .nestedScroll(nestedScrollConnectionInputSheet)
+                .padding(horizontal = 6.dp),
         )
 
-        Surface(
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            shape = RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp),
-            shadowElevation = 10.dp,
-            modifier = Modifier.zIndex(2f)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                InputSheet(
-                    inputTextFieldValue,
-                    parsedString,
-                    resultString,
-                    internalAutocompleteResult,
-                    userPreferences,
-                    onValueChange = onInputFieldValueChange,
-                    onUserPreferencesChanged = onUserPreferencesChanged,
-                    onMenuClick = onMenuClick,
-                    interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
-                    modifier = Modifier
-                        .nestedScroll(nestedScrollConnectionInputSheet)
-                        .scrollable(
-                            rememberScrollState(),
-                            orientation = Orientation.Vertical
-                        )
-                )
+//                InputSheet(
+//                    inputTextFieldValue,
+//                    parsedString,
+//                    resultString,
+//                    internalAutocompleteResult,
+//                    userPreferences,
+//                    onValueChange = onInputFieldValueChange,
+//                    onUserPreferencesChanged = onUserPreferencesChanged,
+//                    onMenuClick = onMenuClick,
+//                    interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
+//                    modifier = Modifier
+//                        .nestedScroll(nestedScrollConnectionInputSheet)
+//                        .scrollable(
+//                            rememberScrollState(),
+//                            orientation = Orientation.Vertical
+//                        )
+//                )
 
-                Column(
-                    modifier = Modifier.clipToBounds()
-                        .shrinkHeightAbsolute(offsetY.value.toInt())
-                        .onGloballyPositioned { maxOffset = it.size.height.toFloat() }
+            Column(
+                modifier = Modifier.clipToBounds()
+                    .shrinkHeightAbsolute(offsetY.value.toInt())
+                    .onGloballyPositioned { maxOffset = it.size.height.toFloat() }
+            ) {
+                TabPanel(
+                    tabItems = keypads.map {
+                        Pair(it.icon, it.name)
+                    },
+                    activeTabItemIndex = activeKeypadIndex,
+                    collapse = internalAutocompleteResult.items.isNotEmpty(),
+                    onTabClicked = onActiveKeypadIndexChanged,
+                    trailingContent = {
+                        AuxiliaryBar(
+                            internalAutocompleteResult,
+                            auxiliaryActions = listOf(
+                                CalculatorAction.MoveCursor(-1),
+                                CalculatorAction.MoveCursor(+1),
+                                CalculatorAction.TraverseHistory(-1),
+                                CalculatorAction.TraverseHistory(+1),
+                            ),
+                            calcActionLabelMapper = CalcActionLabelMapper(userPreferences),
+                            onAction = onKeyAction,
+                            onAutocompleteClick = onAutocompleteClick,
+                            onAutocompleteDismiss = { autocompleteDismissed = true }
+                        )
+                    },
+                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
                 ) {
-                    TabPanel(
-                        tabItems = keypads.map {
-                            Pair(it.icon, it.name)
-                        },
-                        activeTabItemIndex = activeKeypadIndex,
-                        collapse = internalAutocompleteResult.items.isNotEmpty(),
-                        onTabClicked = onActiveKeypadIndexChanged,
-                        trailingContent = {
-                            AuxiliaryBar(
-                                internalAutocompleteResult,
-                                auxiliaryActions = listOf(
-                                    CalculatorAction.MoveCursor(-1),
-                                    CalculatorAction.MoveCursor(+1),
-                                    CalculatorAction.TraverseHistory(-1),
-                                    CalculatorAction.TraverseHistory(+1),
-                                ),
-                                calcActionLabelMapper = CalcActionLabelMapper(userPreferences),
-                                onAction = onKeyAction,
-                                onAutocompleteClick = onAutocompleteClick,
-                                onAutocompleteDismiss = { autocompleteDismissed = true }
+                    Column {
+                        AnimatedContent(
+                            activeKeypadIndex
+                        ) {
+                            Keypad(
+                                keypads[it].sections,
+                                CalcActionLabelMapper(userPreferences),
+                                onKeyAction = onKeyAction,
                             )
-                        },
-                        color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    ) {
-                        Column {
-                            AnimatedContent(
-                                activeKeypadIndex
-                            ) {
-                                Keypad(
-                                    keypads[it].sections,
-                                    CalcActionLabelMapper(userPreferences),
-                                    onKeyAction = onKeyAction,
-                                )
-                            }
-                            Spacer(Modifier.height(6.dp))
-                            Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
                         }
+                        Spacer(Modifier.height(6.dp))
+                        Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
                     }
                 }
             }
@@ -298,16 +289,13 @@ private fun DefaultPreview() {
             TextFieldValue("c"),
             "SpeedOfLight",
             "299.792 458 km/ms",
+            PreviewData.calculationList.last().id,
             activeKeypadIndex = activeKeypadIndex,
             userPreferences = UserPreferences(),
             onUserPreferencesChanged = {},
             autocompleteResult = AutocompleteResult(),
             undoState = UndoState<TextFieldValue>(),
-            calculationHistory = listOf(
-                CalculationHistoryItemData(
-                    0, "1+1", "1+1", "2", LocalDateTime.now()
-                )
-            ),
+            calculationHistory = PreviewData.calculationList,
             onActiveKeypadIndexChanged = { activeKeypadIndex = it }
         )
     }
@@ -316,68 +304,20 @@ private fun DefaultPreview() {
 
 @Preview(showSystemUi = true, device = Devices.DEFAULT)
 @Composable
-private fun ManyHistoryItemsPreview() {
+private fun SingleCalculationPreview() {
 
     QalculateTheme() {
         CalculatorScreenContent(
             TextFieldValue("c"),
             "SpeedOfLight",
             "299.792 458 km/ms",
+            0,
             activeKeypadIndex = 0,
             userPreferences = UserPreferences(),
             onUserPreferencesChanged = {},
             autocompleteResult = AutocompleteResult(),
             undoState = UndoState<TextFieldValue>(),
-            calculationHistory = listOf(
-                CalculationHistoryItemData(
-                    0, "1+1", "1+1", "2", LocalDateTime.now()
-                ),
-                CalculationHistoryItemData(
-                    1, "2+2", "2+2", "4", LocalDateTime.now()
-                ),
-                CalculationHistoryItemData(
-                    2, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
-                ),
-                CalculationHistoryItemData(
-                    3, "2+2", "2+2", "4", LocalDateTime.now().minusDays(1)
-                ),
-                CalculationHistoryItemData(
-                    4, "2+2", "2+2", "4", LocalDateTime.now().minusDays(2)
-                ),
-                CalculationHistoryItemData(
-                    5, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
-                ),
-                CalculationHistoryItemData(
-                    6, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
-                ),
-                CalculationHistoryItemData(
-                    7, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
-                ),
-                CalculationHistoryItemData(
-                    8, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
-                ),
-                CalculationHistoryItemData(
-                    9, "2+2", "2+2", "4", LocalDateTime.now().minusDays(6)
-                )
-            )
-        )
-    }
-}
-
-@Preview(showSystemUi = true, device = Devices.DEFAULT)
-@Composable
-private fun EmptyHistoryPreview() {
-    QalculateTheme() {
-        CalculatorScreenContent(
-            TextFieldValue("c"),
-            "SpeedOfLight",
-            "299.792 458 km/ms",
-            activeKeypadIndex = 0,
-            userPreferences = UserPreferences(),
-            onUserPreferencesChanged = {},
-            autocompleteResult = AutocompleteResult(),
-            undoState = UndoState<TextFieldValue>(),
-            calculationHistory = emptyList()
+            calculationHistory = PreviewData.calculationList.slice(0..0),
         )
     }
 }

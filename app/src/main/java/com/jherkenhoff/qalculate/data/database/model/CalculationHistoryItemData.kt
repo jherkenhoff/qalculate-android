@@ -5,10 +5,14 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 
-@Entity(tableName = "calculation_history")
+@Entity(
+    tableName = "calculation_history"
+)
 data class CalculationHistoryItemData(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    @ColumnInfo(name = "sort_index", defaultValue = "0")
+    val sortIndex: Int,
     @ColumnInfo(name = "input")
     val input: String,
     @ColumnInfo(name = "parsed")
@@ -17,4 +21,6 @@ data class CalculationHistoryItemData(
     val result: String,
     @ColumnInfo(name = "created")
     val created: LocalDateTime,
+    @ColumnInfo(name = "modified", defaultValue = "0")
+    val modified: LocalDateTime,
 )

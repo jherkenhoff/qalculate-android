@@ -1,6 +1,5 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -50,8 +49,15 @@ class CalculatorViewModel @Inject constructor(
     private val calculationHistoryStore: CalculationHistoryStore,
     private val calculatorRepository: CalculatorRepository
 ) : ViewModel() {
-    private val _internalInputTextFieldValue = MutableStateFlow(InternalTextFieldValue(TextFieldValue(), false))
 
+    private val _activeCalculationId = MutableStateFlow(0)
+    val activeCalculationId = _activeCalculationId.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue = 0
+    )
+
+    private val _internalInputTextFieldValue = MutableStateFlow(InternalTextFieldValue(TextFieldValue(), false))
     val inputTextFieldValue = _internalInputTextFieldValue.map { it.textFieldValue }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -117,6 +123,10 @@ class CalculatorViewModel @Inject constructor(
         )
     }
 
+    fun setActiveCalculationId(id: Int) {
+        _activeCalculationId.update { id }
+    }
+
     fun clearCalculationHistory() {
         viewModelScope.launch {
             calculationHistoryStore.deleteAll()
@@ -133,10 +143,12 @@ class CalculatorViewModel @Inject constructor(
         viewModelScope.launch {
             calculationHistoryStore.addItem(
                 CalculationHistoryItemData(
+                    sortIndex = 0,
                     input = inputTextFieldValue.value.text,
                     parsed = parsedString.value,
                     result = resultString.value,
-                    created = LocalDateTime.now()
+                    created = LocalDateTime.now(),
+                    modified = LocalDateTime.now()
                 )
             )
         }
@@ -172,7 +184,7 @@ class CalculatorViewModel @Inject constructor(
     fun traverseHistory(nEntries: Int) {
         if (nEntries == -1) undo()
         else if (nEntries == 1) redo()
-        else throw IllegalArgumentException("Travering history by more then one entry is not supported.")
+        else throw IllegalArgumentException("Travering history by more then one entry is currently not supported.")
     }
 
     fun undo() {

@@ -86,14 +86,14 @@ fun CalculatorKeyButton(
 ) {
 
     val containerColor = when (calcKey.role) {
-        KeyRole.NUMBER -> MaterialTheme.colorScheme.surfaceBright
-        KeyRole.OPERATOR -> MaterialTheme.colorScheme.surfaceContainerHigh
+        KeyRole.NUMBER -> MaterialTheme.colorScheme.surfaceContainer
+        KeyRole.OPERATOR -> MaterialTheme.colorScheme.secondaryContainer
         KeyRole.SYSTEM -> MaterialTheme.colorScheme.tertiaryContainer
     }
 
     val labelColor = when (calcKey.role) {
         KeyRole.NUMBER -> MaterialTheme.colorScheme.onSurface
-        KeyRole.OPERATOR -> MaterialTheme.colorScheme.onSurface
+        KeyRole.OPERATOR -> MaterialTheme.colorScheme.onSecondaryContainer
         KeyRole.SYSTEM -> MaterialTheme.colorScheme.onTertiaryContainer
     }
 
