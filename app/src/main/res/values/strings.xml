@@ -15,4 +15,6 @@
     <string name="clear_history_dialog_title">Clear calculation history?</string>
     <string name="dialog_clear_button">Clear</string>
     <string name="dialog_cancel_button">Cancel</string>
+    <string name="add_new_calculation_above">Add new calculation above</string>
+    <string name="add_new_calculation_below">Add new calculation below</string>
 </resources>
