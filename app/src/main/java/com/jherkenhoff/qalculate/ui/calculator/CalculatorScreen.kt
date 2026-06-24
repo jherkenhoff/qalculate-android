@@ -3,7 +3,6 @@ package com.jherkenhoff.qalculate.ui.calculator
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -19,7 +18,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,18 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -52,8 +43,6 @@ import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.PreviewData
 import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
-import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 
 
 @Composable
@@ -131,147 +120,62 @@ fun CalculatorScreenContent(
     }
     val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
 
-    val historyListState = rememberLazyListState()
-
-    var maxOffset by remember { mutableFloatStateOf(0f) }
-    val offsetY = remember { Animatable(0f) }
-
-    val nestedScrollConnectionInputSheet = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                if (available.y <= 0) {
-                    return Offset.Zero
-                }
-                val newOffset = (offsetY.value + available.y)
-                val clippedNewOffset = newOffset.coerceIn(0f, maxOffset)
-                scope.launch {
-                    offsetY.snapTo(clippedNewOffset)
-                }
-                return Offset(0f, available.y - (newOffset - clippedNewOffset))
-            }
-
-            override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
-                if (available.y >= 0) {
-                    return Offset.Zero
-                }
-
-                val newOffset = (offsetY.value + available.y)
-                val clippedNewOffset = newOffset.coerceIn(0f, maxOffset)
-                scope.launch {
-                    offsetY.snapTo(clippedNewOffset)
-                }
-                return Offset(0f, available.y - (newOffset - clippedNewOffset))
-            }
-
-            override suspend fun onPreFling(available: Velocity): Velocity {
-
-                val velocityThreshold = with(localDensity) { 1000.dp.toPx() }
-
-                val targetOffset = when {
-                    available.y > velocityThreshold -> maxOffset
-                    available.y < -velocityThreshold -> 0f
-                    else -> {
-                        // Not enough momentum. Decide based on position
-                        if (offsetY.value > maxOffset / 2) maxOffset else 0f
-                    }
-                }
-
-                if (calculationHistory.isNotEmpty() && targetOffset == 0f) {
-                    historyListState.animateScrollToItem(0)
-                }
-
-                offsetY.animateTo(targetOffset)
-
-                return available
-            }
-        }
-    }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
     ) {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeContent))
-        CalculationHistoryList(
+        CalculationList(
             calculations = calculationHistory,
             activeCalculationIdx = activeCalculationId,
             activeCalculationInput = inputTextFieldValue,
             activeCalculationParsed = parsedString,
             activeCalculationResult = resultString,
-            onDeleteClick = onDeleteCalculation,
-            scrollState = historyListState,
-            onActiveCalculationChanged = onActiveCalculationChanged,
             interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
-            modifier = Modifier
-                .weight(1f)
-                .nestedScroll(nestedScrollConnectionInputSheet)
-                .padding(horizontal = 6.dp),
+            userPreferences = userPreferences,
+            modifier = Modifier.weight(1f).padding(horizontal = 6.dp),
+            onUserpreferencesChanged = onUserPreferencesChanged,
+            onDeleteClick = onDeleteCalculation,
+            onActiveCalculationChanged = onActiveCalculationChanged,
+            onActiveCalculationInputChange = onInputFieldValueChange,
         )
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+        TabPanel(
+            tabItems = keypads.map {
+                Pair(it.icon, it.name)
+            },
+            activeTabItemIndex = activeKeypadIndex,
+            collapse = internalAutocompleteResult.items.isNotEmpty(),
+            onTabClicked = onActiveKeypadIndexChanged,
+            trailingContent = {
+                AuxiliaryBar(
+                    internalAutocompleteResult,
+                    auxiliaryActions = listOf(
+                        CalculatorAction.MoveCursor(-1),
+                        CalculatorAction.MoveCursor(+1),
+                        CalculatorAction.TraverseHistory(-1),
+                        CalculatorAction.TraverseHistory(+1),
+                    ),
+                    calcActionLabelMapper = CalcActionLabelMapper(userPreferences),
+                    onAction = onKeyAction,
+                    onAutocompleteClick = onAutocompleteClick,
+                    onAutocompleteDismiss = { autocompleteDismissed = true }
+                )
+            },
+            color = MaterialTheme.colorScheme.surfaceContainerHighest,
         ) {
-//                InputSheet(
-//                    inputTextFieldValue,
-//                    parsedString,
-//                    resultString,
-//                    internalAutocompleteResult,
-//                    userPreferences,
-//                    onValueChange = onInputFieldValueChange,
-//                    onUserPreferencesChanged = onUserPreferencesChanged,
-//                    onMenuClick = onMenuClick,
-//                    interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
-//                    modifier = Modifier
-//                        .nestedScroll(nestedScrollConnectionInputSheet)
-//                        .scrollable(
-//                            rememberScrollState(),
-//                            orientation = Orientation.Vertical
-//                        )
-//                )
-
-            Column(
-                modifier = Modifier.clipToBounds()
-                    .shrinkHeightAbsolute(offsetY.value.toInt())
-                    .onGloballyPositioned { maxOffset = it.size.height.toFloat() }
-            ) {
-                TabPanel(
-                    tabItems = keypads.map {
-                        Pair(it.icon, it.name)
-                    },
-                    activeTabItemIndex = activeKeypadIndex,
-                    collapse = internalAutocompleteResult.items.isNotEmpty(),
-                    onTabClicked = onActiveKeypadIndexChanged,
-                    trailingContent = {
-                        AuxiliaryBar(
-                            internalAutocompleteResult,
-                            auxiliaryActions = listOf(
-                                CalculatorAction.MoveCursor(-1),
-                                CalculatorAction.MoveCursor(+1),
-                                CalculatorAction.TraverseHistory(-1),
-                                CalculatorAction.TraverseHistory(+1),
-                            ),
-                            calcActionLabelMapper = CalcActionLabelMapper(userPreferences),
-                            onAction = onKeyAction,
-                            onAutocompleteClick = onAutocompleteClick,
-                            onAutocompleteDismiss = { autocompleteDismissed = true }
-                        )
-                    },
-                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+            Column {
+                AnimatedContent(
+                    activeKeypadIndex
                 ) {
-                    Column {
-                        AnimatedContent(
-                            activeKeypadIndex
-                        ) {
-                            Keypad(
-                                keypads[it].sections,
-                                CalcActionLabelMapper(userPreferences),
-                                onKeyAction = onKeyAction,
-                            )
-                        }
-                        Spacer(Modifier.height(6.dp))
-                        Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
-                    }
+                    Keypad(
+                        keypads[it].sections,
+                        CalcActionLabelMapper(userPreferences),
+                        onKeyAction = onKeyAction,
+                    )
                 }
+                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
             }
         }
     }

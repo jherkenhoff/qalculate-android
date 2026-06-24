@@ -128,6 +128,7 @@ dependencies {
     implementation(libs.androidx.dataStore.preferences)
     implementation(libs.hilt.core)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.qalculate)
