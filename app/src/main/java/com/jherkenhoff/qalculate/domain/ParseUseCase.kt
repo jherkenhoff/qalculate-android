@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.domain
 
+import android.util.Log
 import com.jherkenhoff.libqalculate.AngleUnit
 import com.jherkenhoff.libqalculate.DigitGrouping
 import com.jherkenhoff.libqalculate.DivisionSign
