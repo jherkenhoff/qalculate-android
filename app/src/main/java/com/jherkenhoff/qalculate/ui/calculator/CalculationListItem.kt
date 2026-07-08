@@ -1,6 +1,8 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
 import android.content.ClipData
+import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -53,6 +55,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.InterceptPlatformTextInput
@@ -90,6 +93,7 @@ fun ActiveCalculationListItem(
     modifier: Modifier = Modifier,
     onInputChange: (TextFieldValue) -> Unit = {},
     onDeleteClick: () -> Unit = {},
+    onClick: () -> Unit = {},
     onUserpreferencesChanged: (UserPreferences) -> Unit = {}
 ) {
     var menuOpen by remember { mutableStateOf(false) }
@@ -97,9 +101,9 @@ fun ActiveCalculationListItem(
     with(sharedTransitionScope) {
 
         Surface(
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            color = MaterialTheme.colorScheme.surfaceContainer,
             shape = RoundedCornerShape(largeCornerRadius),
-            modifier = modifier.fillMaxWidth().sharedElement(
+            modifier = modifier.fillMaxWidth().clickable { onClick() }.sharedElement(
                 rememberSharedContentState("container"),
                 animatedVisibilityScope
             )
@@ -216,7 +220,7 @@ fun PassiveCalculationListItem(
 
     with(sharedTransitionScope) {
         Surface(
-            color = MaterialTheme.colorScheme.surfaceContainer,
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
             shape = RoundedCornerShape(
                 topStart = if (topRounded) largeCornerRadius else smallCornerRadius,
                 topEnd = if (topRounded) largeCornerRadius else smallCornerRadius,
@@ -330,7 +334,8 @@ private fun InputField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp)
-                    .focusRequester(focusRequester),
+                    .focusRequester(focusRequester)
+                    .onFocusChanged( { Log.i("Moin", it.isFocused.toString()) } ),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.None,
                     autoCorrectEnabled = false,
