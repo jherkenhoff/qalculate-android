@@ -11,12 +11,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Input
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Input
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -29,6 +39,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.model.AutocompleteItem
@@ -87,26 +98,65 @@ fun AuxiliaryBar(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    for (action in auxiliaryActions) {
-                        IconButton({ onAction(action) }) {
-                            when (val label = calcActionLabelMapper(action)) {
-                                is CalculatorKeyButtonActionLabel.Text -> Text(
-                                    label.text,
-                                    style = MaterialTheme.typography.labelLarge
-                                )
-
-                                is CalculatorKeyButtonActionLabel.Icon -> Icon(
-                                    label.icon,
-                                    label.description,
-                                    modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
-                                )
-
-                                null -> null
-                            }
-                        }
+                    FilledTonalIconButton(
+                        onClick = {  },
+                        shape = RoundedCornerShape(16.dp, 6.dp, 6.dp, 16.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.KeyboardArrowLeft,
+                            null,
+                            modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
+                        )
                     }
+                    FilledTonalIconButton(
+                        onClick = {  },
+                        shape = RoundedCornerShape(6.dp, 16.dp, 16.dp, 6.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.KeyboardArrowRight,
+                            null,
+                            modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
+                        )
+                    }
+
+                    FilledIconButton(
+                        onClick = {  },
+                    ) {
+                        Icon(
+                            Icons.Default.Input,
+                            null,
+                            modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
+                        )
+                    }
+
+//                    for (action in auxiliaryActions) {
+//                        FilledTonalIconButton(
+//                            onClick = { onAction(action) },
+//                        ) {
+//                            when (val label = calcActionLabelMapper(action)) {
+//                                is CalculatorKeyButtonActionLabel.Text -> Text(
+//                                    label.text,
+//                                    style = MaterialTheme.typography.labelLarge
+//                                )
+//
+//                                is CalculatorKeyButtonActionLabel.Icon -> Icon(
+//                                    label.icon,
+//                                    label.description,
+//                                    modifier = Modifier.size(MaterialTheme.typography.labelLarge.lineHeight.toDp())
+//                                )
+//
+//                                null -> null
+//                            }
+//                        }
+//                    }
                 }
             }
         }
     }
+}
+
+
+@Preview
+@Composable
+fun DefaultPreview() {
 }

@@ -1,13 +1,16 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
@@ -26,6 +29,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.TextFieldValue
@@ -114,31 +123,21 @@ fun CalculatorScreenContent(
     val imeHeight = WindowInsets.ime.getBottom(localDensity)
     val imeFullyHidden = imeHeight == 0
 
+    var keypadVisible by remember { mutableStateOf(true) }
+
     var autocompleteDismissed by remember { mutableStateOf(false) }
     if (autocompleteResult.relevantText.isEmpty()) {
         autocompleteDismissed = false
     }
     val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
 
+    val calculationListState = rememberCalculationListState()
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
     ) {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeContent))
-        CalculationList(
-            calculations = calculationHistory,
-            activeCalculationIdx = activeCalculationId,
-            activeCalculationInput = inputTextFieldValue,
-            activeCalculationParsed = parsedString,
-            activeCalculationResult = resultString,
-            interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
-            userPreferences = userPreferences,
-            modifier = Modifier.weight(1f).padding(horizontal = 6.dp),
-            onUserpreferencesChanged = onUserPreferencesChanged,
-            onDeleteClick = onDeleteCalculation,
-            onActiveCalculationChanged = onActiveCalculationChanged,
-            onActiveCalculationInputChange = onInputFieldValueChange,
-        )
 
         TabPanel(
             tabItems = keypads.map {
@@ -162,14 +161,39 @@ fun CalculatorScreenContent(
                     onAutocompleteDismiss = { autocompleteDismissed = true }
                 )
             },
-            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+            topContent = { padding ->
+                val fadeHeightPx = padding.toFloatPx()
+
+                CalculationList(
+                    calculations = calculationHistory,
+                    calculationListState = calculationListState,
+                    activeCalculationIdx = activeCalculationId,
+                    activeCalculationInput = inputTextFieldValue,
+                    activeCalculationParsed = parsedString,
+                    activeCalculationResult = resultString,
+                    padding = padding,
+                    interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
+                    userPreferences = userPreferences,
+                    onUserpreferencesChanged = onUserPreferencesChanged,
+                    onDeleteClick = onDeleteCalculation,
+                    onActiveCalculationChanged = onActiveCalculationChanged,
+                    onActiveCalculationInputChange = onInputFieldValueChange,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(horizontal = 6.dp)
+                        .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+                        .drawWithContent {
+                            drawContent()
+                            drawRect(brush = Brush.verticalGradient(0f to Color.White, 1f to Color.Transparent, startY = size.height - fadeHeightPx, endY = size.height), blendMode = BlendMode.DstIn)
+                        },
+                )
+            },
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
         ) {
             Column {
-                AnimatedContent(
-                    activeKeypadIndex
-                ) {
+                AnimatedVisibility(keypadVisible) {
                     Keypad(
-                        keypads[it].sections,
+                        keypads[activeKeypadIndex].sections,
                         CalcActionLabelMapper(userPreferences),
                         onKeyAction = onKeyAction,
                     )
