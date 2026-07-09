@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -133,6 +134,10 @@ fun CalculatorScreenContent(
 
     val calculationListState = rememberCalculationListState()
 
+    LaunchedEffect(inputTextFieldValue) {
+        calculationListState.animateScrollToActiveCalculation()
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
@@ -156,6 +161,7 @@ fun CalculatorScreenContent(
                         CalculatorAction.TraverseHistory(+1),
                     ),
                     calcActionLabelMapper = CalcActionLabelMapper(userPreferences),
+                    isCalculationSnapped = !calculationListState.isFreeScrolling,
                     onAction = onKeyAction,
                     onAutocompleteClick = onAutocompleteClick,
                     onAutocompleteDismiss = { autocompleteDismissed = true }

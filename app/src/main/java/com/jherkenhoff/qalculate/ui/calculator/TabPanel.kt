@@ -1,11 +1,14 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,6 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Key
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -47,11 +53,13 @@ private fun TabButton(
     text: String,
     modifier: Modifier = Modifier,
     showText: Boolean = true,
+    color: Color = MaterialTheme.colorScheme.onSurface,
     onClicked: () -> Unit = {},
 ) {
     TextButton(
         onClick = onClicked,
-        modifier = modifier
+        colors = ButtonDefaults.textButtonColors().copy(contentColor = color),
+        modifier = modifier.height(48.dp).padding(4.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -84,19 +92,23 @@ fun TabPanel(
         label="Tab expansion animation"
     )
 
-    SubcomposeLayout(modifier.pointerInput(Unit) {
-    }) { constraints ->
+    SubcomposeLayout(
+        modifier.pointerInput(Unit) {}
+    ) { constraints ->
 
         val activeTabItemPlaceable = subcompose(SlotsEnum.ACTIVE_TAB) {
             TabButton(
                 icon = tabItems[activeTabItemIndex].first,
                 text = tabItems[activeTabItemIndex].second,
-                showText = !collapse
+                showText = !collapse,
+                color = MaterialTheme.colorScheme.primary
             )
         }.map { it.measure(constraints) }.first()
 
         val tabItemMeasurable = subcompose(SlotsEnum.TAB) {
-            AnimatedContent(expanded) {
+            AnimatedContent(
+                expanded
+            ) {
                 if (it) {
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -107,6 +119,7 @@ fun TabPanel(
                                 icon = item.first,
                                 text = item.second,
                                 onClicked = { onTabClicked(i); expanded = false },
+                                color = if (i == activeTabItemIndex) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -116,6 +129,7 @@ fun TabPanel(
                         text = tabItems[activeTabItemIndex].second,
                         showText = !collapse,
                         onClicked = { expanded = true },
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -192,7 +206,13 @@ private fun DefaultPreview() {
         topContent = { Surface(color = Color.Red, modifier = Modifier.fillMaxWidth().height(100.dp)) {} },
         activeTabItemIndex = activeKeypad,
         collapse = false,
-        trailingContent = { Text("Trailing content") },
+        trailingContent = {
+            Text(
+                "Trailing content",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxSize().background(Color.Green)
+            )
+                          },
         onTabClicked = { activeKeypad = it }
     ) {
         Box(
