@@ -57,6 +57,7 @@ import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.PreviewData
 import com.jherkenhoff.qalculate.ui.common.DelayedAnimatedVisibility
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableListState
@@ -68,15 +69,24 @@ private fun LazyListState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.las
 class CalculationListState(
     internal val lazyListState: LazyListState
 ) {
+    internal var activeCalculationOffsetPx: Int = 0
+
     internal val activeCalculationLazyListIdx = mutableIntStateOf(0)
     internal val _isActiveCalculationSnapped = mutableStateOf(false)
 
-    internal var activeCalculationOffsetPx: Int = 0
-
     val isActiveCalculationSnapped by _isActiveCalculationSnapped
 
+    internal val _animationInProgress = mutableStateOf(false)
+    val animationInProgress by _animationInProgress
+
+    val isFreeScrolling by derivedStateOf {
+        !animationInProgress && !isActiveCalculationSnapped
+    }
+
     suspend fun animateScrollToActiveCalculation() {
+        _animationInProgress.value = true
         lazyListState.animateScrollToItem(activeCalculationLazyListIdx.intValue, -activeCalculationOffsetPx)
+        _animationInProgress.value = false
     }
 }
 
@@ -111,13 +121,29 @@ fun CalculationList(
 
     calculationListState.activeCalculationLazyListIdx.intValue = calculations.lastIndex - activeCalculationIdx + 1
 
-    calculationListState._isActiveCalculationSnapped.value = calculationListState.lazyListState.layoutInfo.visibleItemsInfo.any {
-        (it.index == calculationListState.activeCalculationLazyListIdx.intValue) && (it.offset == calculationListState.activeCalculationOffsetPx)
+    val isActiveCalculationSnapped by remember(activeCalculationIdx) {
+        derivedStateOf {
+            calculationListState.lazyListState.layoutInfo.visibleItemsInfo.any {
+                (it.index == calculationListState.activeCalculationLazyListIdx.intValue) && (it.offset == calculationListState.activeCalculationOffsetPx)
+            }
+        }
+    }
+
+    LaunchedEffect(calculationListState.lazyListState, activeCalculationIdx) {
+        snapshotFlow {
+            calculationListState.lazyListState.layoutInfo.visibleItemsInfo.any {
+                (it.index == calculationListState.activeCalculationLazyListIdx.intValue) && (it.offset == calculationListState.activeCalculationOffsetPx)
+            }
+        }.distinctUntilChanged()
+            .collect {
+                Log.d("Moin", it.toString())
+                calculationListState._isActiveCalculationSnapped.value = it
+            }
     }
 
     val coroutineScope = rememberCoroutineScope()
 
-    val passiveCalculationItemsAlpha by animateFloatAsState(if (calculationListState.isActiveCalculationSnapped) 0.5f else 1f)
+    val passiveCalculationItemsAlpha by animateFloatAsState(if (calculationListState.isFreeScrolling) 1f else 0.5f)
 
     val snapThreshold = 200
 

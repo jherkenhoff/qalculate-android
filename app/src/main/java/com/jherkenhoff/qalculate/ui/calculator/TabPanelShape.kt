@@ -71,7 +71,7 @@ class TabPanelShape(
 @Composable
 private fun DefaultPreview() {
     Surface(
-        shape = TabPanelShape(100f, 100f,50f),
+        shape = TabPanelShape(200f, 100f,50f),
         modifier = Modifier.size(400.dp, 400.dp)
     ) {}
 }
