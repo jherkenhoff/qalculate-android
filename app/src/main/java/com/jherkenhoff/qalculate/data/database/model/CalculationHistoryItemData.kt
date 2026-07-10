@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 )
 data class CalculationHistoryItemData(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     @ColumnInfo(name = "sort_index", defaultValue = "0")
     val sortIndex: Int,
     @ColumnInfo(name = "input")

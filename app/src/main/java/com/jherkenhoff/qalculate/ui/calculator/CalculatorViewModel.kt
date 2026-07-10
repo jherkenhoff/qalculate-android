@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import android.util.Log
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -50,12 +52,20 @@ class CalculatorViewModel @Inject constructor(
     private val calculatorRepository: CalculatorRepository
 ) : ViewModel() {
 
-    private val _activeCalculationId = MutableStateFlow(0)
-    val activeCalculationId = _activeCalculationId.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        initialValue = 0
-    )
+    init {
+        viewModelScope.launch {
+            calculationHistoryStore.allItems().first().let { calculations ->
+                _calculationDisplayOrder.value = calculations
+                    .sortedBy { it.sortIndex }
+                    .map { it.id }
+                _activeCalculationId.value = _calculationDisplayOrder.value.last()
+            }
+        }
+    }
+
+    private val _activeCalculationId = MutableStateFlow<Long?>(null)
+
+    private val _calculationDisplayOrder = MutableStateFlow<List<Long>>(emptyList())
 
     private val _internalInputTextFieldValue = MutableStateFlow(InternalTextFieldValue(TextFieldValue(), false))
     val inputTextFieldValue = _internalInputTextFieldValue.map { it.textFieldValue }.stateIn(
@@ -103,6 +113,34 @@ class CalculatorViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
+    val calculationListData = combine(
+        calculationHistory,
+        _calculationDisplayOrder,
+        _activeCalculationId
+    ) { calculations, order, activeId ->
+        val calculationsById = calculations.associateBy { it.id }
+
+        CalculationListData(
+            items = order
+                .mapNotNull { id ->
+                    calculationsById[id]
+                }
+                .map { calculation ->
+                    CalculationItem(
+                        id = calculation.id,
+                        input = calculation.input,
+                        parsed = calculation.parsed,
+                        result = calculation.result
+                    )
+                },
+            activeCalculationIdx = order.indexOfFirst { it == activeId }
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue = CalculationListData(emptyList(), null)
+    )
+
     val activeKeypadIndex = userPreferences.map{
         it.activeKeypadIndex
     }.stateIn(
@@ -123,8 +161,40 @@ class CalculatorViewModel @Inject constructor(
         )
     }
 
-    fun setActiveCalculationId(id: Int) {
+    fun persistActiveCalculation() {
+        _activeCalculationId.value?.let { id ->
+            viewModelScope.launch {
+                calculationHistoryStore.updateItem(
+                    calculationHistory.value.first { it.id == id }.copy(
+                        input = inputTextFieldValue.value.text,
+                        parsed = parsedString.value,
+                        result = resultString.value,
+                        modified = LocalDateTime.now()
+                    )
+                )
+            }
+        }
+    }
+
+    fun setActiveCalculationId(id: Long) {
+        persistActiveCalculation()
+
         _activeCalculationId.update { id }
+
+        viewModelScope.launch {
+            // HACK: Querying the room DB each time the active calculation is changed might be a minor performance overhead
+            // It is currently implemented this way to avoid a race condition after adding a new calculation
+            val input = calculationHistoryStore.getItem(id).input
+
+            updateInput(
+                TextFieldValue(input, TextRange(input.length))
+            )
+        }
+    }
+
+    fun setActiveCalculationIdx(idx: Int) {
+        val id = _calculationDisplayOrder.value[idx]
+        setActiveCalculationId(id)
     }
 
     fun clearCalculationHistory() {
@@ -140,29 +210,58 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun submitCalculation() {
-        viewModelScope.launch {
-            calculationHistoryStore.addItem(
-                CalculationHistoryItemData(
-                    sortIndex = 0,
-                    input = inputTextFieldValue.value.text,
-                    parsed = parsedString.value,
-                    result = resultString.value,
-                    created = LocalDateTime.now(),
-                    modified = LocalDateTime.now()
-                )
-            )
-        }
+        val currentId = _activeCalculationId.value ?: return
 
         calculatorRepository.setAnsExpression(mathExpressionPlainText(inputTextFieldValue.value.text))
-        updateInput(
-            inputTextFieldValue.value.copy(selection = TextRange(0, inputTextFieldValue.value.text.length))
-        )
+
+        // Append a new, blank calculation at the end if the currently submitted calculation was the last
+        if (currentId == _calculationDisplayOrder.value.last()) {
+            viewModelScope.launch {
+                val newId = calculationHistoryStore.addItem(
+                    CalculationHistoryItemData(
+                        sortIndex = 0,
+                        input = inputTextFieldValue.value.text,
+                        parsed = parsedString.value,
+                        result = resultString.value,
+                        created = LocalDateTime.now(),
+                        modified = LocalDateTime.now()
+                    )
+                )
+
+                _calculationDisplayOrder.update { order -> order + newId }
+                setActiveCalculationId( newId )
+
+                updateInput(
+                    inputTextFieldValue.value.copy(selection = TextRange(0, inputTextFieldValue.value.text.length))
+                )
+            }
+        } else {
+            val nextIdx = _calculationDisplayOrder.value.indexOfFirst { it == currentId } + 1
+            setActiveCalculationIdx(nextIdx)
+
+        }
+
         undoManager.clear()
     }
 
-    fun deleteCalculation(item: CalculationHistoryItemData) {
+    fun reorderCalculation(fromIdx: Int, toIdx: Int) {
+        _calculationDisplayOrder.value = _calculationDisplayOrder.value.toMutableList().apply {
+            add(toIdx, removeAt(fromIdx))
+        }
+    }
+
+    fun persistCalculationOrder() {
         viewModelScope.launch {
-            calculationHistoryStore.deleteItem(item)
+            _calculationDisplayOrder.value.forEachIndexed { idx, id ->
+                calculationHistoryStore.updateSortIndex(id, idx)
+            }
+        }
+    }
+
+    fun deleteCalculation(idx: Int) {
+        viewModelScope.launch {
+            val id = _calculationDisplayOrder.value[idx]
+            calculationHistoryStore.deleteItem(calculationHistory.value.first { it.id == id })
         }
     }
 
@@ -209,8 +308,11 @@ class CalculatorViewModel @Inject constructor(
         if (textChanged)
             undoManager.snapshot(inputTextFieldValue.value)
 
-
         _internalInputTextFieldValue.update { InternalTextFieldValue(input, doAutocomplete && textChanged) }
+    }
+
+    fun updateInput(input: String, doAutocomplete: Boolean = false) {
+        updateInput(TextFieldValue(input), doAutocomplete)
     }
 
     fun clearInput() {

@@ -38,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,11 +67,13 @@ fun AuxiliaryBar(
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     onAction: (CalculatorAction) -> Unit = { },
     onAutocompleteDismiss: () -> Unit = { },
+    onScrollToActiveCalculationClick: () -> Unit = { },
+    onScrollToLastCalculationClick: () -> Unit = { },
 ) {
     val fadeWidth = 40f
 
     AnimatedContent(
-        autocompleteResult.items.isNotEmpty(),
+        autocompleteResult.items.isNotEmpty() && isCalculationSnapped,
         modifier = modifier
     ) {
         if (it) {
@@ -137,7 +140,7 @@ fun AuxiliaryBar(
                             AuxiliaryIconButton(
                                 Icons.Default.VerticalAlignBottom,
                                 null,
-                                onClick = {},
+                                onClick = onScrollToLastCalculationClick,
                                 roundStart = true,
                                 roundEnd = false,
                                 color = MaterialTheme.colorScheme.secondary
@@ -146,7 +149,7 @@ fun AuxiliaryBar(
                             AuxiliaryIconButton(
                                 Icons.AutoMirrored.Default.Input,
                                 null,
-                                onClick = {},
+                                onClick = onScrollToActiveCalculationClick,
                                 roundStart = false,
                                 roundEnd = true,
                                 color = MaterialTheme.colorScheme.secondary

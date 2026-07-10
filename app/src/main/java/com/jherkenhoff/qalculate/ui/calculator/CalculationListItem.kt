@@ -76,12 +76,13 @@ import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
+import sh.calvin.reorderable.ReorderableCollectionItemScope
 
 private val largeCornerRadius = 16.dp
 private val smallCornerRadius = 4.dp
 
 @Composable
-fun ActiveCalculationListItem(
+fun ReorderableCollectionItemScope.ActiveCalculationListItem(
     number: Int,
     input: TextFieldValue,
     parsed: String,
@@ -94,7 +95,8 @@ fun ActiveCalculationListItem(
     onInputChange: (TextFieldValue) -> Unit = {},
     onDeleteClick: () -> Unit = {},
     onClick: () -> Unit = {},
-    onUserpreferencesChanged: (UserPreferences) -> Unit = {}
+    onUserpreferencesChanged: (UserPreferences) -> Unit = {},
+    onDragStopped: () -> Unit = {}
 ) {
     var menuOpen by remember { mutableStateOf(false) }
 
@@ -131,7 +133,9 @@ fun ActiveCalculationListItem(
                         Icons.Default.DragIndicator,
                         null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center).longPressDraggableHandle(
+                            onDragStopped = onDragStopped
+                        )
                     )
 
                 }
@@ -455,25 +459,25 @@ private fun Menu(
     }
 }
 
-
-@Preview
-@Composable
-private fun ActivePreview() {
-    SharedTransitionLayout() {
-        AnimatedVisibility(true) {
-            ActiveCalculationListItem(
-                1,
-                TextFieldValue("1+1"),
-                "1+1",
-                "2",
-                interceptKeyboard = true,
-                sharedTransitionScope = this@SharedTransitionLayout,
-                animatedVisibilityScope = this@AnimatedVisibility,
-                userPreferences = UserPreferences()
-            )
-        }
-    }
-}
+//
+//@Preview
+//@Composable
+//private fun ActivePreview() {
+//    SharedTransitionLayout() {
+//        AnimatedVisibility(true) {
+//            ActiveCalculationListItem(
+//                1,
+//                TextFieldValue("1+1"),
+//                "1+1",
+//                "2",
+//                interceptKeyboard = true,
+//                sharedTransitionScope = this@SharedTransitionLayout,
+//                animatedVisibilityScope = this@AnimatedVisibility,
+//                userPreferences = UserPreferences()
+//            )
+//        }
+//    }
+//}
 
 @Preview
 @Composable
@@ -493,38 +497,38 @@ private fun PassivePreview() {
     }
 }
 
-
-@Preview
-@Composable
-private fun TransitionPreview() {
-
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(Modifier.fillMaxWidth().height(400.dp)) {
-        SharedTransitionLayout() {
-            AnimatedContent(expanded) {
-                if (it)
-                    ActiveCalculationListItem(
-                        1,
-                        TextFieldValue("1+1"),
-                        "1+1",
-                        "2",
-                        interceptKeyboard = true,
-                        sharedTransitionScope = this@SharedTransitionLayout,
-                        animatedVisibilityScope = this@AnimatedContent,
-                        userPreferences = UserPreferences()
-                    )
-                else
-                    PassiveCalculationListItem(
-                        1,
-                        "1+1",
-                        "0",
-                        topRounded = false,
-                        bottomRounded = false,
-                        sharedTransitionScope = this@SharedTransitionLayout,
-                        animatedVisibilityScope = this@AnimatedContent
-                    )
-            }
-        }
-    }
-}
+//
+//@Preview
+//@Composable
+//private fun TransitionPreview() {
+//
+//    var expanded by remember { mutableStateOf(false) }
+//
+//    Box(Modifier.fillMaxWidth().height(400.dp)) {
+//        SharedTransitionLayout() {
+//            AnimatedContent(expanded) {
+//                if (it)
+//                    ActiveCalculationListItem(
+//                        1,
+//                        TextFieldValue("1+1"),
+//                        "1+1",
+//                        "2",
+//                        interceptKeyboard = true,
+//                        sharedTransitionScope = this@SharedTransitionLayout,
+//                        animatedVisibilityScope = this@AnimatedContent,
+//                        userPreferences = UserPreferences()
+//                    )
+//                else
+//                    PassiveCalculationListItem(
+//                        1,
+//                        "1+1",
+//                        "0",
+//                        topRounded = false,
+//                        bottomRounded = false,
+//                        sharedTransitionScope = this@SharedTransitionLayout,
+//                        animatedVisibilityScope = this@AnimatedContent
+//                    )
+//            }
+//        }
+//    }
+//}
