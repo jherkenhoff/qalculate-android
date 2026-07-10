@@ -103,7 +103,7 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
     with(sharedTransitionScope) {
 
         Surface(
-            color = MaterialTheme.colorScheme.surfaceContainer,
+            color = MaterialTheme.colorScheme.secondaryContainer,
             shape = RoundedCornerShape(largeCornerRadius),
             modifier = modifier.fillMaxWidth().clickable { onClick() }.sharedElement(
                 rememberSharedContentState("container"),
