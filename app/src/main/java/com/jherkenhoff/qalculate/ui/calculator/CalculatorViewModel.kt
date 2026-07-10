@@ -57,7 +57,6 @@ class CalculatorViewModel @Inject constructor(
     private val _activeCalculationId = MutableStateFlow<Long?>(null)
     private val _internalInputTextFieldValue = MutableStateFlow(InternalTextFieldValue(TextFieldValue(), false))
 
-
     val persistentCalculationList = calculationHistoryStore.allItemsById().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -91,7 +90,6 @@ class CalculatorViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
     }
-
 
     val inputTextFieldValue = _internalInputTextFieldValue.map { it.textFieldValue }.stateIn(
         viewModelScope,
