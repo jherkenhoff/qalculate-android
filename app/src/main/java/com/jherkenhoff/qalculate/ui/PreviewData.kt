@@ -1,45 +1,32 @@
 package com.jherkenhoff.qalculate.ui
 
-import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
-import java.time.LocalDateTime
+import com.jherkenhoff.qalculate.ui.calculator.CalculationItem
 
 object PreviewData {
     val calculationList = listOf(
-        CalculationHistoryItemData(
-            0,
+        CalculationItem(
             0,
             "1+1",
             "1+1",
             "2",
-            LocalDateTime.of(2026, 1, 1, 12, 0),
-            LocalDateTime.of(2026, 1, 1, 12, 0)
         ),
-        CalculationHistoryItemData(
-            1,
+        CalculationItem(
             1,
             "boltzmann * planck",
             "boltzmann*planck",
             "9.1482771E-57 second*joule^2/kelvin",
-            LocalDateTime.of(2026, 1, 1, 12, 1),
-            LocalDateTime.of(2026, 1, 1, 12, 1)
         ),
-        CalculationHistoryItemData(
-            2,
+        CalculationItem(
             2,
             "1+1",
             "1+1",
             "2",
-            LocalDateTime.of(2026, 1, 1, 12, 2),
-            LocalDateTime.of(2026, 1, 1, 12, 2)
         ),
-        CalculationHistoryItemData(
-            3,
+        CalculationItem(
             3,
             "boltzmann + planck",
             "boltzmann + planck",
             "6.626 070 15 × 10^(−34) Joule·seconds + 13.806 49 peta joule / terra kelvin",
-            LocalDateTime.of(2026, 1, 1, 12, 3),
-            LocalDateTime.of(2026, 1, 1, 12, 3)
         ),
     )
 }

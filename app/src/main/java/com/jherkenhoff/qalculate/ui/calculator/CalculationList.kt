@@ -1,21 +1,11 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,13 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Input
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -42,25 +25,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.PreviewData
-import com.jherkenhoff.qalculate.ui.common.DelayedAnimatedVisibility
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.ReorderableListState
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.math.abs
 
@@ -71,22 +46,27 @@ class CalculationListState(
 ) {
     internal var activeCalculationOffsetPx: Int = 0
 
-    internal val activeCalculationLazyListIdx = mutableIntStateOf(0)
+    internal val activeCalculationLazyListIdx = mutableStateOf<Int?>(null)
     internal val _isActiveCalculationSnapped = mutableStateOf(false)
-
     val isActiveCalculationSnapped by _isActiveCalculationSnapped
 
-    internal val _animationInProgress = mutableStateOf(false)
-    val animationInProgress by _animationInProgress
+    private var scrollingToActiveCalculation by mutableStateOf(false)
 
     val isFreeScrolling by derivedStateOf {
-        !animationInProgress && !isActiveCalculationSnapped
+        !scrollingToActiveCalculation && !isActiveCalculationSnapped
     }
 
     suspend fun animateScrollToActiveCalculation() {
-        _animationInProgress.value = true
-        lazyListState.animateScrollToItem(activeCalculationLazyListIdx.intValue, -activeCalculationOffsetPx)
-        _animationInProgress.value = false
+        val idx = activeCalculationLazyListIdx.value ?: return
+
+        scrollingToActiveCalculation = true
+        lazyListState.animateScrollToItem(idx, -activeCalculationOffsetPx)
+        scrollingToActiveCalculation = false
+    }
+
+    suspend fun animateScrollToLastCalculation() {
+        scrollingToActiveCalculation = false
+        lazyListState.animateScrollToItem(0, -activeCalculationOffsetPx)
     }
 }
 
@@ -100,8 +80,7 @@ fun rememberCalculationListState(): CalculationListState {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CalculationList(
-    calculations: List<CalculationHistoryItemData>,
-    activeCalculationIdx: Int,
+    calculationListData: CalculationListData,
     calculationListState: CalculationListState,
     activeCalculationInput: TextFieldValue,
     activeCalculationParsed: String,
@@ -111,39 +90,48 @@ fun CalculationList(
     modifier: Modifier = Modifier,
     padding: Dp = 0.dp,
     onActiveCalculationChanged: (Int) -> Unit = {},
-    onDeleteClick: (CalculationHistoryItemData) -> Unit = {},
+    onDeleteClick: (Int) -> Unit = {},
     onActiveCalculationInputChange: (TextFieldValue) -> Unit = {},
     onUserpreferencesChanged: (UserPreferences) -> Unit = {},
+    onCalculationDragged: (Int, Int) -> Unit = { fromIdx, toIdx -> },
+    onCalculationDragStopped: () -> Unit = {}
 ) {
-    calculationListState.activeCalculationOffsetPx = (padding + 20.dp).toIntPx()
+    val calculations = calculationListData.items
+    val activeCalculationIdx = calculationListData.activeCalculationIdx
 
-    val reorderableListState = rememberReorderableLazyListState(calculationListState.lazyListState) { from, to -> }
+    val activeCalculationOffset = padding + 20.dp
+    calculationListState.activeCalculationOffsetPx = activeCalculationOffset.toIntPx()
 
-    calculationListState.activeCalculationLazyListIdx.intValue = calculations.lastIndex - activeCalculationIdx + 1
+    val hapticFeedback = LocalHapticFeedback.current
+    val reorderableListState = rememberReorderableLazyListState(calculationListState.lazyListState) { from, to ->
+        onCalculationDragged(calculations.lastIndex - from.index + 1, calculations.lastIndex - to.index + 1)
+
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+    }
+
+    calculationListState.activeCalculationLazyListIdx.value = activeCalculationIdx?.let { idx -> calculations.lastIndex - idx + 1 }
 
     val isActiveCalculationSnapped by remember(activeCalculationIdx) {
         derivedStateOf {
             calculationListState.lazyListState.layoutInfo.visibleItemsInfo.any {
-                (it.index == calculationListState.activeCalculationLazyListIdx.intValue) && (it.offset == calculationListState.activeCalculationOffsetPx)
+                (it.index == calculationListState.activeCalculationLazyListIdx.value) && (it.offset == calculationListState.activeCalculationOffsetPx)
             }
         }
     }
 
+    // Check if the active calculation is in its "snapped position" and update the
+    // calculationListState if this snapping state changed
     LaunchedEffect(calculationListState.lazyListState, activeCalculationIdx) {
         snapshotFlow {
             calculationListState.lazyListState.layoutInfo.visibleItemsInfo.any {
-                (it.index == calculationListState.activeCalculationLazyListIdx.intValue) && (it.offset == calculationListState.activeCalculationOffsetPx)
+                (it.index == calculationListState.activeCalculationLazyListIdx.value) && (it.offset == calculationListState.activeCalculationOffsetPx)
             }
-        }.distinctUntilChanged()
-            .collect {
-                Log.d("Moin", it.toString())
-                calculationListState._isActiveCalculationSnapped.value = it
-            }
+        }
+            .distinctUntilChanged()
+            .collect { calculationListState._isActiveCalculationSnapped.value = it }
     }
 
     val coroutineScope = rememberCoroutineScope()
-
-    val passiveCalculationItemsAlpha by animateFloatAsState(if (calculationListState.isFreeScrolling) 1f else 0.5f)
 
     val snapThreshold = 200
 
@@ -155,7 +143,7 @@ fun CalculationList(
             }
 
             val target = calculationListState.lazyListState.layoutInfo.visibleItemsInfo
-                .find { it.index == calculationListState.activeCalculationLazyListIdx.intValue }
+                .find { it.index == calculationListState.activeCalculationLazyListIdx.value }
 
             if (target != null) {
                 val distance = target.offset - calculationListState.activeCalculationOffsetPx
@@ -187,16 +175,9 @@ fun CalculationList(
 //                },
     ) {
         item {
-            Column {
-                IconButton(
-                    onClick = {}
-                ) {
-                    Icon(Icons.Default.Add, null)
-                }
-                Spacer(Modifier.height(padding))
-            }
+            Spacer(Modifier.height(activeCalculationOffset))
         }
-        calculations.sortedBy { it.sortIndex }.withIndex().reversed().forEach { (i, calculation) ->
+        calculations.withIndex().reversed().forEach { (i, calculation) ->
             val isFirstItem = i == 0
             val isLastItem = i == calculations.lastIndex
 
@@ -223,10 +204,11 @@ fun CalculationList(
                                         this@AnimatedContent,
                                         userPreferences = userPreferences,
                                         onInputChange = onActiveCalculationInputChange,
-                                        onDeleteClick = { onDeleteClick(calculation) },
+                                        onDeleteClick = { onDeleteClick(i) },
                                         onClick = { coroutineScope.launch { calculationListState.animateScrollToActiveCalculation() }},
                                         onUserpreferencesChanged = onUserpreferencesChanged,
-                                        modifier = Modifier.padding(vertical = 2.dp)//.longPressDraggableHandle()
+                                        onDragStopped = onCalculationDragStopped,
+                                        modifier = Modifier.padding(vertical = 2.dp)
                                     )
                                 } else {
                                     PassiveCalculationListItem(
@@ -238,8 +220,8 @@ fun CalculationList(
                                         this@SharedTransitionLayout,
                                         this@AnimatedContent,
                                         onClick = { onActiveCalculationChanged(i) },
-                                        onDeleteClick = { onDeleteClick(calculation) },
-                                        modifier = Modifier.padding(vertical = 2.dp).alpha(passiveCalculationItemsAlpha)//.longPressDraggableHandle()
+                                        onDeleteClick = { onDeleteClick(i) },
+                                        modifier = Modifier.padding(vertical = 2.dp).longPressDraggableHandle()
                                     )
                                 }
                             }
@@ -258,9 +240,8 @@ private fun DefaultPreview() {
     val calculationListState = rememberCalculationListState()
 
     CalculationList(
-        calculations = PreviewData.calculationList,
+        calculationListData = CalculationListData(PreviewData.calculationList, 0),
         calculationListState = calculationListState,
-        activeCalculationIdx = activeIdx,
         activeCalculationInput = TextFieldValue("1+1"),
         activeCalculationParsed = "1+1",
         activeCalculationResult = "2",

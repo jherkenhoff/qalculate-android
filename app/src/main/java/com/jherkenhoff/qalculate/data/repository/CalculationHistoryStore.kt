@@ -8,10 +8,10 @@ class CalculationHistoryStore(
     private val dao: CalculationHistoryItemDao
 ) {
     fun allItems(): Flow<List<CalculationHistoryItemData>> = dao.getAll()
-
+    suspend fun getItem(id: Long) = dao.getItem(id)
     suspend fun addItem(item : CalculationHistoryItemData) = dao.insert(item)
-
+    suspend fun updateItem(item: CalculationHistoryItemData) = dao.update(item)
     suspend fun deleteItem(item: CalculationHistoryItemData) = dao.delete(item)
-
     suspend fun deleteAll() = dao.deleteAll()
+    suspend fun updateSortIndex(id: Long, sortIndex: Int) = dao.updateSortIndex(id, sortIndex)
 }

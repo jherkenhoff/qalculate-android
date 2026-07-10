@@ -15,11 +15,17 @@ interface CalculationHistoryItemDao {
     @Query("SELECT * FROM calculation_history")
     fun getAll(): Flow<List<CalculationHistoryItemData>>
 
+    @Query("SELECT * FROM calculation_history WHERE id = :id")
+    suspend fun getItem(id: Long): CalculationHistoryItemData
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(item: CalculationHistoryItemData)
+    suspend fun insert(item: CalculationHistoryItemData): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(vararg entity: CalculationHistoryItemData)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entities: Collection<CalculationHistoryItemData>)
 
     @Delete
     suspend fun delete(entity: CalculationHistoryItemData): Int
@@ -30,9 +36,13 @@ interface CalculationHistoryItemDao {
     @Query("DELETE FROM calculation_history")
     suspend fun deleteAll()
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(entities: Collection<CalculationHistoryItemData>)
-
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(entity: CalculationHistoryItemData)
+
+    @Query("""
+        UPDATE calculation_history
+        SET sort_index = :sortIndex
+        WHERE id = :id
+        """)
+    suspend fun updateSortIndex(id: Long, sortIndex: Int)
 }
