@@ -1,6 +1,5 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -18,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.PreviewData
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.math.abs
@@ -89,15 +88,16 @@ fun CalculationList(
     userPreferences: UserPreferences,
     modifier: Modifier = Modifier,
     padding: Dp = 0.dp,
-    onActiveCalculationChanged: (Int) -> Unit = {},
-    onDeleteClick: (Int) -> Unit = {},
+    onActiveCalculationChanged: (Long) -> Unit = {},
+    onDeleteClick: (Long) -> Unit = {},
     onActiveCalculationInputChange: (TextFieldValue) -> Unit = {},
     onUserpreferencesChanged: (UserPreferences) -> Unit = {},
     onCalculationDragged: (Int, Int) -> Unit = { fromIdx, toIdx -> },
     onCalculationDragStopped: () -> Unit = {}
 ) {
     val calculations = calculationListData.items
-    val activeCalculationIdx = calculationListData.activeCalculationIdx
+    val activeCalculationId = calculationListData.activeCalculationId
+    val activeCalculationIdx = calculations.indexOfFirst { it.id == activeCalculationId }.takeIf { it != -1 }
 
     val activeCalculationOffset = padding + 20.dp
     calculationListState.activeCalculationOffsetPx = activeCalculationOffset.toIntPx()
@@ -110,14 +110,6 @@ fun CalculationList(
     }
 
     calculationListState.activeCalculationLazyListIdx.value = activeCalculationIdx?.let { idx -> calculations.lastIndex - idx + 1 }
-
-    val isActiveCalculationSnapped by remember(activeCalculationIdx) {
-        derivedStateOf {
-            calculationListState.lazyListState.layoutInfo.visibleItemsInfo.any {
-                (it.index == calculationListState.activeCalculationLazyListIdx.value) && (it.offset == calculationListState.activeCalculationOffsetPx)
-            }
-        }
-    }
 
     // Check if the active calculation is in its "snapped position" and update the
     // calculationListState if this snapping state changed
@@ -135,7 +127,10 @@ fun CalculationList(
 
     val snapThreshold = 200
 
+    // Snapping behaviour
     LaunchedEffect(calculationListState.lazyListState.isScrollInProgress) {
+        if (reorderableListState.isAnyItemDragging) return@LaunchedEffect // Don't snap during reordering
+
         if (!calculationListState.lazyListState.isScrollInProgress) {
             if (!calculationListState.lazyListState.canScrollBackward || !calculationListState.lazyListState.canScrollForward) {
                 // Don't snap if scrolled all the way to the start or end
@@ -157,7 +152,7 @@ fun CalculationList(
         }
     }
 
-    LaunchedEffect(activeCalculationIdx) {
+    LaunchedEffect(calculations.size) {
         calculationListState.animateScrollToActiveCalculation()
     }
 
@@ -195,33 +190,32 @@ fun CalculationList(
                             AnimatedContent(i == activeCalculationIdx) { isExpanded ->
                                 if (isExpanded) {
                                     ActiveCalculationListItem(
-                                        i+1,
                                         activeCalculationInput,
                                         activeCalculationParsed,
                                         activeCalculationResult,
+                                        calculation.executionOrderNumber,
                                         interceptKeyboard,
                                         this@SharedTransitionLayout,
                                         this@AnimatedContent,
                                         userPreferences = userPreferences,
                                         onInputChange = onActiveCalculationInputChange,
-                                        onDeleteClick = { onDeleteClick(i) },
-                                        onClick = { coroutineScope.launch { calculationListState.animateScrollToActiveCalculation() }},
+                                        onDeleteClick = { onDeleteClick(calculation.id) },
                                         onUserpreferencesChanged = onUserpreferencesChanged,
                                         onDragStopped = onCalculationDragStopped,
                                         modifier = Modifier.padding(vertical = 2.dp)
                                     )
                                 } else {
                                     PassiveCalculationListItem(
-                                        i+1,
                                         calculation.input,
                                         calculation.result,
+                                        calculation.executionOrderNumber,
                                         topRounded = isFirstItem,
                                         bottomRounded = isLastItem,
                                         this@SharedTransitionLayout,
                                         this@AnimatedContent,
-                                        onClick = { onActiveCalculationChanged(i) },
-                                        onDeleteClick = { onDeleteClick(i) },
-                                        modifier = Modifier.padding(vertical = 2.dp).longPressDraggableHandle()
+                                        onClick = { onActiveCalculationChanged(calculation.id) },
+                                        onDeleteClick = { onDeleteClick(calculation.id) },
+                                        modifier = Modifier.padding(vertical = 2.dp)
                                     )
                                 }
                             }
@@ -236,7 +230,7 @@ fun CalculationList(
 @Preview()
 @Composable
 private fun DefaultPreview() {
-    var activeIdx by remember { mutableIntStateOf(1) }
+    var activeIdx by remember { mutableLongStateOf(1L) }
     val calculationListState = rememberCalculationListState()
 
     CalculationList(

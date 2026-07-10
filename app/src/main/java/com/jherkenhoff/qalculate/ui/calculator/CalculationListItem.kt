@@ -83,10 +83,10 @@ private val smallCornerRadius = 4.dp
 
 @Composable
 fun ReorderableCollectionItemScope.ActiveCalculationListItem(
-    number: Int,
     input: TextFieldValue,
     parsed: String,
     result: String,
+    executionOrderNumber: Int?,
     interceptKeyboard: Boolean,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
@@ -120,7 +120,7 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
                         .width(40.dp)
                 ) {
                     Text(
-                        number.toString(),
+                        executionOrderNumber?.toString() ?: "•",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.align(Alignment.TopCenter).padding(6.dp)
@@ -133,7 +133,7 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
                         Icons.Default.DragIndicator,
                         null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.align(Alignment.Center).longPressDraggableHandle(
+                        modifier = Modifier.align(Alignment.Center).draggableHandle(
                             onDragStopped = onDragStopped
                         )
                     )
@@ -209,9 +209,9 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
 
 @Composable
 fun PassiveCalculationListItem(
-    number: Int,
     input: String,
     result: String,
+    executionOrderNumber: Int?,
     topRounded: Boolean,
     bottomRounded: Boolean,
     sharedTransitionScope: SharedTransitionScope,
@@ -248,7 +248,7 @@ fun PassiveCalculationListItem(
                         .fillMaxHeight()
                 ) {
                     Text(
-                        number.toString(),
+                        executionOrderNumber?.toString() ?: "•",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.align(Alignment.Center).padding(6.dp)
@@ -485,9 +485,9 @@ private fun PassivePreview() {
     SharedTransitionLayout() {
         AnimatedVisibility(true) {
             PassiveCalculationListItem(
-                1,
                 "1+1",
                 "0",
+                1,
                 topRounded = false,
                 bottomRounded = false,
                 sharedTransitionScope = this@SharedTransitionLayout,

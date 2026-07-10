@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -75,7 +74,7 @@ fun CalculatorScreen(
         onSettingsClick = openSettings,
         onAutocompleteClick = viewModel::acceptAutocomplete,
         onActiveKeypadIndexChanged = viewModel::setActiveKeypadIndex,
-        onActiveCalculationChanged = viewModel::setActiveCalculationIdx,
+        onActiveCalculationChanged = viewModel::setActiveCalculationId,
         onCalculationReorder = viewModel::reorderCalculation,
         onCalculationReorderFinished = viewModel::persistCalculationOrder
     )
@@ -108,12 +107,12 @@ fun CalculatorScreenContent(
     undoState: UndoState<TextFieldValue>,
     onKeyAction: (CalculatorAction) -> Unit = { },
     onInputFieldValueChange: (TextFieldValue) -> Unit = { },
-    onDeleteCalculation: (Int) -> Unit = { },
+    onDeleteCalculation: (Long) -> Unit = { },
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
     onMenuClick: () -> Unit = {  },
     onSettingsClick: () -> Unit = {  },
     onActiveKeypadIndexChanged: (Int) -> Unit = {},
-    onActiveCalculationChanged: (Int) -> Unit = {},
+    onActiveCalculationChanged: (Long) -> Unit = {},
     onCalculationReorder: (Int, Int) -> Unit = {_, _, ->},
     onCalculationReorderFinished: () -> Unit = {}
 ) {
@@ -132,10 +131,6 @@ fun CalculatorScreenContent(
     val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
 
     val calculationListState = rememberCalculationListState()
-
-    LaunchedEffect(inputTextFieldValue) {
-        calculationListState.animateScrollToActiveCalculation()
-    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -168,7 +163,7 @@ fun CalculatorScreenContent(
                         calculationListState.animateScrollToActiveCalculation()
                     }},
                     onScrollToLastCalculationClick = { scope.launch {
-                        onActiveCalculationChanged(calculationListData.items.lastIndex)
+                        onActiveCalculationChanged(calculationListData.items.last().id)
                         calculationListState.animateScrollToLastCalculation()
                     }},
                 )
