@@ -230,17 +230,17 @@ fun CalculationList(
 @Preview()
 @Composable
 private fun DefaultPreview() {
-    var activeIdx by remember { mutableLongStateOf(1L) }
+    var calculationListData by remember { mutableStateOf(CalculationListData(PreviewData.calculationList, 0)) }
     val calculationListState = rememberCalculationListState()
 
     CalculationList(
-        calculationListData = CalculationListData(PreviewData.calculationList, 0),
+        calculationListData = calculationListData,
         calculationListState = calculationListState,
         activeCalculationInput = TextFieldValue("1+1"),
         activeCalculationParsed = "1+1",
         activeCalculationResult = "2",
         interceptKeyboard = false,
         userPreferences = UserPreferences(),
-        onActiveCalculationChanged = { activeIdx = it }
+        onActiveCalculationChanged = { calculationListData = calculationListData.copy(activeCalculationId = it) }
     )
 }
