@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
@@ -56,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.InterceptPlatformTextInput
@@ -107,7 +109,7 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
             shape = RoundedCornerShape(largeCornerRadius),
             modifier = modifier.fillMaxWidth().clickable { onClick() }.sharedElement(
                 rememberSharedContentState("container"),
-                animatedVisibilityScope
+                animatedVisibilityScope,
             )
         ) {
             Row(
@@ -141,15 +143,17 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
                 }
                 VerticalDivider(Modifier.fillMaxHeight().padding(vertical = 8.dp))
 
-                Column {
+                Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
                     Row(
-                        horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        CalculatorChips(
-                            userPreferences,
-                            onUserPreferencesChanged = onUserpreferencesChanged
+                        InputField(
+                            value = input,
+                            onValueChange = onInputChange,
+                            interceptKeyboard = interceptKeyboard,
+                            onSubmit = {},
+                            modifier = Modifier.weight(1f)
                         )
                         Box(Modifier.width(40.dp)) {
                             IconButton(onClick = { menuOpen = true }) {
@@ -166,40 +170,33 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
                             )
                         }
                     }
-                    Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
-                        InputField(
-                            value = input,
-                            onValueChange = onInputChange,
-                            interceptKeyboard = interceptKeyboard,
-                            onSubmit = {}
-                        )
-                        HorizontalDivider()
-                        Text(
-                            mathExpressionFormatter(parsed),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(Modifier.height(6.dp))
+                    HorizontalDivider()
+                    Text(
+                        mathExpressionFormatter(parsed),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(6.dp))
 
-                        AutoSizeText(
-                            text = "= " + mathExpressionFormatter(result),
-                            alignment = Alignment.CenterEnd,
-                            style = MaterialTheme.typography.displayMedium,
-                            minTextSize = 14.sp,
-                            maxTextSize = 40.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp, horizontal = 8.dp)
-                                .size(40.dp)
-                                .sharedElement(
-                                    rememberSharedContentState("result"),
-                                    animatedVisibilityScope
-                                )
-                        )
-                    }
+                    AutoSizeText(
+                        text = "= " + mathExpressionFormatter(result),
+                        alignment = Alignment.CenterEnd,
+                        style = MaterialTheme.typography.displayMedium,
+                        minTextSize = 14.sp,
+                        maxTextSize = 40.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp, horizontal = 8.dp)
+                            .size(40.dp)
+                            .sharedElement(
+                                rememberSharedContentState("result"),
+                                animatedVisibilityScope
+                            )
+                    )
                 }
+
             }
         }
 

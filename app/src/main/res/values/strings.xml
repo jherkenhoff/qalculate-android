@@ -17,4 +17,5 @@
     <string name="dialog_cancel_button">Cancel</string>
     <string name="add_calculation_above">Add calculation above</string>
     <string name="add_calculation_below">Add calculation below</string>
+    <string name="open_navigation_menu">Open navigation menu</string>
 </resources>

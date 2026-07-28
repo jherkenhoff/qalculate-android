@@ -1,34 +1,30 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
-import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
-import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
+import androidx.compose.material3.R
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +42,9 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.AndroidUiModes.UI_MODE_NIGHT_YES
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -144,94 +142,125 @@ fun CalculatorScreenContent(
 
     val calculationListState = rememberCalculationListState()
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.background(MaterialTheme.colorScheme.background)
-    ) {
-        TopAppBar(
-            title = {  },
-            navigationIcon = {
-                IconButton(onClick = {}) {
-                    Icon(Icons.Default.Menu, null)
-                }
-            },
-            actions = {
-                CalculatorChips(
-                    userPreferences
+    LaunchedEffect(activeKeypadIndex) {
+        calculationListState.animateScrollToActiveCalculation()
+    }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {  },
+                navigationIcon = {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(Icons.Default.Menu,
+                            stringResource(com.jherkenhoff.qalculate.R.string.open_navigation_menu)
+                        )
+                    }
+                },
+                actions = {
+                    CalculatorChips(
+                        userPreferences
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-        )
+            )
+        }
+    ) { innerPadding ->
 
-        TabPanel(
-            tabItems = keypads.map {
-                Pair(it.icon, it.name)
-            },
-            activeTabItemIndex = activeKeypadIndex,
-            collapse = internalAutocompleteResult.items.isNotEmpty(),
-            onTabClicked = onActiveKeypadIndexChanged,
-            trailingContent = {
-                AuxiliaryBar(
-                    internalAutocompleteResult,
-                    auxiliaryActions = listOf(
-                        CalculatorAction.MoveCursor(-1),
-                        CalculatorAction.MoveCursor(+1),
-                        CalculatorAction.TraverseHistory(-1),
-                        CalculatorAction.TraverseHistory(+1),
-                    ),
-                    calcActionLabelMapper = CalcActionLabelMapper(userPreferences),
-                    isCalculationSnapped = !calculationListState.isFreeScrolling,
-                    onAction = onKeyAction,
-                    onAutocompleteClick = onAutocompleteClick,
-                    onAutocompleteDismiss = { autocompleteDismissed = true },
-                    onScrollToActiveCalculationClick = { scope.launch {
-                        calculationListState.animateScrollToActiveCalculation()
-                    }},
-                    onScrollToLastCalculationClick = { scope.launch {
-                        onActiveCalculationChanged(calculationListData.items.last().id)
-                        calculationListState.animateScrollToLastCalculation()
-                    }},
-                )
-            },
-            topContent = { padding ->
-                val fadeHeightPx = padding.toFloatPx()
-
-                CalculationList(
-                    calculationListData = calculationListData,
-                    calculationListState = calculationListState,
-                    activeCalculationInput = inputTextFieldValue,
-                    activeCalculationParsed = parsedString,
-                    activeCalculationResult = resultString,
-                    padding = padding,
-                    interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
-                    userPreferences = userPreferences,
-                    onUserpreferencesChanged = onUserPreferencesChanged,
-                    onDeleteClick = onDeleteCalculation,
-                    onActiveCalculationChanged = onActiveCalculationChanged,
-                    onActiveCalculationInputChange = onInputFieldValueChange,
-                    onCalculationDragged = onCalculationReorder,
-                    onCalculationDragStopped = onCalculationReorderFinished,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(horizontal = 6.dp)
-                        .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
-                        .drawWithContent {
-                            drawContent()
-                            drawRect(brush = Brush.verticalGradient(0f to Color.White, 1f to Color.Transparent, startY = size.height - fadeHeightPx, endY = size.height), blendMode = BlendMode.DstIn)
-                        },
-                )
-            },
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            Column {
-                AnimatedVisibility(keypadVisible) {
-                    Keypad(
-                        keypads[activeKeypadIndex].sections,
-                        CalcActionLabelMapper(userPreferences),
-                        onKeyAction = onKeyAction,
+
+            TabPanel(
+                tabItems = keypads.map {
+                    Pair(it.icon, it.name)
+                },
+                activeTabItemIndex = activeKeypadIndex,
+                collapse = internalAutocompleteResult.items.isNotEmpty(),
+                onTabClicked = onActiveKeypadIndexChanged,
+                trailingContent = {
+                    AuxiliaryBar(
+                        internalAutocompleteResult,
+                        auxiliaryActions = listOf(
+                            CalculatorAction.MoveCursor(-1),
+                            CalculatorAction.MoveCursor(+1),
+                            CalculatorAction.TraverseHistory(-1),
+                            CalculatorAction.TraverseHistory(+1),
+                        ),
+                        calcActionLabelMapper = CalcActionLabelMapper(userPreferences),
+                        isCalculationSnapped = !calculationListState.isFreeScrolling,
+                        onAction = onKeyAction,
+                        onAutocompleteClick = onAutocompleteClick,
+                        onAutocompleteDismiss = { autocompleteDismissed = true },
+                        onScrollToActiveCalculationClick = {
+                            scope.launch {
+                                calculationListState.animateScrollToActiveCalculation()
+                            }
+                        },
+                        onScrollToLastCalculationClick = {
+                            scope.launch {
+                                onActiveCalculationChanged(calculationListData.items.last().id)
+                                calculationListState.animateScrollToLastCalculation()
+                            }
+                        },
+                    )
+                },
+                topContent = { padding ->
+                    val fadeHeightPx = padding.toFloatPx()
+
+                    CalculationList(
+                        calculationListData = calculationListData,
+                        calculationListState = calculationListState,
+                        activeCalculationInput = inputTextFieldValue,
+                        activeCalculationParsed = parsedString,
+                        activeCalculationResult = resultString,
+                        padding = padding,
+                        interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
+                        userPreferences = userPreferences,
+                        onUserpreferencesChanged = onUserPreferencesChanged,
+                        onDeleteClick = onDeleteCalculation,
+                        onActiveCalculationChanged = onActiveCalculationChanged,
+                        onActiveCalculationInputChange = onInputFieldValueChange,
+                        onCalculationDragged = onCalculationReorder,
+                        onCalculationDragStopped = onCalculationReorderFinished,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(horizontal = 6.dp)
+                            .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+                            .drawWithContent {
+                                drawContent()
+                                drawRect(
+                                    brush = Brush.verticalGradient(
+                                        0f to Color.White,
+                                        1f to Color.Transparent,
+                                        startY = size.height - fadeHeightPx,
+                                        endY = size.height
+                                    ), blendMode = BlendMode.DstIn
+                                )
+                            },
+                    )
+                },
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            ) {
+                Column {
+                    AnimatedVisibility(keypadVisible) {
+                        Keypad(
+                            keypads[activeKeypadIndex].sections,
+                            CalcActionLabelMapper(userPreferences),
+                            onKeyAction = onKeyAction,
+                        )
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Spacer(
+                        Modifier.height(
+                            innerPadding.calculateBottomPadding()
+                        )
                     )
                 }
-                Spacer(Modifier.height(6.dp))
-                Spacer(Modifier.height(WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()))
             }
         }
     }
@@ -239,7 +268,7 @@ fun CalculatorScreenContent(
 
 
 @Preview(name = "Light Mode", showSystemUi = true, device = Devices.DEFAULT)
-@Preview(name = "Dark Mode", showSystemUi = true, device = Devices.DEFAULT, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Dark Mode", showSystemUi = true, device = Devices.DEFAULT, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun DefaultPreview() {
     var activeKeypadIndex by remember { mutableIntStateOf(0) }
