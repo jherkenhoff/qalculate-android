@@ -52,7 +52,6 @@ class CalculatorViewModel @Inject constructor(
     private val calculationHistoryStore: CalculationHistoryStore,
     private val calculatorRepository: CalculatorRepository
 ) : ViewModel() {
-
     private val _calculationDisplayOrder = MutableStateFlow<List<Long>>(emptyList())
     private val _activeCalculationId = MutableStateFlow<Long?>(null)
     private val _internalInputTextFieldValue = MutableStateFlow(InternalTextFieldValue(TextFieldValue(), false))
