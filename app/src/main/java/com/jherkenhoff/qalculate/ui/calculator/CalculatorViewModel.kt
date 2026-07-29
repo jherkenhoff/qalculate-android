@@ -11,7 +11,7 @@ import com.jherkenhoff.qalculate.data.AutocompleteRepository
 import com.jherkenhoff.qalculate.data.CalculatorRepository
 import com.jherkenhoff.qalculate.data.UserPreferencesRepository
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
-import com.jherkenhoff.qalculate.data.repository.CalculationHistoryStore
+import com.jherkenhoff.qalculate.data.repository.CalculationListRepository
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
@@ -26,8 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -37,9 +35,18 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 
-data class InternalTextFieldValue(
-    val textFieldValue: TextFieldValue,
-    val doAutocomplete: Boolean
+data class ActiveCalculationInput(
+    val id: Long?,
+    val input: TextFieldValue,
+    val doAutocomplete: Boolean,
+)
+
+data class ActiveCalculationData(
+    val id: Long?,
+    val input: TextFieldValue,
+    val parsed: String,
+    val result: String,
+    val autocompleteResult: AutocompleteResult
 )
 
 @HiltViewModel
@@ -49,79 +56,33 @@ class CalculatorViewModel @Inject constructor(
     private val autocompleteUseCase: AutocompleteUseCase,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val autocompleteRepository: AutocompleteRepository,
-    private val calculationHistoryStore: CalculationHistoryStore,
+    private val calculationListRepository: CalculationListRepository,
     private val calculatorRepository: CalculatorRepository
 ) : ViewModel() {
-    private val _calculationDisplayOrder = MutableStateFlow<List<Long>>(emptyList())
-    private val _activeCalculationId = MutableStateFlow<Long?>(null)
-    private val _internalInputTextFieldValue = MutableStateFlow(InternalTextFieldValue(TextFieldValue(), false))
+    private val _calculationDragOrder = MutableStateFlow<List<Long>?>(null)
 
-    val persistentCalculationList = calculationHistoryStore.allItemsById().stateIn(
+    private val _activeCalculationInput = MutableStateFlow(ActiveCalculationInput(null, TextFieldValue(), false))
+
+    val persistentCalculationList = calculationListRepository.allItemsSorted().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyMap()
+        initialValue = emptyList()
     )
 
     init {
         viewModelScope.launch {
-            calculationHistoryStore.allItems().first().let { calculations ->
-                _calculationDisplayOrder.value = calculations
-                    .sortedBy { it.sortIndex }
-                    .map { it.id }
-                _activeCalculationId.value = _calculationDisplayOrder.value.lastOrNull()
-            }
-        }
+            persistentCalculationList
+                .collect { list ->
+                    val activeId = _activeCalculationInput.value.id
 
-        persistentCalculationList
-            .onEach { calculationHistory ->
-                if (calculationHistory.isEmpty()) {
-                    calculationHistoryStore.addItem(
-                        CalculationHistoryItemData(
-                            sortIndex = 0,
-                            input = "",
-                            parsed = "",
-                            result = "",
-                            created = LocalDateTime.now(),
-                            modified = LocalDateTime.now()
-                        )
-                    )
+                    if (activeId == null || list.none { it.id == activeId }) {
+                        list.lastOrNull()?.let { lastCalculation ->
+                            changeActiveCalculation(lastCalculation.id)
+                        }
+                    }
                 }
-            }
-            .launchIn(viewModelScope)
+        }
     }
-
-    val inputTextFieldValue = _internalInputTextFieldValue.map { it.textFieldValue }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        initialValue = TextFieldValue()
-    )
-
-    val parsedString = combine(inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
-        return@combine parseUseCase(inputTextFieldValue.text, userPreferences)
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        initialValue = ""
-    )
-
-    val resultString = combine(inputTextFieldValue, userPreferencesRepository.userPreferencesFlow) { inputTextFieldValue, userPreferences ->
-        return@combine calculateUseCase(inputTextFieldValue.text, userPreferences)
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        initialValue = ""
-    )
-
-    val autocompleteResult = combine(autocompleteRepository.trie , _internalInputTextFieldValue) { autocompleteTrie, internalInputTextFieldValue ->
-        if (internalInputTextFieldValue.doAutocomplete)
-            autocompleteUseCase(autocompleteTrie, internalInputTextFieldValue.textFieldValue)
-        else
-            AutocompleteResult()
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        initialValue = AutocompleteResult()
-    )
 
     val userPreferences = userPreferencesRepository.userPreferencesFlow.stateIn(
         viewModelScope,
@@ -129,21 +90,55 @@ class CalculatorViewModel @Inject constructor(
         UserPreferences()
     )
 
+    val activeCalculationData = combine(_activeCalculationInput, userPreferences, autocompleteRepository.trie) { activeCalculationInput, userPreferences, autocompleteTrie ->
+        val autocompleteResult = if (activeCalculationInput.doAutocomplete)
+            autocompleteUseCase(autocompleteTrie, activeCalculationInput.input)
+        else
+            AutocompleteResult()
+
+        ActiveCalculationData(
+            id = activeCalculationInput.id,
+            input = activeCalculationInput.input,
+            parsed = parseUseCase(activeCalculationInput.input.text, userPreferences),
+            result = calculateUseCase(activeCalculationInput.input.text, userPreferences),
+            autocompleteResult = autocompleteResult
+        )
+    }.onEach {
+        it.id?.let { id ->
+            if (_calculationExecutionOrder.value.lastOrNull() != id) {
+                _calculationExecutionOrder.update { it + id }
+            }
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        initialValue =
+            ActiveCalculationData(
+                id = null,
+                input = TextFieldValue(""),
+                parsed = "",
+                result = "",
+                autocompleteResult = AutocompleteResult()
+            )
+    )
+
     private val _calculationExecutionOrder = MutableStateFlow<List<Long>>(emptyList())
 
     val calculationListData = combine(
         persistentCalculationList,
-        _calculationDisplayOrder,
-        _activeCalculationId,
+        _calculationDragOrder,
+        activeCalculationData,
         _calculationExecutionOrder
-    ) { calculations, order, activeId, executionOrder ->
+    ) { calculations, displayOrder, activeCalculationData, executionOrder ->
+
+        val sortedCalculations = if (displayOrder == null) {
+            calculations
+        } else {
+            displayOrder.mapNotNull { id -> calculations.find { it.id == id } }
+        }
 
         CalculationListData(
-            items = order
-                .mapNotNull { id ->
-                    calculations[id]
-                }
-                .map { calculation ->
+            items = sortedCalculations.map { calculation ->
                     CalculationItem(
                         id = calculation.id,
                         input = calculation.input,
@@ -154,7 +149,7 @@ class CalculatorViewModel @Inject constructor(
                             .takeIf { it != -1 }
                     )
                 },
-            activeCalculationId = activeId
+            activeCalculationId = activeCalculationData.id
         )
     }.stateIn(
         viewModelScope,
@@ -183,13 +178,13 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun persistActiveCalculation() {
-        persistentCalculationList.value[_activeCalculationId.value]?.let { calculation ->
+        persistentCalculationList.value.find { it.id == _activeCalculationInput.value.id } ?.let { calculation ->
             viewModelScope.launch {
-                calculationHistoryStore.updateItem(
+                calculationListRepository.updateItem(
                     calculation.copy(
-                        input = inputTextFieldValue.value.text,
-                        parsed = parsedString.value,
-                        result = resultString.value,
+                        input = activeCalculationData.value.input.text,
+                        parsed = activeCalculationData.value.parsed,
+                        result = activeCalculationData.value.result,
                         modified = LocalDateTime.now()
                     )
                 )
@@ -197,30 +192,27 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    fun setActiveCalculationId(id: Long) {
+    fun changeActiveCalculation(id: Long) {
         persistActiveCalculation()
-
-        _activeCalculationId.update { id }
 
         viewModelScope.launch {
             // HACK: Querying the room DB each time the active calculation is changed might be a minor performance overhead
             // It is currently implemented this way to avoid a race condition after adding a new calculation
-            val input = calculationHistoryStore.getItem(id).input
+            val input = calculationListRepository.getItem(id).input
 
-            updateInput(
-                TextFieldValue(input, TextRange(input.length))
-            )
+            _activeCalculationInput.update {
+                ActiveCalculationInput(
+                    id = id,
+                    input = TextFieldValue(input, TextRange(input.length)),
+                    doAutocomplete = true
+                )
+            }
         }
-    }
-
-    fun setActiveCalculationIdx(idx: Int) {
-        val id = _calculationDisplayOrder.value[idx]
-        setActiveCalculationId(id)
     }
 
     fun clearCalculationHistory() {
         viewModelScope.launch {
-            calculationHistoryStore.deleteAll()
+            calculationListRepository.deleteAll()
         }
     }
 
@@ -230,65 +222,67 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    fun submitCalculation() {
-        val currentId = _activeCalculationId.value ?: return
+    fun submitActiveCalculation() {
+        val currentId = activeCalculationData.value.id ?: return
 
-        calculatorRepository.setAnsExpression(mathExpressionPlainText(inputTextFieldValue.value.text))
+        calculatorRepository.setAnsExpression(mathExpressionPlainText(activeCalculationData.value.input.text))
 
         // Append a new, blank calculation at the end if the currently submitted calculation was the last
-        if (currentId == _calculationDisplayOrder.value.lastOrNull()) {
+        if (currentId == persistentCalculationList.value.last().id) {
             viewModelScope.launch {
-                val newId = calculationHistoryStore.addItem(
+                val newId = calculationListRepository.addItem(
                     CalculationHistoryItemData(
                         sortIndex = 0,
-                        input = inputTextFieldValue.value.text,
-                        parsed = parsedString.value,
-                        result = resultString.value,
+                        input = activeCalculationData.value.input.text,
+                        parsed = activeCalculationData.value.parsed,
+                        result = activeCalculationData.value.result,
                         created = LocalDateTime.now(),
                         modified = LocalDateTime.now()
                     )
                 )
 
-                _calculationDisplayOrder.update { order -> order + newId }
-                setActiveCalculationId( newId )
+                changeActiveCalculation( newId )
 
-                updateInput(
-                    inputTextFieldValue.value.copy(selection = TextRange(0, inputTextFieldValue.value.text.length))
-                )
+                _activeCalculationInput.update {
+                    ActiveCalculationInput(
+                        id = newId,
+                        input = it.input.copy(selection = TextRange(0, it.input.text.length)),
+                        doAutocomplete = true
+                    )
+                }
             }
         } else {
-            val nextIdx = _calculationDisplayOrder.value.indexOfFirst { it == currentId } + 1
-            setActiveCalculationIdx(nextIdx)
-
+            val nextIdx = persistentCalculationList.value.indexOfFirst { it.id == currentId } + 1
+            val nextId = persistentCalculationList.value[nextIdx].id
+            changeActiveCalculation(nextId)
         }
 
         undoManager.clear()
     }
 
     fun reorderCalculation(fromIdx: Int, toIdx: Int) {
-        _calculationDisplayOrder.value = _calculationDisplayOrder.value.toMutableList().apply {
-            add(toIdx, removeAt(fromIdx))
+        val currentOrder = _calculationDragOrder.value?: persistentCalculationList.value.map { it.id }
+
+        _calculationDragOrder.update {
+            currentOrder.toMutableList().apply {
+                add(toIdx, removeAt(fromIdx))
+            }
         }
     }
 
     fun persistCalculationOrder() {
-        viewModelScope.launch {
-            _calculationDisplayOrder.value.forEachIndexed { idx, id ->
-                calculationHistoryStore.updateSortIndex(id, idx)
+        _calculationDragOrder.value?.let {
+            viewModelScope.launch {
+                calculationListRepository.updateSortIndex(it)
+                _calculationDragOrder.update { null }
             }
         }
     }
 
     fun deleteCalculation(id: Long) {
-        val deletedCalculationOrderIndex = _calculationDisplayOrder.value.indexOfFirst { it == id }.takeIf{ it != -1 }
-
-        persistentCalculationList.value[id]?.let { calculation ->
-            _calculationDisplayOrder.update { displayOrder ->
-                displayOrder.toMutableList().apply { remove(id) }
-            }
-
+        persistentCalculationList.value.find { it.id == id }?.let { calculation ->
             viewModelScope.launch {
-                calculationHistoryStore.deleteItem(calculation)
+                calculationListRepository.deleteItem(calculation)
             }
         }
     }
@@ -297,7 +291,7 @@ class CalculatorViewModel @Inject constructor(
         when (action) {
             is CalculatorAction.InsertText -> insertText(action)
             is CalculatorAction.DeleteChars -> removeChars(action.nChars)
-            is CalculatorAction.SubmitCalculation -> submitCalculation()
+            is CalculatorAction.SubmitCalculation -> submitActiveCalculation()
             is CalculatorAction.ClearAll -> clearInput()
             is CalculatorAction.MoveCursor -> moveCursor(action.nChars)
             is CalculatorAction.TraverseHistory -> traverseHistory(action.nEntries)
@@ -315,30 +309,41 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun undo() {
-        val undoState = undoManager.undo(inputTextFieldValue.value)
+        val undoState = undoManager.undo(_activeCalculationInput.value.input)
         if (undoState !== null)
-            _internalInputTextFieldValue.update { InternalTextFieldValue(undoState, false) }
+            _activeCalculationInput.update { it.copy(input = undoState, doAutocomplete = false) }
     }
 
     fun redo() {
-        val redoState = undoManager.redo(inputTextFieldValue.value)
+        val redoState = undoManager.redo(_activeCalculationInput.value.input)
         if (redoState !== null)
-            _internalInputTextFieldValue.update { InternalTextFieldValue(redoState, false) }
+            _activeCalculationInput.update { it.copy(input = redoState, doAutocomplete = false) }
     }
 
     fun moveCursor(chars: Int) {
-        val newCursorPosition = (inputTextFieldValue.value.selection.end + chars).coerceIn(0, inputTextFieldValue.value.text.length)
-        updateInput(inputTextFieldValue.value.copy(selection = TextRange(newCursorPosition)))
+        val newCursorPosition =
+            (_activeCalculationInput.value.input.selection.end + chars).coerceIn(
+                0,
+                _activeCalculationInput.value.input.text.length
+            )
+        _activeCalculationInput.update {
+            it.copy(input = it.input.copy(selection = TextRange(newCursorPosition)))
+        }
     }
 
     fun updateInput(input: TextFieldValue, doAutocomplete: Boolean = false) {
-        val textChanged = input.text != inputTextFieldValue.value.text
+        val textChanged = input.text != _activeCalculationInput.value.input.text
         if (textChanged)
-            undoManager.snapshot(inputTextFieldValue.value)
+            undoManager.snapshot(_activeCalculationInput.value.input)
 
-        _internalInputTextFieldValue.update { InternalTextFieldValue(input, doAutocomplete && textChanged) }
+        _activeCalculationInput.update {
+            it.copy(
+                input = input,
+                doAutocomplete = doAutocomplete && textChanged
+            )
+        }
 
-        _activeCalculationId.value?.let { id ->
+        _activeCalculationInput.value.id?.let { id ->
             if (_calculationExecutionOrder.value.lastOrNull() != id) {
                 _calculationExecutionOrder.update { it + id }
             }
@@ -354,67 +359,92 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun insertText(action: CalculatorAction.InsertText) {
-        val maxChars = inputTextFieldValue.value.text.length
-        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
-        val selectedText = inputTextFieldValue.value.getSelectedText()
-        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
+        val maxChars = _activeCalculationInput.value.input.text.length
+        val textBeforeSelection =
+            _activeCalculationInput.value.input.getTextBeforeSelection(maxChars)
+        val selectedText = _activeCalculationInput.value.input.getSelectedText()
+        val textAfterSelection =
+            _activeCalculationInput.value.input.getTextAfterSelection(maxChars)
 
         with(action) {
             if (selectedText.isNotEmpty()) {
-                    val newText = when (selectionPolicy) {
-                        CalculatorAction.InsertText.SelectionPolicy.REPLACE -> "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
-                        CalculatorAction.InsertText.SelectionPolicy.SURROUND -> "$textBeforeSelection$preCursorText$selectedText$postCursorText$textAfterSelection"
-                        CalculatorAction.InsertText.SelectionPolicy.PARENTHESES -> "$textBeforeSelection($selectedText)$preCursorText$postCursorText$textAfterSelection"
-                    }
+                val newText = when (selectionPolicy) {
+                    CalculatorAction.InsertText.SelectionPolicy.REPLACE -> "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
+                    CalculatorAction.InsertText.SelectionPolicy.SURROUND -> "$textBeforeSelection$preCursorText$selectedText$postCursorText$textAfterSelection"
+                    CalculatorAction.InsertText.SelectionPolicy.PARENTHESES -> "$textBeforeSelection($selectedText)$preCursorText$postCursorText$textAfterSelection"
+                }
 
-                    val newSelection = when (selectionPolicy) {
-                        CalculatorAction.InsertText.SelectionPolicy.REPLACE -> TextRange(textBeforeSelection.length + preCursorText.length)
-                        CalculatorAction.InsertText.SelectionPolicy.SURROUND -> TextRange(textBeforeSelection.length, newText.length - textAfterSelection.length)
-                        CalculatorAction.InsertText.SelectionPolicy.PARENTHESES -> TextRange(newText.length - postCursorText.length - textAfterSelection.length)
-                    }
+                val newSelection = when (selectionPolicy) {
+                    CalculatorAction.InsertText.SelectionPolicy.REPLACE -> TextRange(
+                        textBeforeSelection.length + preCursorText.length
+                    )
 
-                    updateInput(TextFieldValue(
+                    CalculatorAction.InsertText.SelectionPolicy.SURROUND -> TextRange(
+                        textBeforeSelection.length,
+                        newText.length - textAfterSelection.length
+                    )
+
+                    CalculatorAction.InsertText.SelectionPolicy.PARENTHESES -> TextRange(newText.length - postCursorText.length - textAfterSelection.length)
+                }
+
+                updateInput(
+                    TextFieldValue(
                         text = newText,
                         selection = newSelection
-                    ))
+                    )
+                )
             } else {
-                updateInput(TextFieldValue(
-                    text = "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection",
-                    selection = TextRange(textBeforeSelection.length + preCursorText.length)
-                ))
+                updateInput(
+                    TextFieldValue(
+                        text = "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection",
+                        selection = TextRange(textBeforeSelection.length + preCursorText.length)
+                    )
+                )
             }
         }
     }
 
     fun replaceRange(range: TextRange, preCursorText: String, postCursorText: String = "") {
-        val newText = inputTextFieldValue.value.text.replaceRange(range.start, range.end, "$preCursorText$postCursorText")
+        val newText = _activeCalculationInput.value.input.text.replaceRange(
+            range.start,
+            range.end,
+            "$preCursorText$postCursorText"
+        )
         val newCursorPosition = range.start + preCursorText.length
 
-        updateInput(TextFieldValue(
-            text = newText,
-            selection = TextRange(newCursorPosition)
-        ))
+        updateInput(
+            TextFieldValue(
+                text = newText,
+                selection = TextRange(newCursorPosition)
+            )
+        )
     }
 
     fun insertText(preCursorText: String, postCursorText: String = "") {
-        val maxChars = inputTextFieldValue.value.text.length
-        val textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars)
-        val textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars)
+        val maxChars = _activeCalculationInput.value.input.text.length
+        val textBeforeSelection =
+            _activeCalculationInput.value.input.getTextBeforeSelection(maxChars)
+        val textAfterSelection =
+            _activeCalculationInput.value.input.getTextAfterSelection(maxChars)
         val newText = "$textBeforeSelection$preCursorText$postCursorText$textAfterSelection"
         val newCursorPosition = textBeforeSelection.length + preCursorText.length
 
-        updateInput(TextFieldValue(
-            text = newText,
-            selection = TextRange(newCursorPosition)
-        ))
+        updateInput(
+            TextFieldValue(
+                text = newText,
+                selection = TextRange(newCursorPosition)
+            )
+        )
     }
 
     fun removeChars(nChars: Int) {
-        val maxChars = inputTextFieldValue.value.text.length
-        var textBeforeSelection = inputTextFieldValue.value.getTextBeforeSelection(maxChars).text
-        var textAfterSelection = inputTextFieldValue.value.getTextAfterSelection(maxChars).text
+        val maxChars = _activeCalculationInput.value.input.text.length
+        var textBeforeSelection =
+            _activeCalculationInput.value.input.getTextBeforeSelection(maxChars).text
+        var textAfterSelection =
+            _activeCalculationInput.value.input.getTextAfterSelection(maxChars).text
 
-        if (inputTextFieldValue.value.selection.length == 0) {
+        if (_activeCalculationInput.value.input.selection.length == 0) {
             if (nChars > 0) {
                 textAfterSelection = textAfterSelection.drop(nChars.absoluteValue)
             } else if (nChars < 0) {
@@ -425,18 +455,19 @@ class CalculatorViewModel @Inject constructor(
         val newText = "$textBeforeSelection$textAfterSelection"
         val newCursorPosition = textBeforeSelection.length
 
-        updateInput(TextFieldValue(
-            text = newText,
-            selection = TextRange(newCursorPosition)
-        ))
+        updateInput(
+            TextFieldValue(
+                text = newText,
+                selection = TextRange(newCursorPosition)
+            )
+        )
     }
 
     fun acceptAutocomplete(autocompleteItem: AutocompleteItem) {
         replaceRange(
-            autocompleteResult.value.contextRange,
+            activeCalculationData.value.autocompleteResult.contextRange,
             autocompleteItem.typeBeforeCursor,
             autocompleteItem.typeAfterCursor
         )
-
     }
 }

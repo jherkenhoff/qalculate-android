@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.PreviewData
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.math.abs
@@ -152,10 +153,6 @@ fun CalculationList(
         }
     }
 
-    LaunchedEffect(calculations.size) {
-        calculationListState.animateScrollToActiveCalculation()
-    }
-
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         state = calculationListState.lazyListState,
@@ -200,6 +197,9 @@ fun CalculationList(
                                         userPreferences = userPreferences,
                                         onInputChange = onActiveCalculationInputChange,
                                         onDeleteClick = { onDeleteClick(calculation.id) },
+                                        onClick = { coroutineScope.launch {
+                                            calculationListState.animateScrollToActiveCalculation()
+                                        }},
                                         onUserpreferencesChanged = onUserpreferencesChanged,
                                         onDragStopped = onCalculationDragStopped,
                                         modifier = Modifier.padding(vertical = 2.dp)

@@ -11,17 +11,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.R
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,15 +65,12 @@ fun CalculatorScreen(
     openSettings: () -> Unit = { }
 ) {
     CalculatorScreenContent(
-        inputTextFieldValue = viewModel.inputTextFieldValue.collectAsStateWithLifecycle().value,
-        parsedString = viewModel.parsedString.collectAsStateWithLifecycle().value,
-        resultString = viewModel.resultString.collectAsStateWithLifecycle().value,
+        activeCalculationData = viewModel.activeCalculationData.collectAsStateWithLifecycle().value,
         calculationListData = viewModel.calculationListData.collectAsStateWithLifecycle().value,
         activeKeypadIndex = viewModel.activeKeypadIndex.collectAsStateWithLifecycle().value,
         userPreferences = viewModel.userPreferences.collectAsStateWithLifecycle().value,
         onUserPreferencesChanged = viewModel::updateUserPreferences,
         onKeyAction = viewModel::handleKeyAction,
-        autocompleteResult = viewModel.autocompleteResult.collectAsStateWithLifecycle().value,
         undoState = viewModel.undoState.collectAsStateWithLifecycle().value,
         onInputFieldValueChange = { viewModel.updateInput(it, true) },
         onDeleteCalculation = viewModel::deleteCalculation,
@@ -84,7 +78,7 @@ fun CalculatorScreen(
         onSettingsClick = openSettings,
         onAutocompleteClick = viewModel::acceptAutocomplete,
         onActiveKeypadIndexChanged = viewModel::setActiveKeypadIndex,
-        onActiveCalculationChanged = viewModel::setActiveCalculationId,
+        onActiveCalculationChanged = viewModel::changeActiveCalculation,
         onCalculationReorder = viewModel::reorderCalculation,
         onCalculationReorderFinished = viewModel::persistCalculationOrder
     )
@@ -106,14 +100,11 @@ fun Modifier.shrinkHeightAbsolute(shrinkPx: Int): Modifier = this.then(
 )
 @Composable
 fun CalculatorScreenContent(
-    inputTextFieldValue: TextFieldValue,
-    parsedString: String,
-    resultString: String,
+    activeCalculationData: ActiveCalculationData,
     activeKeypadIndex: Int,
     userPreferences: UserPreferences,
     onUserPreferencesChanged : (UserPreferences) -> Unit,
     calculationListData: CalculationListData,
-    autocompleteResult: AutocompleteResult,
     undoState: UndoState<TextFieldValue>,
     onKeyAction: (CalculatorAction) -> Unit = { },
     onInputFieldValueChange: (TextFieldValue) -> Unit = { },
@@ -135,14 +126,14 @@ fun CalculatorScreenContent(
     var keypadVisible by remember { mutableStateOf(true) }
 
     var autocompleteDismissed by remember { mutableStateOf(false) }
-    if (autocompleteResult.relevantText.isEmpty()) {
+    if (activeCalculationData.autocompleteResult.relevantText.isEmpty()) {
         autocompleteDismissed = false
     }
-    val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else autocompleteResult
+    val internalAutocompleteResult = if (autocompleteDismissed) AutocompleteResult() else activeCalculationData.autocompleteResult
 
     val calculationListState = rememberCalculationListState()
 
-    LaunchedEffect(activeKeypadIndex) {
+    LaunchedEffect(activeCalculationData.id) {
         calculationListState.animateScrollToActiveCalculation()
     }
     Scaffold(
@@ -215,9 +206,9 @@ fun CalculatorScreenContent(
                     CalculationList(
                         calculationListData = calculationListData,
                         calculationListState = calculationListState,
-                        activeCalculationInput = inputTextFieldValue,
-                        activeCalculationParsed = parsedString,
-                        activeCalculationResult = resultString,
+                        activeCalculationInput = activeCalculationData.input,
+                        activeCalculationParsed = activeCalculationData.parsed,
+                        activeCalculationResult = activeCalculationData.result,
                         padding = padding,
                         interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
                         userPreferences = userPreferences,
@@ -254,11 +245,9 @@ fun CalculatorScreenContent(
                             onKeyAction = onKeyAction,
                         )
                     }
-                    Spacer(Modifier.height(6.dp))
                     Spacer(
                         Modifier.height(
-                            innerPadding.calculateBottomPadding() +
-                                    WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()
+                            innerPadding.calculateBottomPadding() + WindowInsets.ime.getBottom(LocalDensity.current).toDp() + 6.dp
                         )
                     )
                 }
@@ -276,14 +265,17 @@ private fun DefaultPreview() {
 
     QalculateTheme() {
         CalculatorScreenContent(
-            TextFieldValue("c"),
-            "SpeedOfLight",
-            "299.792 458 km/ms",
+            activeCalculationData = ActiveCalculationData(
+                id = 0,
+                input = TextFieldValue("c"),
+                parsed = "SpeedOfLight",
+                result = "299.792 458 km/ms",
+                autocompleteResult = AutocompleteResult(),
+            ),
             calculationListData = CalculationListData(PreviewData.calculationList, 0),
             activeKeypadIndex = activeKeypadIndex,
             userPreferences = UserPreferences(),
             onUserPreferencesChanged = {},
-            autocompleteResult = AutocompleteResult(),
             undoState = UndoState<TextFieldValue>(),
             onActiveKeypadIndexChanged = { activeKeypadIndex = it }
         )
@@ -294,18 +286,23 @@ private fun DefaultPreview() {
 @Preview(showSystemUi = true, device = Devices.DEFAULT)
 @Composable
 private fun SingleCalculationPreview() {
+    var activeKeypadIndex by remember { mutableIntStateOf(0) }
 
     QalculateTheme() {
         CalculatorScreenContent(
-            TextFieldValue("c"),
-            "SpeedOfLight",
-            "299.792 458 km/ms",
-            0,
+            activeCalculationData = ActiveCalculationData(
+                id = 0,
+                input = TextFieldValue("c"),
+                parsed = "SpeedOfLight",
+                result = "299.792 458 km/ms",
+                autocompleteResult = AutocompleteResult(),
+            ),
+            activeKeypadIndex = activeKeypadIndex,
             calculationListData = CalculationListData(PreviewData.calculationList.slice(0..0), 0),
             userPreferences = UserPreferences(),
             onUserPreferencesChanged = {},
-            autocompleteResult = AutocompleteResult(),
             undoState = UndoState<TextFieldValue>(),
+            onActiveKeypadIndexChanged = { activeKeypadIndex = it }
         )
     }
 }

@@ -23,4 +23,15 @@ data class CalculationHistoryItemData(
     val created: LocalDateTime,
     @ColumnInfo(name = "modified", defaultValue = "0")
     val modified: LocalDateTime,
-)
+) {
+    companion object {
+        fun empty() = CalculationHistoryItemData(
+            sortIndex = 0,
+            input = "",
+            parsed = "",
+            result = "",
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now()
+        )
+    }
+}

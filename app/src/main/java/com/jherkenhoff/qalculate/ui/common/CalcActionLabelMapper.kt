@@ -10,41 +10,42 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorKeyButtonActionLabel
 import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.ui.calculator.CalculatorKeyButtonActionLabel.*
 
 class CalcActionLabelMapper (
     private val userPreferences: UserPreferences
 ) {
     operator fun invoke(action: CalculatorAction) : CalculatorKeyButtonActionLabel {
         return when (action) {
-            is CalculatorAction.ClearAll -> CalculatorKeyButtonActionLabel.Text("AC")
+            is CalculatorAction.ClearAll -> Text("AC")
             is CalculatorAction.DeleteChars -> {
-                if (action.nChars < 0) CalculatorKeyButtonActionLabel.Icon(
+                if (action.nChars < 0) Icon(
                     Icons.AutoMirrored.Filled.Backspace,
                     null
                 )
-                else CalculatorKeyButtonActionLabel.Text("DEL")
+                else Text("DEL")
             }
-            is CalculatorAction.InsertText -> CalculatorKeyButtonActionLabel.Text(action.label)
+            is CalculatorAction.InsertText -> Text(action.label)
             is CalculatorAction.MoveCursor -> {
                 if (action.nChars < 0)
-                    CalculatorKeyButtonActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null)
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null)
                 else
-                    CalculatorKeyButtonActionLabel.Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null)
             }
-            is CalculatorAction.SubmitCalculation -> CalculatorKeyButtonActionLabel.Icon(
+            is CalculatorAction.SubmitCalculation -> Icon(
                 Icons.AutoMirrored.Filled.KeyboardReturn,
                 null
             )
             is CalculatorAction.TraverseHistory -> {
                 if (action.nEntries < 0)
-                    CalculatorKeyButtonActionLabel.Icon(Icons.AutoMirrored.Filled.Undo, "Undo")
+                    Icon(Icons.AutoMirrored.Filled.Undo, "Undo")
                 else
-                    CalculatorKeyButtonActionLabel.Icon(Icons.AutoMirrored.Filled.Redo, "Redo")
+                    Icon(Icons.AutoMirrored.Filled.Redo, "Redo")
             }
-            is CalculatorAction.InsertDivisionSymbol -> CalculatorKeyButtonActionLabel.Text(userPreferences.getDivisionSignString())
-            is CalculatorAction.InsertMultiplicationSymbol -> CalculatorKeyButtonActionLabel.Text(userPreferences.getMultiplicationSignString())
-            is CalculatorAction.InsertDecimalSymbol -> CalculatorKeyButtonActionLabel.Text(userPreferences.getDecimalSeparatorString())
-            is CalculatorAction.StoreAsVariable -> CalculatorKeyButtonActionLabel.Text("→ ${action.name}")
+            is CalculatorAction.InsertDivisionSymbol -> Text(userPreferences.getDivisionSignString())
+            is CalculatorAction.InsertMultiplicationSymbol -> Text(userPreferences.getMultiplicationSignString())
+            is CalculatorAction.InsertDecimalSymbol -> Text(userPreferences.getDecimalSeparatorString())
+            is CalculatorAction.StoreAsVariable -> Text("→ ${action.name}")
         }
     }
 }
