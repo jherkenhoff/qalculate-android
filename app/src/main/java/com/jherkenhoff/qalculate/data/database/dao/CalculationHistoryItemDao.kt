@@ -15,6 +15,9 @@ interface CalculationHistoryItemDao {
     @Query("SELECT * FROM calculation_history")
     fun getAll(): Flow<List<CalculationHistoryItemData>>
 
+    @Query("SELECT * FROM calculation_history ORDER BY sort_index ASC")
+    fun getAllSorted(): Flow<List<CalculationHistoryItemData>>
+
     @Query("SELECT * FROM calculation_history WHERE id = :id")
     suspend fun getItem(id: Long): CalculationHistoryItemData
 
@@ -39,10 +42,10 @@ interface CalculationHistoryItemDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(entity: CalculationHistoryItemData)
 
-    @Query("""
-        UPDATE calculation_history
-        SET sort_index = :sortIndex
-        WHERE id = :id
-        """)
+    @Query("UPDATE calculation_history SET sort_index = :sortIndex WHERE id = :id")
     suspend fun updateSortIndex(id: Long, sortIndex: Int)
+
+    @Query("SELECT COUNT(*) FROM calculation_history")
+    suspend fun count(): Int
+
 }

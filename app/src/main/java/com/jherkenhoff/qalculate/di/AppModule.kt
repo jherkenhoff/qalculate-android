@@ -11,7 +11,7 @@ import com.jherkenhoff.qalculate.data.CalculatorRepository
 import com.jherkenhoff.qalculate.data.UserPreferencesRepository
 import com.jherkenhoff.qalculate.data.database.QalculateDatabase
 import com.jherkenhoff.qalculate.data.database.dao.CalculationHistoryItemDao
-import com.jherkenhoff.qalculate.data.repository.CalculationHistoryStore
+import com.jherkenhoff.qalculate.data.repository.CalculationListRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,8 +60,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideCalculationHistoryStore(dao: CalculationHistoryItemDao): CalculationHistoryStore {
-        return CalculationHistoryStore(dao)
+    fun provideCalculationListRepository(db: QalculateDatabase, dao: CalculationHistoryItemDao): CalculationListRepository {
+        return CalculationListRepository(db, dao)
     }
 
     @Provides
