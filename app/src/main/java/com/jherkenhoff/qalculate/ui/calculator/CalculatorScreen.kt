@@ -257,7 +257,8 @@ fun CalculatorScreenContent(
                     Spacer(Modifier.height(6.dp))
                     Spacer(
                         Modifier.height(
-                            innerPadding.calculateBottomPadding()
+                            innerPadding.calculateBottomPadding() +
+                                    WindowInsets.safeContent.getBottom(LocalDensity.current).toDp()
                         )
                     )
                 }
