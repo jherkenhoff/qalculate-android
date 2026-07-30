@@ -62,7 +62,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -101,6 +103,8 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
     onDragStopped: () -> Unit = {}
 ) {
     var menuOpen by remember { mutableStateOf(false) }
+
+    val clipboardManager = LocalClipboardManager.current
 
     with(sharedTransitionScope) {
 
@@ -179,7 +183,7 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
                     Spacer(Modifier.height(6.dp))
 
                     AutoSizeText(
-                        text = "= " + mathExpressionFormatter(result),
+                        text = mathExpressionFormatter(result),
                         alignment = Alignment.CenterEnd,
                         style = MaterialTheme.typography.displayMedium,
                         minTextSize = 14.sp,
@@ -193,6 +197,14 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
                             .sharedElement(
                                 rememberSharedContentState("result"),
                                 animatedVisibilityScope
+                            )
+                            .combinedClickable(
+                                onClick = {  },
+                                onLongClick = {
+                                    clipboardManager.setText(
+                                        AnnotatedString(mathExpressionPlainText(result))
+                                    )
+                                }
                             )
                     )
                 }
@@ -218,6 +230,8 @@ fun PassiveCalculationListItem(
     onDeleteClick: () -> Unit = {}
 ) {
     var menuOpen by remember { mutableStateOf(false) }
+
+    val clipboardManager = LocalClipboardManager.current
 
     with(sharedTransitionScope) {
         Surface(
@@ -264,16 +278,32 @@ fun PassiveCalculationListItem(
                             rememberSharedContentState("input"),
                             animatedVisibilityScope
                         )
+                        .combinedClickable(
+                            onClick = {  },
+                            onLongClick = {
+                                clipboardManager.setText(
+                                    AnnotatedString(input)
+                                )
+                            }
+                        )
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
-                    "= " + mathExpressionFormatter(result),
+                    mathExpressionFormatter(result),
                     textAlign = TextAlign.End,
                     modifier = Modifier
                         .padding(vertical = 8.dp)
                         .sharedElement(
                             rememberSharedContentState("result"),
                             animatedVisibilityScope
+                        )
+                        .combinedClickable(
+                            onClick = {  },
+                            onLongClick = {
+                                clipboardManager.setText(
+                                    AnnotatedString(mathExpressionPlainText(result))
+                                )
+                            }
                         )
                 )
                 Box(
