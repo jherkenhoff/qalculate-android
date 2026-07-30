@@ -22,6 +22,7 @@ class ParseUseCase @Inject constructor(
         parseOptions.preserve_format = true
 
         val printOptions = userPreferences.getPrintOptions()
+        printOptions.preserve_format = true
         printOptions.negative_exponents = true
         printOptions.abbreviate_names   = false
         printOptions.spacious           = true
