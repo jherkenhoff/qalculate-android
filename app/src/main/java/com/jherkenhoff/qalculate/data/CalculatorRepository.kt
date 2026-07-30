@@ -91,18 +91,15 @@ class CalculatorRepository @Inject constructor(
         val unlocalizedInput = calc.unlocalizeExpression(input, parseOptions)
 
         // TODO: Implement proper conversion handling
-        val toExpressions = unlocalizedInput.split(" to ")
-        if (toExpressions.size == 2) {
-            val beforeToExpression = calc.parse(toExpressions.first(), parseOptions)
-            val afterToExpression = calc.parse(toExpressions.last(), parseOptions)
+        val parts = unlocalizedInput.split(Regex("""(?=\s(?:to|where)\s)|(?<=\s(?:to|where)\s)"""))
 
-            val beforeToString = calc.print(beforeToExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
-            val afterToString = calc.print(afterToExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
-
-            return "$beforeToString to $afterToString"
-        } else {
-            val parsedExpression = calc.parse(unlocalizedInput, parseOptions)
-            return calc.print(parsedExpression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
+        return parts.joinToString("") {
+            if (it in setOf(" to ", " where ")) {
+                it
+            } else {
+                val expression = calc.parse(it, parseOptions)
+                calc.print(expression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
+            }
         }
     }
 }
