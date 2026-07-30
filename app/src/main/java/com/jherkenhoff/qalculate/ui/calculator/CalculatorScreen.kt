@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -45,6 +46,9 @@ import androidx.compose.ui.tooling.preview.AndroidUiModes.UI_MODE_NIGHT_YES
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
@@ -64,6 +68,20 @@ fun CalculatorScreen(
     openDrawer: () -> Unit = { },
     openSettings: () -> Unit = { }
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                viewModel.persistActiveCalculation()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     CalculatorScreenContent(
         activeCalculationData = viewModel.activeCalculationData.collectAsStateWithLifecycle().value,
         calculationListData = viewModel.calculationListData.collectAsStateWithLifecycle().value,

@@ -8,12 +8,11 @@ hilt = "2.59.2"
 androidxUi = "1.8.3"
 androidxHiltNavigationCompose = "1.2.0"
 androidxNavigation = "2.8.1"
-androidxLifecycle = "2.8.6"
 androidxDataStore = "1.1.1"
 androidxRoom = "2.8.0"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.6"
+lifecycle = "2.11.0"
 activityCompose = "1.10.1"
 composeBom = "2026.05.01"
 ksp = "2.3.4"
@@ -25,7 +24,9 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidxHiltNavigationCompose" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -42,7 +43,6 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidxRoom" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "androidxRoom" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidxRoom" }
-androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
