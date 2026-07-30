@@ -177,7 +177,7 @@ fun CalculationList(
             item(key = if(calculation.id == activeCalculationId) "active" else calculation.id) {
                 ReorderableItem(
                     reorderableListState,
-                    key = calculation.id,
+                    key = if(calculation.id == activeCalculationId) "active" else calculation.id,
                     animateItemModifier = Modifier
                 ) { isDragging ->
                     Box(
