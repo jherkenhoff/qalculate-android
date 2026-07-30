@@ -31,12 +31,15 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.VerticalAlignBottom
+import androidx.compose.material3.ChipColors
+import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
@@ -93,9 +96,14 @@ fun AuxiliaryBar(
                         Spacer(Modifier.width(fadeWidth.toDp()-8.dp))
                     }
                     items(autocompleteResult.items) { it ->
-                        SuggestionChip(
+                        ElevatedSuggestionChip(
                             label = { Text(it.title) },
-                            onClick = { onAutocompleteClick(it) }
+                            onClick = { onAutocompleteClick(it) },
+                            colors = SuggestionChipDefaults.elevatedSuggestionChipColors()
+                                .copy(
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                )
                         )
                     }
                     item{
