@@ -19,81 +19,8 @@ class CalculateUseCase @Inject constructor(
     private val calculatorRepository: CalculatorRepository
 ) {
     operator fun invoke(input: String, userPreferences: UserPreferences, format: Boolean = true): String {
-
-        val parseOptions = ParseOptions()
-        parseOptions.preserve_format = userPreferences.preserveFormat
-        parseOptions.angle_unit = when (userPreferences.angleUnit) {
-            UserPreferences.AngleUnit.RADIANS -> AngleUnit.ANGLE_UNIT_RADIANS
-            UserPreferences.AngleUnit.DEGREES -> AngleUnit.ANGLE_UNIT_DEGREES
-            UserPreferences.AngleUnit.GRADIANS -> AngleUnit.ANGLE_UNIT_GRADIANS
-        }
-
-        var evaluationOptions = EvaluationOptions()
-        evaluationOptions.sync_units = true
-        evaluationOptions.approximation = when (userPreferences.approximationMode) {
-            UserPreferences.ApproximationMode.TRY_EXACT -> ApproximationMode.APPROXIMATION_TRY_EXACT
-            UserPreferences.ApproximationMode.EXACT -> ApproximationMode.APPROXIMATION_EXACT
-            UserPreferences.ApproximationMode.APPROXIMATE -> ApproximationMode.APPROXIMATION_APPROXIMATE
-        }
-        evaluationOptions.parse_options = parseOptions
-        evaluationOptions.allow_complex = true
-
-        var printOptions = PrintOptions()
-        printOptions.use_unicode_signs = 1
-        printOptions.spell_out_logical_operators = true
-
-        printOptions.exp_display = when (userPreferences.expDisplay) {
-            UserPreferences.ExpDisplay.POWER_OF_10 -> ExpDisplay.EXP_POWER_OF_10
-            UserPreferences.ExpDisplay.LOWERCASE_E -> ExpDisplay.EXP_LOWERCASE_E
-            UserPreferences.ExpDisplay.UPPERCASE_E -> ExpDisplay.EXP_UPPERCASE_E
-        }
-
-        printOptions.interval_display = when (userPreferences.intervalDisplay) {
-            UserPreferences.IntervalDisplay.CONCISE -> IntervalDisplay.INTERVAL_DISPLAY_CONCISE
-            UserPreferences.IntervalDisplay.INTERVAL -> IntervalDisplay.INTERVAL_DISPLAY_INTERVAL
-            UserPreferences.IntervalDisplay.PLUSMINUS -> IntervalDisplay.INTERVAL_DISPLAY_PLUSMINUS
-            UserPreferences.IntervalDisplay.MIDPOINT -> IntervalDisplay.INTERVAL_DISPLAY_MIDPOINT
-            UserPreferences.IntervalDisplay.RELATIVE -> IntervalDisplay.INTERVAL_DISPLAY_RELATIVE
-            UserPreferences.IntervalDisplay.SIGNIFICANT_DIGITS -> IntervalDisplay.INTERVAL_DISPLAY_SIGNIFICANT_DIGITS
-        }
-        //printOptions.indicate_infinite_series = true // TODO: Why is this a char? Check with upstream libqalculate
-
-        printOptions.negative_exponents = userPreferences.negativeExponents
-        printOptions.abbreviate_names   = userPreferences.abbreviateNames
-        printOptions.spacious           = userPreferences.spaciousOutput
-        printOptions.decimalpoint_sign  = when (userPreferences.decimalSeparator) {
-            UserPreferences.DecimalSeparator.DOT -> "."
-            UserPreferences.DecimalSeparator.COMMA -> ","
-        }
-        printOptions.digit_grouping = DigitGrouping.DIGIT_GROUPING_NONE
-        printOptions.min_exp = when (userPreferences.numericalDisplayMode) {
-            UserPreferences.NumericalDisplayMode.NORMAL -> -1
-            UserPreferences.NumericalDisplayMode.SCIENTIFIC -> 3
-            UserPreferences.NumericalDisplayMode.ENGINEERING -> -3
-        }
-        printOptions.multiplication_sign = when (userPreferences.multiplicationSign) {
-            UserPreferences.MultiplicationSign.DOT -> MultiplicationSign.MULTIPLICATION_SIGN_DOT
-            UserPreferences.MultiplicationSign.X -> MultiplicationSign.MULTIPLICATION_SIGN_X
-            UserPreferences.MultiplicationSign.ASTERISK -> MultiplicationSign.MULTIPLICATION_SIGN_ASTERISK
-            UserPreferences.MultiplicationSign.ALTDOT -> MultiplicationSign.MULTIPLICATION_SIGN_ALTDOT
-        }
-        printOptions.division_sign = when (userPreferences.divisionSign) {
-            UserPreferences.DivisionSign.DIVISION_SLASH -> DivisionSign.DIVISION_SIGN_DIVISION_SLASH
-            UserPreferences.DivisionSign.DIVISION -> DivisionSign.DIVISION_SIGN_DIVISION
-            UserPreferences.DivisionSign.SLASH -> DivisionSign.DIVISION_SIGN_SLASH
-        }
-        printOptions.place_units_separately = userPreferences.placeUnitsSeparately
-        printOptions.use_denominator_prefix = userPreferences.useDenominatorPrefix
-
-        printOptions.number_fraction_format = when (userPreferences.numberFractionFormat) {
-            UserPreferences.NumberFractionFormat.FRACTION_DECIMAL -> NumberFractionFormat.FRACTION_DECIMAL
-            UserPreferences.NumberFractionFormat.FRACTION_DECIMAL_EXACT -> NumberFractionFormat.FRACTION_DECIMAL_EXACT
-            UserPreferences.NumberFractionFormat.FRACTION_FRACTIONAL -> NumberFractionFormat.FRACTION_FRACTIONAL
-            UserPreferences.NumberFractionFormat.FRACTION_COMBINED -> NumberFractionFormat.FRACTION_COMBINED
-            UserPreferences.NumberFractionFormat.FRACTION_PERCENT -> NumberFractionFormat.FRACTION_PERCENT
-            UserPreferences.NumberFractionFormat.FRACTION_PERMILLE -> NumberFractionFormat.FRACTION_PERMILLE
-            UserPreferences.NumberFractionFormat.FRACTION_PERMYRIAD -> NumberFractionFormat.FRACTION_PERMYRIAD
-        }
+        val evaluationOptions = userPreferences.getEvaluationOptions()
+        val printOptions = userPreferences.getPrintOptions()
 
         return calculatorRepository.calculateAndPrint(
             input,

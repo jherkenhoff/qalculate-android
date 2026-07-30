@@ -31,6 +31,7 @@ class UserPreferencesRepository @Inject constructor(
         val PRESERVE_FORMAT_KEY = booleanPreferencesKey("preserve_format")
         val EXP_DISPLAY_KEY = stringPreferencesKey("exp_display")
         val INTERVAL_DISPLAY_KEY = stringPreferencesKey("interval_display")
+        val DIGIT_GROUPING_KEY = booleanPreferencesKey("digit_grouping")
     }
 
     inline fun <reified T : Enum<T>> String?.toEnum() : T? {
@@ -56,6 +57,7 @@ class UserPreferencesRepository @Inject constructor(
             preserveFormat = preferences[PRESERVE_FORMAT_KEY] ?: UserPreferences.Default.preserveFormat,
             expDisplay = preferences[EXP_DISPLAY_KEY].toEnum<UserPreferences.ExpDisplay>() ?: UserPreferences.Default.expDisplay,
             intervalDisplay = preferences[INTERVAL_DISPLAY_KEY].toEnum<UserPreferences.IntervalDisplay>() ?: UserPreferences.Default.intervalDisplay,
+            digitGrouping = preferences[DIGIT_GROUPING_KEY] ?: UserPreferences.Default.digitGrouping,
         )
     }
 
@@ -77,6 +79,7 @@ class UserPreferencesRepository @Inject constructor(
             it[PRESERVE_FORMAT_KEY] = userPreferences.preserveFormat
             it[EXP_DISPLAY_KEY] = userPreferences.expDisplay.name
             it[INTERVAL_DISPLAY_KEY] = userPreferences.intervalDisplay.name
+            it[DIGIT_GROUPING_KEY] = userPreferences.digitGrouping
         }
     }
 }

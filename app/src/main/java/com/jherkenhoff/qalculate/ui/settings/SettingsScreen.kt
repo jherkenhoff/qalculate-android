@@ -162,6 +162,19 @@ fun SettingsScreenContent(
             }
             item {
                 SegmentedListItem(
+                    headlineContent = { Text("Digit grouping") },
+                    trailingContent = {
+                        Switch(
+                            checked = userPreferences.digitGrouping,
+                            onCheckedChange = { onUserPreferenceChange(userPreferences.copy(digitGrouping = it)) }
+                        )
+                    },
+                    colors = ListItemDefaults.colors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                    top = true
+                )
+            }
+            item {
+                SegmentedListItem(
                     headlineContent = { Text("Negative exponents") },
                     supportingContent = { Text("Print A${userPreferences.getMultiplicationSignString()}B⁻¹ instead of A${userPreferences.getDivisionSignString()}B") },
                     trailingContent = {
@@ -176,8 +189,7 @@ fun SettingsScreenContent(
                             }
                         )
                     },
-                    colors = ListItemDefaults.colors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
-                    top = true
+                    colors = ListItemDefaults.colors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
                 )
             }
 
