@@ -51,7 +51,7 @@ data class UserPreferences(
 
     fun getMultiplicationSignString(): String {
         return when (this.multiplicationSign) {
-            MultiplicationSign.DOT -> "·"
+            MultiplicationSign.DOT -> "∙"
             MultiplicationSign.X -> "×"
             MultiplicationSign.ASTERISK -> "*"
             MultiplicationSign.ALTDOT -> "."

@@ -90,7 +90,7 @@ object KeyLibrary {
     )
 
     val OPERATOR_MINUS = CalcKey.Default(
-        clickAction = CalculatorAction.InsertText.operator("-"),
+        clickAction = CalculatorAction.InsertText.operator("−"),
         role = KeyRole.OPERATOR
     )
 
