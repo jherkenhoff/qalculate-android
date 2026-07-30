@@ -11,6 +11,10 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +63,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.platform.LocalClipboard
@@ -86,6 +91,24 @@ import sh.calvin.reorderable.ReorderableCollectionItemScope
 private val largeCornerRadius = 16.dp
 private val smallCornerRadius = 4.dp
 
+fun Modifier.onLongPress(
+    onLongPress: () -> Unit
+): Modifier = pointerInput(onLongPress) {
+    awaitEachGesture {
+        val down = awaitFirstDown(requireUnconsumed = false)
+
+        val longPress = awaitLongPressOrCancellation(down.id)
+        if (longPress != null) {
+            onLongPress()
+            // Consume everything until the finger is released.
+            do {
+                val event = awaitPointerEvent()
+                event.changes.forEach { it.consume() }
+            } while (event.changes.any { it.pressed })
+
+        }
+    }
+}
 @Composable
 fun ReorderableCollectionItemScope.ActiveCalculationListItem(
     id: Long,
@@ -200,15 +223,11 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
                             .sharedElement(
                                 rememberSharedContentState("result"),
                                 animatedVisibilityScope
-                            )
-                            .combinedClickable(
-                                onClick = {  },
-                                onLongClick = {
-                                    clipboardManager.setText(
-                                        AnnotatedString(mathExpressionPlainText(result))
-                                    )
-                                }
-                            )
+                            ).onLongPress({
+                                clipboardManager.setText(
+                                    AnnotatedString(mathExpressionPlainText(result))
+                                )
+                            })
                     )
                 }
 
@@ -281,15 +300,11 @@ fun PassiveCalculationListItem(
                         .sharedElement(
                             rememberSharedContentState("input"),
                             animatedVisibilityScope
-                        )
-                        .combinedClickable(
-                            onClick = {  },
-                            onLongClick = {
-                                clipboardManager.setText(
-                                    AnnotatedString(input)
-                                )
-                            }
-                        )
+                        ).onLongPress({
+                            clipboardManager.setText(
+                                AnnotatedString(input)
+                            )
+                        })
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
@@ -300,15 +315,11 @@ fun PassiveCalculationListItem(
                         .sharedElement(
                             rememberSharedContentState("result"),
                             animatedVisibilityScope
-                        )
-                        .combinedClickable(
-                            onClick = {  },
-                            onLongClick = {
-                                clipboardManager.setText(
-                                    AnnotatedString(mathExpressionPlainText(result))
-                                )
-                            }
-                        )
+                        ).onLongPress({
+                            clipboardManager.setText(
+                                AnnotatedString(mathExpressionPlainText(result))
+                            )
+                        })
                 )
                 Box(
                 ) {
