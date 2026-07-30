@@ -236,7 +236,8 @@ fun DefaultKey(
                 KeyLabel(
                     label = clickActionLabel,
                     color = labelColor,
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center),
+                    style = MaterialTheme.typography.titleMedium
                 )
                 calcKey.longClickAction?.let {
                     KeyLabel(
