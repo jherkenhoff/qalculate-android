@@ -152,6 +152,8 @@ fun CalculatorScreenContent(
 
     val calculationListState = rememberCalculationListState()
 
+    val calcActionLabelMapper = remember(userPreferences) { CalcActionLabelMapper(userPreferences) }
+
     LaunchedEffect(activeCalculationData.id) {
         calculationListState.animateScrollToActiveCalculation()
     }
@@ -261,7 +263,7 @@ fun CalculatorScreenContent(
                     AnimatedVisibility(keypadVisible) {
                         Keypad(
                             keypads[activeKeypadIndex].sections,
-                            CalcActionLabelMapper(userPreferences),
+                            calcActionLabelMapper,
                             onKeyAction = onAction,
                             modifier = Modifier.padding(top = 6.dp)
                         )

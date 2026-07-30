@@ -22,8 +22,6 @@ fun Keypad(
     modifier: Modifier = Modifier,
     onKeyAction: (CalculatorAction) -> Unit = {},
 ) {
-
-
     Column(
         modifier.padding(horizontal = 3.dp),
         verticalArrangement = Arrangement.spacedBy(3.dp)
