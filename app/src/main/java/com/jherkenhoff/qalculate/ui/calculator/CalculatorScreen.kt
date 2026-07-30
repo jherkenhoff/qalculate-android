@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background

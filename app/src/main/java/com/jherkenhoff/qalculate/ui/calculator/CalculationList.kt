@@ -173,7 +173,7 @@ fun CalculationList(
             val isFirstItem = i == 0
             val isLastItem = i == calculations.lastIndex
 
-            item(key = calculation.id) {
+            item(key = if(calculation.id == activeCalculationId) "active" else calculation.id) {
                 ReorderableItem(
                     reorderableListState,
                     key = calculation.id,

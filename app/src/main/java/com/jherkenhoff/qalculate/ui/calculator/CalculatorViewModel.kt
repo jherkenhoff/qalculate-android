@@ -1,6 +1,7 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
 import android.util.Log
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -80,6 +81,7 @@ class CalculatorViewModel @Inject constructor(
         viewModelScope.launch {
             persistentCalculationList
                 .collect { list ->
+                    // Set the active calculation ID if not already set (hopefully only at startup)
                     val activeId = _activeCalculationInput.value.id
 
                     if (activeId == null || list.none { it.id == activeId }) {
@@ -199,6 +201,13 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
+    fun changeActiveCalculation(calculation: ActiveCalculationInput) {
+        persistActiveCalculation()
+        viewModelScope.launch {
+            _activeCalculationInput.update { calculation }
+        }
+    }
+
     fun changeActiveCalculation(id: Long) {
         persistActiveCalculation()
 
@@ -248,15 +257,13 @@ class CalculatorViewModel @Inject constructor(
                     )
                 )
 
-                changeActiveCalculation( newId )
-
-                _activeCalculationInput.update {
+                changeActiveCalculation(
                     ActiveCalculationInput(
                         id = newId,
-                        input = it.input.copy(selection = TextRange(0, it.input.text.length)),
+                        input = activeCalculationData.value.input.copy(selection = TextRange(0, activeCalculationData.value.input.text.length)),
                         doAutocomplete = true
                     )
-                }
+                )
             }
         } else {
             val nextIdx = persistentCalculationList.value.indexOfFirst { it.id == currentId } + 1
