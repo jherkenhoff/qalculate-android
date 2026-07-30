@@ -21,6 +21,22 @@ interface CalculationHistoryItemDao {
     @Query("SELECT * FROM calculation_history WHERE id = :id")
     suspend fun getItem(id: Long): CalculationHistoryItemData
 
+    @Query("""
+        SELECT * FROM calculation_history
+        WHERE sort_index < :index
+        ORDER BY sort_index DESC
+        LIMIT 1
+    """)
+    suspend fun getPrevious(index: Double): CalculationHistoryItemData?
+
+    @Query("""
+        SELECT * FROM calculation_history
+        WHERE sort_index > :index
+        ORDER BY sort_index ASC
+        LIMIT 1
+    """)
+    suspend fun getNext(index: Double): CalculationHistoryItemData?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: CalculationHistoryItemData): Long
 
@@ -43,7 +59,7 @@ interface CalculationHistoryItemDao {
     suspend fun update(entity: CalculationHistoryItemData)
 
     @Query("UPDATE calculation_history SET sort_index = :sortIndex WHERE id = :id")
-    suspend fun updateSortIndex(id: Long, sortIndex: Int)
+    suspend fun updateSortIndex(id: Long, sortIndex: Double)
 
     @Query("SELECT COUNT(*) FROM calculation_history")
     suspend fun count(): Int

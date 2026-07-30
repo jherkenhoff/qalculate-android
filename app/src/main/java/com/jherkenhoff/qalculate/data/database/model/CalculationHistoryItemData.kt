@@ -12,7 +12,7 @@ data class CalculationHistoryItemData(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     @ColumnInfo(name = "sort_index", defaultValue = "0")
-    val sortIndex: Int,
+    val sortIndex: Double,
     @ColumnInfo(name = "input")
     val input: String,
     @ColumnInfo(name = "parsed")
@@ -26,7 +26,7 @@ data class CalculationHistoryItemData(
 ) {
     companion object {
         fun empty() = CalculationHistoryItemData(
-            sortIndex = 0,
+            sortIndex = 0.0,
             input = "",
             parsed = "",
             result = "",

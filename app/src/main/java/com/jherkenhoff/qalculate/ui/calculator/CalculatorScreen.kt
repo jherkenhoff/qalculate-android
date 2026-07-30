@@ -1,6 +1,5 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
@@ -89,7 +88,7 @@ fun CalculatorScreen(
         activeKeypadIndex = viewModel.activeKeypadIndex.collectAsStateWithLifecycle().value,
         userPreferences = viewModel.userPreferences.collectAsStateWithLifecycle().value,
         onUserPreferencesChanged = viewModel::updateUserPreferences,
-        onKeyAction = viewModel::handleKeyAction,
+        onAction = viewModel::handleAction,
         undoState = viewModel.undoState.collectAsStateWithLifecycle().value,
         onInputFieldValueChange = { viewModel.updateInput(it, true) },
         onDeleteCalculation = viewModel::deleteCalculation,
@@ -125,7 +124,7 @@ fun CalculatorScreenContent(
     onUserPreferencesChanged : (UserPreferences) -> Unit,
     calculationListData: CalculationListData,
     undoState: UndoState<TextFieldValue>,
-    onKeyAction: (CalculatorAction) -> Unit = { },
+    onAction: (CalculatorAction) -> Unit = { },
     onInputFieldValueChange: (TextFieldValue) -> Unit = { },
     onDeleteCalculation: (Long) -> Unit = { },
     onAutocompleteClick: (AutocompleteItem) -> Unit = { },
@@ -204,7 +203,7 @@ fun CalculatorScreenContent(
                         ),
                         calcActionLabelMapper = CalcActionLabelMapper(userPreferences),
                         isCalculationSnapped = !calculationListState.isFreeScrolling,
-                        onAction = onKeyAction,
+                        onAction = onAction,
                         onAutocompleteClick = onAutocompleteClick,
                         onAutocompleteDismiss = { autocompleteDismissed = true },
                         onScrollToActiveCalculationClick = {
@@ -233,11 +232,11 @@ fun CalculatorScreenContent(
                         interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
                         userPreferences = userPreferences,
                         onUserpreferencesChanged = onUserPreferencesChanged,
-                        onDeleteClick = onDeleteCalculation,
                         onActiveCalculationChanged = onActiveCalculationChanged,
                         onActiveCalculationInputChange = onInputFieldValueChange,
                         onCalculationDragged = onCalculationReorder,
                         onCalculationDragStopped = onCalculationReorderFinished,
+                        onAction = onAction,
                         modifier = Modifier
                             .fillMaxHeight()
                             .padding(horizontal = 6.dp)
@@ -262,7 +261,7 @@ fun CalculatorScreenContent(
                         Keypad(
                             keypads[activeKeypadIndex].sections,
                             CalcActionLabelMapper(userPreferences),
-                            onKeyAction = onKeyAction,
+                            onKeyAction = onAction,
                         )
                     }
                     Spacer(

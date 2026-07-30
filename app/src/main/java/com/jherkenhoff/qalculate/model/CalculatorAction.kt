@@ -45,4 +45,8 @@ sealed interface CalculatorAction {
     data class MoveCursor(val nChars: Int): CalculatorAction
     data class TraverseHistory(val nEntries: Int): CalculatorAction
     data class StoreAsVariable(val name: String?): CalculatorAction
+    data class DeleteCalculation(val id: Long): CalculatorAction
+    data class AddCalculation(val referenceId: Long, val direction: Direction): CalculatorAction {
+        enum class Direction{ABOVE, BELOW}
+    }
 }

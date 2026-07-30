@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.PreviewData
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -90,11 +91,11 @@ fun CalculationList(
     modifier: Modifier = Modifier,
     padding: Dp = 0.dp,
     onActiveCalculationChanged: (Long) -> Unit = {},
-    onDeleteClick: (Long) -> Unit = {},
     onActiveCalculationInputChange: (TextFieldValue) -> Unit = {},
     onUserpreferencesChanged: (UserPreferences) -> Unit = {},
     onCalculationDragged: (Int, Int) -> Unit = { fromIdx, toIdx -> },
-    onCalculationDragStopped: () -> Unit = {}
+    onCalculationDragStopped: () -> Unit = {},
+    onAction: (CalculatorAction) -> Unit = {}
 ) {
     val calculations = calculationListData.items
     val activeCalculationId = calculationListData.activeCalculationId
@@ -187,6 +188,7 @@ fun CalculationList(
                             AnimatedContent(i == activeCalculationIdx) { isExpanded ->
                                 if (isExpanded) {
                                     ActiveCalculationListItem(
+                                        calculation.id,
                                         activeCalculationInput,
                                         activeCalculationParsed,
                                         activeCalculationResult,
@@ -196,16 +198,17 @@ fun CalculationList(
                                         this@AnimatedContent,
                                         userPreferences = userPreferences,
                                         onInputChange = onActiveCalculationInputChange,
-                                        onDeleteClick = { onDeleteClick(calculation.id) },
                                         onClick = { coroutineScope.launch {
                                             calculationListState.animateScrollToActiveCalculation()
                                         }},
                                         onUserpreferencesChanged = onUserpreferencesChanged,
                                         onDragStopped = onCalculationDragStopped,
+                                        onAction = onAction,
                                         modifier = Modifier.padding(vertical = 2.dp)
                                     )
                                 } else {
                                     PassiveCalculationListItem(
+                                        calculation.id,
                                         calculation.input,
                                         calculation.result,
                                         calculation.executionOrderNumber,
@@ -214,7 +217,7 @@ fun CalculationList(
                                         this@SharedTransitionLayout,
                                         this@AnimatedContent,
                                         onClick = { onActiveCalculationChanged(calculation.id) },
-                                        onDeleteClick = { onDeleteClick(calculation.id) },
+                                        onAction = onAction,
                                         modifier = Modifier.padding(vertical = 2.dp)
                                     )
                                 }

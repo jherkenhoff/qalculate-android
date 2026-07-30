@@ -1,7 +1,5 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.util.Log
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -248,7 +246,7 @@ class CalculatorViewModel @Inject constructor(
             viewModelScope.launch {
                 val newId = calculationListRepository.addItem(
                     CalculationHistoryItemData(
-                        sortIndex = 0,
+                        sortIndex = persistentCalculationList.value.last().sortIndex + 1.0,
                         input = activeCalculationData.value.input.text,
                         parsed = activeCalculationData.value.parsed,
                         result = activeCalculationData.value.result,
@@ -301,7 +299,7 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
-    fun handleKeyAction(action: CalculatorAction) {
+    fun handleAction(action: CalculatorAction) {
         when (action) {
             is CalculatorAction.InsertText -> insertText(action)
             is CalculatorAction.DeleteChars -> removeChars(action.nChars)
@@ -313,6 +311,42 @@ class CalculatorViewModel @Inject constructor(
             is CalculatorAction.InsertDecimalSymbol -> insertText(userPreferences.value.getDecimalSeparatorString())
             is CalculatorAction.InsertDivisionSymbol -> insertText(userPreferences.value.getDivisionSignString())
             is CalculatorAction.InsertMultiplicationSymbol -> insertText(userPreferences.value.getMultiplicationSignString())
+            is CalculatorAction.AddCalculation -> insertCalculation(action.referenceId, action.direction)
+            is CalculatorAction.DeleteCalculation -> deleteCalculation(action.id)
+        }
+    }
+
+    fun insertCalculation(referenceId: Long, direction: CalculatorAction.AddCalculation.Direction) {
+        viewModelScope.launch {
+            val newId = when (direction) {
+                CalculatorAction.AddCalculation.Direction.ABOVE ->
+                    calculationListRepository.insertAbove(
+                        referenceId,
+                        CalculationHistoryItemData(
+                            input = "",
+                            parsed = "",
+                            result = "",
+                            created = LocalDateTime.now(),
+                            modified = LocalDateTime.now(),
+                            sortIndex = 0.0,
+                        )
+                    )
+
+                CalculatorAction.AddCalculation.Direction.BELOW ->
+                    calculationListRepository.insertBelow(
+                        referenceId,
+                        CalculationHistoryItemData(
+                            input = "",
+                            parsed = "",
+                            result = "",
+                            created = LocalDateTime.now(),
+                            modified = LocalDateTime.now(),
+                            sortIndex = 0.0,
+                        )
+                    )
+            }
+
+            changeActiveCalculation(newId)
         }
     }
 

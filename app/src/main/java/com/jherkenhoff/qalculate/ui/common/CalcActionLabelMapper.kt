@@ -46,6 +46,8 @@ class CalcActionLabelMapper (
             is CalculatorAction.InsertMultiplicationSymbol -> Text(userPreferences.getMultiplicationSignString())
             is CalculatorAction.InsertDecimalSymbol -> Text(userPreferences.getDecimalSeparatorString())
             is CalculatorAction.StoreAsVariable -> Text("→ ${action.name}")
+            is CalculatorAction.AddCalculation -> if (action.direction == CalculatorAction.AddCalculation.Direction.ABOVE) Text("Add above") else Text("Add below")
+            is CalculatorAction.DeleteCalculation -> Text("Delete")
         }
     }
 }

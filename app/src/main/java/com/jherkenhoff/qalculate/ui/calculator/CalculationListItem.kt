@@ -75,6 +75,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jherkenhoff.qalculate.R
+import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
@@ -87,6 +88,7 @@ private val smallCornerRadius = 4.dp
 
 @Composable
 fun ReorderableCollectionItemScope.ActiveCalculationListItem(
+    id: Long,
     input: TextFieldValue,
     parsed: String,
     result: String,
@@ -97,10 +99,10 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
     userPreferences: UserPreferences,
     modifier: Modifier = Modifier,
     onInputChange: (TextFieldValue) -> Unit = {},
-    onDeleteClick: () -> Unit = {},
     onClick: () -> Unit = {},
     onUserpreferencesChanged: (UserPreferences) -> Unit = {},
-    onDragStopped: () -> Unit = {}
+    onDragStopped: () -> Unit = {},
+    onAction: (CalculatorAction) -> Unit = {}
 ) {
     var menuOpen by remember { mutableStateOf(false) }
 
@@ -169,8 +171,9 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
                             }
                             Menu(
                                 menuOpen,
+                                id,
                                 onDismissRequest = { menuOpen = false },
-                                onDeleteClick = onDeleteClick
+                                onAction = onAction
                             )
                         }
                     }
@@ -218,6 +221,7 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
 
 @Composable
 fun PassiveCalculationListItem(
+    id: Long,
     input: String,
     result: String,
     executionOrderNumber: Int?,
@@ -227,7 +231,7 @@ fun PassiveCalculationListItem(
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onDeleteClick: () -> Unit = {}
+    onAction: (CalculatorAction) -> Unit = {}
 ) {
     var menuOpen by remember { mutableStateOf(false) }
 
@@ -319,8 +323,9 @@ fun PassiveCalculationListItem(
                     }
                     Menu(
                         menuOpen,
+                        id,
                         onDismissRequest = { menuOpen = false },
-                        onDeleteClick = onDeleteClick
+                        onAction = onAction
                     )
                 }
             }
@@ -391,96 +396,31 @@ private fun InputField(
 }
 
 @Composable
-private fun ResultSection(
-    resultText: String,
-    modifier: Modifier = Modifier,
-    onDeleteClick: () -> Unit = {}
-) {
-    var menuOpen by remember { mutableStateOf(false) }
-
-    val clipboard = LocalClipboard.current
-    val scope = rememberCoroutineScope()
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-    ) {
-        Row(
-            Modifier
-                .weight(1f, fill = false)
-                .combinedClickable(
-                    interactionSource = null,
-                    indication = null,
-                    onClick = {},
-                    onLongClick = {
-                        scope.launch {
-                            clipboard.setClipEntry(
-                                ClipEntry(
-                                    ClipData.newPlainText(null, mathExpressionPlainText(resultText))
-                                )
-                            )
-                        }
-                    }
-                )
-        ) {
-            Text(
-                "= ",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.alignByBaseline(),
-            )
-            Text(
-                mathExpressionFormatter(resultText),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.alignByBaseline()
-            )
-        }
-
-        Box(
-        ) {
-            IconButton(
-                onClick = { menuOpen = true }
-            ) {
-                Icon(
-                    Icons.Outlined.MoreVert,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Menu(
-                menuOpen,
-                onDismissRequest = { menuOpen = false },
-                onDeleteClick = onDeleteClick
-            )
-        }
-    }
-}
-
-@Composable
 private fun Menu(
     expanded: Boolean,
+    calculationId: Long,
     onDismissRequest: () -> Unit,
-    onDeleteClick: () -> Unit = {}
+    onAction: (CalculatorAction) -> Unit = {},
 ) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest
     ) {
         DropdownMenuItem(
-            text = { Text("Delete") },
-            leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null) },
-            onClick = { onDismissRequest(); onDeleteClick() }
-        )
-        DropdownMenuItem(
             text = { Text(stringResource(R.string.add_calculation_above)) },
             leadingIcon = { Icon(Icons.Default.KeyboardArrowUp, contentDescription = null) },
-            onClick = { onDismissRequest(); onDeleteClick() }
+            onClick = { onDismissRequest(); onAction(CalculatorAction.AddCalculation(calculationId, CalculatorAction.AddCalculation.Direction.ABOVE)) }
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.add_calculation_below)) },
             leadingIcon = { Icon(Icons.Default.KeyboardArrowDown, contentDescription = null) },
-            onClick = { onDismissRequest(); onDeleteClick() }
+            onClick = { onDismissRequest(); onAction(CalculatorAction.AddCalculation(calculationId, CalculatorAction.AddCalculation.Direction.BELOW)) }
+        )
+        HorizontalDivider()
+        DropdownMenuItem(
+            text = { Text("Delete") },
+            leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null) },
+            onClick = { onDismissRequest(); onAction(CalculatorAction.DeleteCalculation(calculationId)) }
         )
     }
 }
@@ -511,6 +451,7 @@ private fun PassivePreview() {
     SharedTransitionLayout() {
         AnimatedVisibility(true) {
             PassiveCalculationListItem(
+                0,
                 "1+1",
                 "0",
                 1,
