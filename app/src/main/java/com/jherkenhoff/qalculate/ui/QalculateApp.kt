@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -21,7 +22,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun QalculateApp() {
 
-    val viewModel: CalculatorViewModel = viewModel()
+    val calculatorViewModel: CalculatorViewModel = hiltViewModel()
 
     QalculateTheme(dynamicColor = true) {
         val navController = rememberNavController()
@@ -53,12 +54,13 @@ fun QalculateApp() {
                     onUnitsClick = { navController.navigate(NavDestinations.Units); coroutineScope.launch { drawerState.close() } },
                     onAboutClick = { navController.navigate(NavDestinations.About); coroutineScope.launch { drawerState.close() } },
                     onSettingsClick = { navController.navigate(NavDestinations.Settings); coroutineScope.launch { drawerState.close() } },
-                    onClearCalculationHistoryClicked = { viewModel.clearCalculationHistory(); coroutineScope.launch { drawerState.close() }  }
+                    onClearCalculationHistoryClicked = { calculatorViewModel.clearCalculationHistory(); coroutineScope.launch { drawerState.close() }  }
                 )
             },
             gesturesEnabled = drawerState.isOpen
         ) {
             QalculateNavGraph(
+                calculatorViewModel = calculatorViewModel,
                 navController = navController,
                 openDrawer = { coroutineScope.launch { drawerState.open() } },
                 onNavigateUp = { navController.popBackStack() }

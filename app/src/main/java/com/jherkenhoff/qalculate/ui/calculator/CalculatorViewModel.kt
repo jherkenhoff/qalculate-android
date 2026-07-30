@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import android.util.Log
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
@@ -59,6 +60,12 @@ class CalculatorViewModel @Inject constructor(
     private val calculationListRepository: CalculationListRepository,
     private val calculatorRepository: CalculatorRepository
 ) : ViewModel() {
+
+    init {
+        viewModelScope.launch {
+            calculationListRepository.ensureNotEmpty()
+        }
+    }
     private val _calculationDragOrder = MutableStateFlow<List<Long>?>(null)
 
     private val _activeCalculationInput = MutableStateFlow(ActiveCalculationInput(null, TextFieldValue(), false))

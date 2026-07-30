@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.ui
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,6 +28,7 @@ sealed class NavDestinations{
 
 @Composable
 fun QalculateNavGraph(
+    calculatorViewModel: CalculatorViewModel,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     openDrawer: () -> Unit = {},
@@ -40,7 +42,7 @@ fun QalculateNavGraph(
     ) {
         composable<NavDestinations.Calculator> {
             CalculatorScreen(
-                viewModel = hiltViewModel<CalculatorViewModel>(),
+                viewModel = calculatorViewModel,
                 openDrawer = openDrawer,
                 openSettings = { navController.navigate(NavDestinations.Settings) },
             )

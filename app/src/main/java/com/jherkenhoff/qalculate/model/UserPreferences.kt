@@ -73,8 +73,8 @@ data class UserPreferences(
             AngleUnit.DEGREES -> com.jherkenhoff.libqalculate.AngleUnit.ANGLE_UNIT_DEGREES
             AngleUnit.GRADIANS -> com.jherkenhoff.libqalculate.AngleUnit.ANGLE_UNIT_GRADIANS
         }
-        //parseOptions.comma_as_separator = true
-        //parseOptions.dot_as_separator = true
+        parseOptions.comma_as_separator = decimalSeparator == DecimalSeparator.DOT
+        parseOptions.dot_as_separator = decimalSeparator == DecimalSeparator.COMMA
         return parseOptions
     }
 

@@ -149,7 +149,8 @@ fun CalculatorScreenContent(
                 },
                 actions = {
                     CalculatorChips(
-                        userPreferences
+                        userPreferences,
+                        onUserPreferencesChanged = onUserPreferencesChanged
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

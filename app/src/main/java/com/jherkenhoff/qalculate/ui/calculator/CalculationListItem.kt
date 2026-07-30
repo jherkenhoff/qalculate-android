@@ -365,8 +365,7 @@ private fun InputField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp)
-                    .focusRequester(focusRequester)
-                    .onFocusChanged( { Log.i("Moin", it.isFocused.toString()) } ),
+                    .focusRequester(focusRequester),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.None,
                     autoCorrectEnabled = false,
