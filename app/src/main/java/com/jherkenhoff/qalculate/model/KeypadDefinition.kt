@@ -4,9 +4,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 data class KeyPositionSpec(
     val row: Int,
-    val col: Int,
+    val column: Int,
     val rowSpan: Int = 1,
-    val colSpan: Int = 1,
+    val columnSpan: Int = 1,
 )
 
 data class KeypadSection(
