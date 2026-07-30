@@ -252,13 +252,13 @@ object KeyLibrary {
 
     val SI_PREFIX = CalcKey.Selector(
         listOf(
-            CalculatorAction.InsertText.operator("G"),
-            CalculatorAction.InsertText.operator("M"),
-            CalculatorAction.InsertText.operator("k"),
-            CalculatorAction.InsertText.operator("m"),
-            CalculatorAction.InsertText.operator("µ"),
-            CalculatorAction.InsertText.operator("n"),
-            CalculatorAction.InsertText.operator("p"),
+            CalculatorAction.InsertText.operator("Giga", "G"),
+            CalculatorAction.InsertText.operator("Mega", "M"),
+            CalculatorAction.InsertText.operator("Kilo", "k"),
+            CalculatorAction.InsertText.operator("Milli", "m"),
+            CalculatorAction.InsertText.operator("Micro", "µ"),
+            CalculatorAction.InsertText.operator("Nano", "n"),
+            CalculatorAction.InsertText.operator("Pico", "p"),
         ),
         2,
         role= KeyRole.OPERATOR
@@ -276,18 +276,18 @@ object KeyLibrary {
 
     val SI_UNITS = CalcKey.Selector(
         listOf(
-            CalculatorAction.InsertText.operator("A"),
-            CalculatorAction.InsertText.operator("g"),
-            CalculatorAction.InsertText.operator("J"),
-            CalculatorAction.InsertText.operator("K"),
-            CalculatorAction.InsertText.operator("L"),
-            CalculatorAction.InsertText.operator("m"),
-            CalculatorAction.InsertText.operator("N"),
-            CalculatorAction.InsertText.operator("Ω"),
-            CalculatorAction.InsertText.operator("Pa"),
-            CalculatorAction.InsertText.operator("s"),
-            CalculatorAction.InsertText.operator("V"),
-            CalculatorAction.InsertText.operator("W"),
+            CalculatorAction.InsertText.operator("Ampere", "A"),
+            CalculatorAction.InsertText.operator("Gram", "g"),
+            CalculatorAction.InsertText.operator("Joule", "J"),
+            CalculatorAction.InsertText.operator("Kelvin", "K"),
+            CalculatorAction.InsertText.operator("Liter", "l"),
+            CalculatorAction.InsertText.operator("Meter", "m"),
+            CalculatorAction.InsertText.operator("Newton", "N"),
+            CalculatorAction.InsertText.operator("Ohm", "Ω"),
+            CalculatorAction.InsertText.operator("Pascal", "Pa"),
+            CalculatorAction.InsertText.operator("Seconds", "s"),
+            CalculatorAction.InsertText.operator("Volt", "V"),
+            CalculatorAction.InsertText.operator("Watt", "W"),
         ),
         5,
         role= KeyRole.OPERATOR

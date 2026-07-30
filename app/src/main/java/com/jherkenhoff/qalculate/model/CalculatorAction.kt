@@ -30,6 +30,9 @@ sealed interface CalculatorAction {
             fun operator(label: AnnotatedString, operator: String): InsertText {
                 return InsertText(label, preCursorText = operator, selectionPolicy = SelectionPolicy.PARENTHESES)
             }
+            fun operator(label: String, operator: String): InsertText {
+                return operator(AnnotatedString(label), operator)
+            }
             fun operator(operator: String): InsertText {
                 return InsertText(operator, preCursorText = operator, selectionPolicy = SelectionPolicy.PARENTHESES)
             }
