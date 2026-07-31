@@ -1,6 +1,7 @@
 package com.jherkenhoff.qalculate.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +13,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
 
     @Inject
     lateinit var autocompleteRepository: AutocompleteRepository

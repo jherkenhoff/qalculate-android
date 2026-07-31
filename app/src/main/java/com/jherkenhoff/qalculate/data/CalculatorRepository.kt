@@ -1,5 +1,7 @@
 package com.jherkenhoff.qalculate.data
 
+import android.content.Context.MODE_PRIVATE
+import android.util.Log
 import com.jherkenhoff.libqalculate.AutomaticApproximation
 import com.jherkenhoff.libqalculate.AutomaticFractionFormat
 import com.jherkenhoff.libqalculate.Calculator
@@ -10,6 +12,7 @@ import com.jherkenhoff.libqalculate.ParseOptions
 import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.Unit
 import com.jherkenhoff.libqalculate.Variable
+import com.jherkenhoff.libqalculate.libqalculate
 import com.jherkenhoff.libqalculate.libqalculateConstants
 import com.jherkenhoff.qalculate.model.UserPreferences
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +21,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
 import javax.inject.Inject
 
 class CalculatorRepository @Inject constructor(
@@ -38,6 +45,7 @@ class CalculatorRepository @Inject constructor(
     val ans = KnownVariable(calc.temporaryCategory(), "ans", "undefined")
 
     init {
+        Log.i("MoinMoin", "Load global definitions")
         calc.loadGlobalDefinitions()
 
         calc.addVariable(ans)
@@ -48,6 +56,38 @@ class CalculatorRepository @Inject constructor(
                 UserPreferences.DecimalSeparator.COMMA -> calc.useDecimalComma()
             }
         }.launchIn(appScope)
+
+        appScope.launch {
+            // Load exchange rates
+            // TODO: Error handling, i.e. show something meaningful in the UI
+            // TODO: Is this the right spot to do it?
+
+            for (i in 1..3) {
+                val outputFile = File(calc.getExchangeRatesFileName(i))
+                outputFile.parentFile?.mkdirs()
+
+                val url = URL(calc.getExchangeRatesUrl(i))
+                val connection = url.openConnection() as HttpURLConnection
+
+                connection.connectTimeout = 1_000 // 1 second
+                connection.readTimeout = 1_000    // 1 second
+
+                try {
+                    connection.inputStream.use { input ->
+                        outputFile.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    Log.d("Qalculate", "Downloaded exchange rate data to ${outputFile.absolutePath}")
+                } catch (e: Exception) {
+                    Log.e("Qalculate", "Failed to download exchange rates from ${url.toString()}", e)
+                }
+
+                Log.i("MoinMoin", outputFile.parentFile!!.list().contentToString())
+            }
+
+            calc.loadExchangeRates()
+        }
 
         _variables.value = calc.variables
         _units.value = calc.units
