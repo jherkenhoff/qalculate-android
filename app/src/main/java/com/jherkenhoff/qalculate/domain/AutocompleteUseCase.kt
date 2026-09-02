@@ -3,10 +3,9 @@ package com.jherkenhoff.qalculate.domain
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getTextBeforeSelection
-import com.jherkenhoff.qalculate.data.AutocompleteRepository
+import com.jherkenhoff.qalculate.data.repository.AutocompleteRepository
 import com.jherkenhoff.qalculate.model.AutocompleteItem
 import com.jherkenhoff.qalculate.model.Trie
-import com.jherkenhoff.qalculate.model.UserPreferences
 import javax.inject.Inject
 
 data class AutocompleteResult (
@@ -15,9 +14,11 @@ data class AutocompleteResult (
     val items: List<AutocompleteItem> = emptyList()
 )
 
-class AutocompleteUseCase @Inject constructor() {
+class AutocompleteUseCase @Inject constructor(
+    private val autocompleteRepository: AutocompleteRepository,
+) {
 
-    operator fun invoke(trie: Trie<AutocompleteItem>, inputTextFieldValue: TextFieldValue): AutocompleteResult {
+    operator fun invoke(inputTextFieldValue: TextFieldValue): AutocompleteResult {
 
         val textBefore = inputTextFieldValue.getTextBeforeSelection(inputTextFieldValue.text.length).toString()
 
@@ -31,9 +32,7 @@ class AutocompleteUseCase @Inject constructor() {
 
         val relevantText = match.value
 
-        val autocompleteItems = trie.search(relevantText).map {
-            it.value
-        }
+        val autocompleteItems = autocompleteRepository.getAutocompleteSuggestions(relevantText)
 
         return AutocompleteResult(
             relevantText,

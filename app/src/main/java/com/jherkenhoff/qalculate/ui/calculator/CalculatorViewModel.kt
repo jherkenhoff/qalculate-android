@@ -7,7 +7,7 @@ import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jherkenhoff.qalculate.data.AutocompleteRepository
+import com.jherkenhoff.qalculate.data.repository.AutocompleteRepository
 import com.jherkenhoff.qalculate.data.CalculatorRepository
 import com.jherkenhoff.qalculate.data.UserPreferencesRepository
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
@@ -56,7 +56,6 @@ class CalculatorViewModel @Inject constructor(
     private val calculateUseCase: CalculateUseCase,
     private val autocompleteUseCase: AutocompleteUseCase,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val autocompleteRepository: AutocompleteRepository,
     private val calculationListRepository: CalculationListRepository,
     private val calculatorRepository: CalculatorRepository
 ) : ViewModel() {
@@ -114,9 +113,9 @@ class CalculatorViewModel @Inject constructor(
         UserPreferences()
     )
 
-    val activeCalculationData = combine(_activeCalculationInput, userPreferences, autocompleteRepository.trie) { activeCalculationInput, userPreferences, autocompleteTrie ->
+    val activeCalculationData = combine(_activeCalculationInput, userPreferences) { activeCalculationInput, userPreferences ->
         val autocompleteResult = if (activeCalculationInput.doAutocomplete)
-            autocompleteUseCase(autocompleteTrie, activeCalculationInput.input)
+            autocompleteUseCase(activeCalculationInput.input)
         else
             AutocompleteResult()
 
