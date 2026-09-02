@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -19,6 +20,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -29,8 +32,10 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -75,6 +81,8 @@ import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
 import kotlinx.coroutines.awaitCancellation
 import sh.calvin.reorderable.ReorderableCollectionItemScope
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 private val largeCornerRadius = 16.dp
 private val smallCornerRadius = 4.dp
@@ -108,6 +116,7 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     userPreferences: UserPreferences,
+    unknownVariables: List<String>,
     modifier: Modifier = Modifier,
     onInputChange: (TextFieldValue) -> Unit = {},
     onClick: () -> Unit = {},
@@ -161,6 +170,18 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
                 VerticalDivider(Modifier.fillMaxHeight().padding(vertical = 8.dp))
 
                 Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+                    AnimatedVisibility(unknownVariables.isNotEmpty()) {
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Unknowns:", style = MaterialTheme.typography.labelSmall)
+                            unknownVariables.forEach {
+                                Chip(it, highlight = true)
+                            }
+                        }
+                    }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
@@ -466,6 +487,43 @@ private fun PassivePreview() {
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this@AnimatedVisibility
                     )
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ActivePreview() {
+
+    val lazyListState = rememberLazyListState()
+    val reorderableListState = rememberReorderableLazyListState(lazyListState) { from, to -> }
+
+
+    LazyColumn(
+        state = lazyListState,
+    ) {
+        item {
+            ReorderableItem(
+                reorderableListState,
+                key = 1,
+            ) { isDragging ->
+                SharedTransitionLayout() {
+                    AnimatedVisibility(true) {
+                        ActiveCalculationListItem(
+                            1,
+                            TextFieldValue("1+1"),
+                            "1+1",
+                            "2",
+                            1,
+                            false,
+                            unknownVariables = listOf("x"),
+                            userPreferences = UserPreferences.Default,
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedVisibilityScope = this@AnimatedVisibility
+                        )
+                    }
                 }
             }
         }

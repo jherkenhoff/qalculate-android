@@ -228,9 +228,7 @@ fun CalculatorScreenContent(
                     CalculationList(
                         calculationListData = calculationListData,
                         calculationListState = calculationListState,
-                        activeCalculationInput = activeCalculationData.input,
-                        activeCalculationParsed = activeCalculationData.parsed,
-                        activeCalculationResult = activeCalculationData.result,
+                        activeCalculationData = activeCalculationData,
                         padding = padding,
                         interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
                         userPreferences = userPreferences,
@@ -294,6 +292,7 @@ private fun DefaultPreview() {
                 parsed = "SpeedOfLight",
                 result = "299.792 458 km/ms",
                 autocompleteResult = AutocompleteResult(),
+                unknownVariables = emptyList()
             ),
             calculationListData = CalculationListData(PreviewData.calculationList, 0),
             activeKeypadIndex = activeKeypadIndex,
@@ -314,11 +313,12 @@ private fun SingleCalculationPreview() {
     QalculateTheme() {
         CalculatorScreenContent(
             activeCalculationData = ActiveCalculationData(
-                id = 0,
-                input = TextFieldValue("c"),
-                parsed = "SpeedOfLight",
-                result = "299.792 458 km/ms",
+                null,
+                TextFieldValue("7×x+9 = 2"),
+                "7×x+9 = 2",
+                "x=-1",
                 autocompleteResult = AutocompleteResult(),
+                unknownVariables = listOf("x"),
             ),
             activeKeypadIndex = activeKeypadIndex,
             calculationListData = CalculationListData(PreviewData.calculationList.slice(0..0), 0),
