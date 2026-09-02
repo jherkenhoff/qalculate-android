@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.PreviewData
@@ -83,9 +84,7 @@ fun rememberCalculationListState(): CalculationListState {
 fun CalculationList(
     calculationListData: CalculationListData,
     calculationListState: CalculationListState,
-    activeCalculationInput: TextFieldValue,
-    activeCalculationParsed: String,
-    activeCalculationResult: String,
+    activeCalculationData: ActiveCalculationData,
     interceptKeyboard: Boolean,
     userPreferences: UserPreferences,
     modifier: Modifier = Modifier,
@@ -189,14 +188,15 @@ fun CalculationList(
                                 if (isExpanded) {
                                     ActiveCalculationListItem(
                                         calculation.id,
-                                        activeCalculationInput,
-                                        activeCalculationParsed,
-                                        activeCalculationResult,
+                                        activeCalculationData.input,
+                                        activeCalculationData.parsed,
+                                        activeCalculationData.result,
                                         calculation.executionOrderNumber,
                                         interceptKeyboard,
-                                        this@SharedTransitionLayout,
-                                        this@AnimatedContent,
+                                        sharedTransitionScope = this@SharedTransitionLayout,
+                                        animatedVisibilityScope = this@AnimatedContent,
                                         userPreferences = userPreferences,
+                                        unknownVariables = activeCalculationData.unknownVariables,
                                         onInputChange = onActiveCalculationInputChange,
                                         onClick = { coroutineScope.launch {
                                             calculationListState.animateScrollToActiveCalculation()
@@ -239,9 +239,14 @@ private fun DefaultPreview() {
     CalculationList(
         calculationListData = calculationListData,
         calculationListState = calculationListState,
-        activeCalculationInput = TextFieldValue("1+1"),
-        activeCalculationParsed = "1+1",
-        activeCalculationResult = "2",
+        activeCalculationData = ActiveCalculationData(
+            null,
+            TextFieldValue("7×x+9 = 2"),
+            "7×x+9 = 2",
+            "x=-1",
+            autocompleteResult = AutocompleteResult(),
+            unknownVariables = listOf("x"),
+        ),
         interceptKeyboard = false,
         userPreferences = UserPreferences(),
         onActiveCalculationChanged = { calculationListData = calculationListData.copy(activeCalculationId = it) }

@@ -8,6 +8,8 @@ import com.jherkenhoff.libqalculate.Calculator
 import com.jherkenhoff.libqalculate.EvaluationOptions
 import com.jherkenhoff.libqalculate.KnownVariable
 import com.jherkenhoff.libqalculate.MathFunction
+import com.jherkenhoff.libqalculate.MathStructure
+import com.jherkenhoff.libqalculate.MathStructureVector
 import com.jherkenhoff.libqalculate.ParseOptions
 import com.jherkenhoff.libqalculate.PrintOptions
 import com.jherkenhoff.libqalculate.Unit
@@ -27,6 +29,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 import javax.inject.Inject
 
+data class CalculatorResult(
+    val parsed: String,
+    val result: String
+)
+
 class CalculatorRepository @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val appScope: CoroutineScope
@@ -45,9 +52,7 @@ class CalculatorRepository @Inject constructor(
     val ans = KnownVariable(calc.temporaryCategory(), "ans", "undefined")
 
     init {
-        Log.i("MoinMoin", "Load global definitions")
         calc.loadGlobalDefinitions()
-
         calc.addVariable(ans)
 
         userPreferencesRepository.userPreferencesFlow.onEach {
@@ -82,8 +87,6 @@ class CalculatorRepository @Inject constructor(
                 } catch (e: Exception) {
                     Log.e("Qalculate", "Failed to download exchange rates from ${url.toString()}", e)
                 }
-
-                Log.i("MoinMoin", outputFile.parentFile!!.list().contentToString())
             }
 
             calc.loadExchangeRates()
@@ -140,6 +143,22 @@ class CalculatorRepository @Inject constructor(
                 val expression = calc.parse(it, parseOptions)
                 calc.print(expression, 2000, printOptions, true, 1, libqalculateConstants.TAG_TYPE_HTML)
             }
+        }
+    }
+
+    fun findAllUnknowns(
+        input: String
+    ) : List<String> {
+        val unlocalizedInput = calc.unlocalizeExpression(input)
+
+        val ms = calc.parse(input)
+
+        val unknowns = MathStructure()
+
+        ms.findAllUnknowns(unknowns)
+
+        return (1..unknowns.countChildren()).map { i ->
+            unknowns.getChild(i).print()
         }
     }
 }

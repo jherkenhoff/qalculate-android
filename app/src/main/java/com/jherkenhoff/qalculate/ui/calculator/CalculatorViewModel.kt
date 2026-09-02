@@ -46,7 +46,8 @@ data class ActiveCalculationData(
     val input: TextFieldValue,
     val parsed: String,
     val result: String,
-    val autocompleteResult: AutocompleteResult
+    val autocompleteResult: AutocompleteResult,
+    val unknownVariables: List<String>
 )
 
 @HiltViewModel
@@ -124,7 +125,8 @@ class CalculatorViewModel @Inject constructor(
             input = activeCalculationInput.input,
             parsed = parseUseCase(activeCalculationInput.input.text, userPreferences),
             result = calculateUseCase(activeCalculationInput.input.text, userPreferences),
-            autocompleteResult = autocompleteResult
+            autocompleteResult = autocompleteResult,
+            unknownVariables = calculatorRepository.findAllUnknowns(activeCalculationInput.input.text)
         )
     }.onEach {
         it.id?.let { id ->
@@ -141,7 +143,8 @@ class CalculatorViewModel @Inject constructor(
                 input = TextFieldValue(""),
                 parsed = "",
                 result = "",
-                autocompleteResult = AutocompleteResult()
+                autocompleteResult = AutocompleteResult(),
+                unknownVariables = emptyList()
             )
     )
 

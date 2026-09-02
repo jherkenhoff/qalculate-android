@@ -24,6 +24,7 @@ sealed class NavDestinations{
     @Serializable data object Units
     @Serializable data object About
     @Serializable data object Settings
+    @Serializable data class ExpressionItemDetail(val referenceName: String)
 }
 
 @Composable
@@ -67,6 +68,5 @@ fun QalculateNavGraph(
                 libqalculateVersion = "${libqalculateConstants.QALCULATE_MAJOR_VERSION}.${libqalculateConstants.QALCULATE_MINOR_VERSION}.${libqalculateConstants.QALCULATE_MICRO_VERSION}"
             )
         }
-
     }
 }

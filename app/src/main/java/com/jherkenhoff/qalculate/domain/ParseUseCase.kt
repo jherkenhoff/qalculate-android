@@ -29,6 +29,8 @@ class ParseUseCase @Inject constructor(
         printOptions.improve_division_multipliers = false
         printOptions.place_units_separately = false
 
+        Log.d("Moin", calculatorRepository.findAllUnknowns(input).toString())
+
         return calculatorRepository.parseAndPrint(input, parseOptions, printOptions)
     }
 }
