@@ -8,8 +8,9 @@ data class AutocompleteItem (
     val type: AutocompleteType,
     val name: String,
     val title: String,
+    val category: String,
     val abbreviations: List<String>,
     val description: String,
     val typeBeforeCursor: String,
-    val typeAfterCursor: String
+    val typeAfterCursor: String,
 )
