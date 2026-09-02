@@ -329,8 +329,8 @@ class CalculatorViewModel @Inject constructor(
             is CalculatorAction.TraverseHistory -> traverseHistory(action.nEntries)
             is CalculatorAction.StoreAsVariable -> null
             is CalculatorAction.InsertDecimalSymbol -> insertText(userPreferences.value.getDecimalSeparatorString())
-            is CalculatorAction.InsertDivisionSymbol -> insertText(userPreferences.value.getDivisionSignString())
-            is CalculatorAction.InsertMultiplicationSymbol -> insertText(userPreferences.value.getMultiplicationSignString())
+            is CalculatorAction.InsertDivisionSymbol -> insertText(CalculatorAction.InsertText(userPreferences.value.getDivisionSignString(), selectionPolicy = CalculatorAction.InsertText.SelectionPolicy.PARENTHESES))
+            is CalculatorAction.InsertMultiplicationSymbol -> insertText(CalculatorAction.InsertText(userPreferences.value.getMultiplicationSignString(), selectionPolicy = CalculatorAction.InsertText.SelectionPolicy.PARENTHESES))
             is CalculatorAction.AddCalculation -> insertCalculation(action.referenceId, action.direction)
             is CalculatorAction.DeleteCalculation -> deleteCalculation(action.id)
         }
