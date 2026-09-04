@@ -40,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -61,10 +60,10 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
-import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.CalculatorAction
-import com.jherkenhoff.qalculate.model.UndoState
-import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.domain.model.CalculatorAction
+import com.jherkenhoff.qalculate.domain.model.ExpressionItem
+import com.jherkenhoff.qalculate.domain.model.UndoState
+import com.jherkenhoff.qalculate.domain.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.PreviewData
 import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 import com.jherkenhoff.qalculate.ui.theme.QalculateTheme
@@ -137,7 +136,7 @@ fun CalculatorScreenContent(
     onAction: (CalculatorAction) -> Unit = { },
     onInputFieldValueChange: (TextFieldValue) -> Unit = { },
     onDeleteCalculation: (Long) -> Unit = { },
-    onAutocompleteClick: (AutocompleteItem) -> Unit = { },
+    onAutocompleteClick: (ExpressionItem) -> Unit = { },
     onMenuClick: () -> Unit = {  },
     onSettingsClick: () -> Unit = {  },
     onActiveKeypadIndexChanged: (Int) -> Unit = {},

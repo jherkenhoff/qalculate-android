@@ -3,7 +3,7 @@ package com.jherkenhoff.qalculate.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jherkenhoff.qalculate.data.UserPreferencesRepository
-import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.domain.model.UserPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.stateIn

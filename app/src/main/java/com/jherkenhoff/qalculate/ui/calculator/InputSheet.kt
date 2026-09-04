@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jherkenhoff.qalculate.R
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
-import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.domain.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 import kotlinx.coroutines.awaitCancellation
 

@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.domain.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.SingleEnumSelectDialog
 
 @Composable

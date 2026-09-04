@@ -1,4 +1,4 @@
-package com.jherkenhoff.qalculate.model
+package com.jherkenhoff.qalculate.domain.model
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

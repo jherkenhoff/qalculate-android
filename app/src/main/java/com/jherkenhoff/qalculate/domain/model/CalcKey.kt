@@ -1,4 +1,4 @@
-package com.jherkenhoff.qalculate.model
+package com.jherkenhoff.qalculate.domain.model
 
 enum class KeyRole {
     OPERATOR, NUMBER, SYSTEM

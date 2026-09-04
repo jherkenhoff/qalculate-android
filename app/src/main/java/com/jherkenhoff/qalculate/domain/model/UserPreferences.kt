@@ -1,5 +1,6 @@
-package com.jherkenhoff.qalculate.model
+package com.jherkenhoff.qalculate.domain.model
 
+import com.jherkenhoff.libqalculate.DigitGrouping
 import com.jherkenhoff.libqalculate.EvaluationOptions
 import com.jherkenhoff.libqalculate.ParseOptions
 import com.jherkenhoff.libqalculate.PrintOptions
@@ -118,8 +119,8 @@ data class UserPreferences(
             DecimalSeparator.COMMA -> ","
         }
         printOptions.digit_grouping = when (digitGrouping) {
-            true -> com.jherkenhoff.libqalculate.DigitGrouping.DIGIT_GROUPING_STANDARD
-            false -> com.jherkenhoff.libqalculate.DigitGrouping.DIGIT_GROUPING_NONE
+            true -> DigitGrouping.DIGIT_GROUPING_STANDARD
+            false -> DigitGrouping.DIGIT_GROUPING_NONE
         }
         printOptions.min_exp = when (numericalDisplayMode) {
             NumericalDisplayMode.NORMAL -> -1

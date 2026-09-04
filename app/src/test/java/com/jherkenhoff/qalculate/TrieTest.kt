@@ -1,6 +1,6 @@
 package com.jherkenhoff.qalculate
 
-import com.jherkenhoff.qalculate.model.MutableTrie
+import com.jherkenhoff.qalculate.domain.model.MutableTrie
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

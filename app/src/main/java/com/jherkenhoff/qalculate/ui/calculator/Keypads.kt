@@ -4,10 +4,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Science
-import com.jherkenhoff.qalculate.model.KeyLibrary
-import com.jherkenhoff.qalculate.model.KeyPositionSpec
-import com.jherkenhoff.qalculate.model.KeypadSection
-import com.jherkenhoff.qalculate.model.KeypadDefinition
+import com.jherkenhoff.qalculate.domain.model.KeyLibrary
+import com.jherkenhoff.qalculate.domain.model.KeyPositionSpec
+import com.jherkenhoff.qalculate.domain.model.KeypadSection
+import com.jherkenhoff.qalculate.domain.model.KeypadDefinition
 
 val basicKeypadSectionExtended = KeypadSection(
     rows = 2,

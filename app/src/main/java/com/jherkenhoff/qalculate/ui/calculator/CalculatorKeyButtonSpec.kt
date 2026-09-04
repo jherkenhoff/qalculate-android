@@ -1,6 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import com.jherkenhoff.qalculate.model.CalculatorAction
+import com.jherkenhoff.qalculate.domain.model.CalculatorAction
 
 enum class KeyRole {
     OPERATOR, NUMBER, SYSTEM

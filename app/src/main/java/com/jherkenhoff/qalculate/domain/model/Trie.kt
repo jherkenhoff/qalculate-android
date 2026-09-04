@@ -1,5 +1,7 @@
-package com.jherkenhoff.qalculate.model
+package com.jherkenhoff.qalculate.domain.model
 
+import kotlin.collections.iterator
+import kotlin.text.iterator
 
 
 interface Trie<Value> {
