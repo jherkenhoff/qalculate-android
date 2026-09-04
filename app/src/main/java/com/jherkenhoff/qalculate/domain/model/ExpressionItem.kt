@@ -13,6 +13,7 @@ data class ExpressionItemName (
 )
 
 sealed class ExpressionItem {
+    abstract val title: String
     abstract val names: List<ExpressionItemName>
     abstract val description: String
     abstract val category: String

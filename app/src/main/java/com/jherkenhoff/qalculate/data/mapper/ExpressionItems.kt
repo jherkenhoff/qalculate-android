@@ -33,6 +33,7 @@ fun ExpressionItem.names() =
 fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
     return when (this) {
         is com.jherkenhoff.libqalculate.AliasUnit -> AliasUnit(
+            title = title(),
             names = names(),
             description = description(),
             category = category(),
@@ -41,6 +42,7 @@ fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
         )
 
         is com.jherkenhoff.libqalculate.CompositeUnit -> CompositeUnit(
+            title = title(),
             names = names(),
             description = description(),
             category = category(),
@@ -48,6 +50,7 @@ fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
         )
 
         else -> BaseUnit(
+            title = title(),
             names = names(),
             description = description(),
             category = category(),
@@ -58,6 +61,7 @@ fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
 
 fun com.jherkenhoff.libqalculate.MathFunction.toModel(): MathFunction {
     return MathFunction(
+        title = title(),
         names = names(),
         description = description(),
         category = category(),
@@ -85,6 +89,7 @@ fun com.jherkenhoff.libqalculate.Variable.toModel(): AbstractMathVariable {
     return when (this) {
 
         is com.jherkenhoff.libqalculate.KnownVariable -> KnownVariable(
+            title = title(),
             names = names(),
             description = description(),
             category = category(),
@@ -93,6 +98,7 @@ fun com.jherkenhoff.libqalculate.Variable.toModel(): AbstractMathVariable {
 
         is com.jherkenhoff.libqalculate.UnknownVariable -> {
             UnknownVariable(
+                title = title(),
                 names = names(),
                 description = description(),
                 category = category(),
@@ -101,6 +107,7 @@ fun com.jherkenhoff.libqalculate.Variable.toModel(): AbstractMathVariable {
         }
 
         else -> Variable(
+            title = title(),
             names = names(),
             description = description(),
             category = category(),
