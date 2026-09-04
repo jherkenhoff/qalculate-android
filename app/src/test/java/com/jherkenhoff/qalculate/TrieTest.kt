@@ -1,6 +1,6 @@
 package com.jherkenhoff.qalculate
 
-import com.jherkenhoff.qalculate.model.Trie
+import com.jherkenhoff.qalculate.model.MutableTrie
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -9,14 +9,14 @@ import org.junit.Test
 class TrieTest {
     @Test
     fun `Should return empty list when empty`() {
-        val trie = Trie<Int>()
+        val trie = MutableTrie<Int>()
         val result = trie.search("searchstring")
         assertTrue(result.isEmpty())
     }
 
     @Test
     fun `Should return leaf node`() {
-        val trie = Trie<Int>()
+        val trie = MutableTrie<Int>()
         trie.insert("house", 2)
         trie.insert("cat", 3)
         trie.insert("car", 4)
@@ -28,7 +28,7 @@ class TrieTest {
 
     @Test
     fun `Should return multiple matching nodes`() {
-        val trie = Trie<Int>()
+        val trie = MutableTrie<Int>()
         trie.insert("house", 2)
         trie.insert("cat", 3)
         trie.insert("car", 4)
