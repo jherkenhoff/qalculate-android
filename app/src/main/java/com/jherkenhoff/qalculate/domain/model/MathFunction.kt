@@ -5,6 +5,7 @@ sealed class AbstractMathFunction : ExpressionItem() {
 }
 
 data class MathFunction(
+    override val title: String,
     override val names: List<ExpressionItemName>,
     override val description: String,
     override val category: String,
@@ -12,6 +13,7 @@ data class MathFunction(
 ) : AbstractMathFunction()
 
 data class UserFunction(
+    override val title: String,
     override val names: List<ExpressionItemName>,
     override val description: String,
     override val category: String,
@@ -21,6 +23,7 @@ data class UserFunction(
 ) : AbstractMathFunction()
 
 data class DataSet(
+    override val title: String,
     override val names: List<ExpressionItemName>,
     override val description: String,
     override val category: String,
