@@ -33,7 +33,6 @@ fun ExpressionItem.names() =
 fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
     return when (this) {
         is com.jherkenhoff.libqalculate.AliasUnit -> AliasUnit(
-            id = id(),
             names = names(),
             description = description(),
             category = category(),
@@ -42,7 +41,6 @@ fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
         )
 
         is com.jherkenhoff.libqalculate.CompositeUnit -> CompositeUnit(
-            id = id(),
             names = names(),
             description = description(),
             category = category(),
@@ -50,7 +48,6 @@ fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
         )
 
         else -> BaseUnit(
-            id = id(),
             names = names(),
             description = description(),
             category = category(),
@@ -61,7 +58,6 @@ fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
 
 fun com.jherkenhoff.libqalculate.MathFunction.toModel(): MathFunction {
     return MathFunction(
-        id = id(),
         names = names(),
         description = description(),
         category = category(),
