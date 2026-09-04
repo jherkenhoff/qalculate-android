@@ -1,7 +1,7 @@
 package com.jherkenhoff.qalculate.domain
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.jherkenhoff.qalculate.model.CalculatorAction
+import com.jherkenhoff.qalculate.domain.model.CalculatorAction
 
 class CalcActionEnableLogic(
     private val input: TextFieldValue

@@ -4,14 +4,13 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import com.jherkenhoff.qalculate.data.repository.AutocompleteRepository
-import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.Trie
+import com.jherkenhoff.qalculate.domain.model.ExpressionItem
 import javax.inject.Inject
 
 data class AutocompleteResult (
     val relevantText: String = "",
     val contextRange: TextRange = TextRange(0),
-    val items: List<AutocompleteItem> = emptyList()
+    val items: List<ExpressionItem> = emptyList()
 )
 
 class AutocompleteUseCase @Inject constructor(

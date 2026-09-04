@@ -1,27 +1,21 @@
 package com.jherkenhoff.qalculate.data.repository
 
-import android.util.Log
-import com.jherkenhoff.libqalculate.ExpressionItem
-import com.jherkenhoff.libqalculate.ExpressionItemType
-import com.jherkenhoff.libqalculate.MathFunction
-import com.jherkenhoff.libqalculate.Unit
-import com.jherkenhoff.libqalculate.Variable
-import com.jherkenhoff.qalculate.data.CalculatorRepository
-import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.AutocompleteType
-import com.jherkenhoff.qalculate.model.MutableTrie
-import com.jherkenhoff.qalculate.model.Trie
+import com.jherkenhoff.qalculate.domain.model.ExpressionItem
+import com.jherkenhoff.qalculate.domain.model.MathFunction
+import com.jherkenhoff.qalculate.domain.model.MutableTrie
+import com.jherkenhoff.qalculate.domain.model.Trie
+import com.jherkenhoff.qalculate.domain.model.AbstractMathVariable
+import com.jherkenhoff.qalculate.domain.model.MathUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
 
 data class AutocompleteTries(
-    val caseSensitiveTrie: Trie<AutocompleteItem> = MutableTrie(),
-    val caseInsensitiveTrie: Trie<AutocompleteItem> = MutableTrie()
+    val caseSensitiveTrie: Trie<ExpressionItem> = MutableTrie(),
+    val caseInsensitiveTrie: Trie<ExpressionItem> = MutableTrie()
 )
 
 @Singleton
@@ -41,50 +35,26 @@ class AutocompleteRepository @Inject constructor(
         initialValue = AutocompleteTries()
     )
 
-    fun buildTries(variables: List<Variable>, units: List<Unit>, functions: List<MathFunction>): AutocompleteTries {
-        val caseSensitiveTrie = MutableTrie<AutocompleteItem>()
-        val caseInsensitiveTrie = MutableTrie<AutocompleteItem>()
+    fun buildTries(variables: List<AbstractMathVariable>, units: List<MathUnit>, functions: List<MathFunction>): AutocompleteTries {
+        val caseSensitiveTrie = MutableTrie<ExpressionItem>()
+        val caseInsensitiveTrie = MutableTrie<ExpressionItem>()
 
         units.forEach { unit ->
-            val item = AutocompleteItem(
-                type = AutocompleteType.FUNCTION,
-                name = unit.name(),
-                title = unit.title(true, true),
-                category = unit.category(),
-                abbreviations = emptyList(),
-                description = unit.description(),
-                typeBeforeCursor = unit.name(),
-                typeAfterCursor = ""
-            )
-            for (i in 1..unit.countNames()) {
-                val expressionName = unit.getName(i)
-
-                if (expressionName.case_sensitive) {
-                    caseSensitiveTrie.insert(expressionName.name, item)
+            unit.names.forEach {
+                if (it.caseSensitive) {
+                    caseSensitiveTrie.insert(it.name, unit)
                 } else {
-                    caseInsensitiveTrie.insert(expressionName.name, item)
+                    caseInsensitiveTrie.insert(it.name, unit)
                 }
             }
         }
 
         functions.forEach { function ->
-            val item = AutocompleteItem(
-                type = AutocompleteType.FUNCTION,
-                name = function.name() + "()",
-                title = function.title(true, true),
-                category = function.category(),
-                abbreviations = emptyList(),
-                description = function.description(),
-                typeBeforeCursor = function.name() + "(",
-                typeAfterCursor = ")"
-            )
-            for (i in 1..function.countNames()) {
-                val expressionName = function.getName(i)
-
-                if (expressionName.case_sensitive) {
-                    caseSensitiveTrie.insert(expressionName.name, item)
+            function.names.forEach {
+                if (it.caseSensitive) {
+                    caseSensitiveTrie.insert(it.name, function)
                 } else {
-                    caseInsensitiveTrie.insert(expressionName.name, item)
+                    caseInsensitiveTrie.insert(it.name, function)
                 }
             }
         }
@@ -95,7 +65,7 @@ class AutocompleteRepository @Inject constructor(
         )
     }
 
-    fun getAutocompleteSuggestions(key: String): List<AutocompleteItem> {
+    fun getAutocompleteSuggestions(key: String): List<ExpressionItem> {
         val caseSensitiveMatches = _tries.value.caseSensitiveTrie.search(key)
         val caseInsensitiveMatches = _tries.value.caseInsensitiveTrie.search(key.lowercase())
 

@@ -1,6 +1,6 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import com.jherkenhoff.qalculate.model.CalculatorAction
+import com.jherkenhoff.qalculate.domain.model.CalculatorAction
 
 /**
  * Model of a calculator action, including a label de

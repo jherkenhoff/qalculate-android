@@ -7,8 +7,7 @@ import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jherkenhoff.qalculate.data.repository.AutocompleteRepository
-import com.jherkenhoff.qalculate.data.CalculatorRepository
+import com.jherkenhoff.qalculate.data.repository.CalculatorRepository
 import com.jherkenhoff.qalculate.data.UserPreferencesRepository
 import com.jherkenhoff.qalculate.data.database.model.CalculationHistoryItemData
 import com.jherkenhoff.qalculate.data.repository.CalculationListRepository
@@ -16,10 +15,16 @@ import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.domain.AutocompleteUseCase
 import com.jherkenhoff.qalculate.domain.CalculateUseCase
 import com.jherkenhoff.qalculate.domain.ParseUseCase
-import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.CalculatorAction
-import com.jherkenhoff.qalculate.model.UndoManager
-import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.domain.model.CalculatorAction
+import com.jherkenhoff.qalculate.domain.model.DataSet
+import com.jherkenhoff.qalculate.domain.model.ExpressionItem
+import com.jherkenhoff.qalculate.domain.model.KnownVariable
+import com.jherkenhoff.qalculate.domain.model.MathFunction
+import com.jherkenhoff.qalculate.domain.model.MathUnit
+import com.jherkenhoff.qalculate.domain.model.UndoManager
+import com.jherkenhoff.qalculate.domain.model.UnknownVariable
+import com.jherkenhoff.qalculate.domain.model.UserFunction
+import com.jherkenhoff.qalculate.domain.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -530,11 +535,20 @@ class CalculatorViewModel @Inject constructor(
         )
     }
 
-    fun acceptAutocomplete(autocompleteItem: AutocompleteItem) {
+    fun acceptAutocomplete(expressionItem: ExpressionItem) {
+        val expression = expressionItem.names.find { it.abbreviation }?.name
+            ?: expressionItem.names.firstOrNull()?.name
+            ?: ""
+
+        val (beforeCursor, afterCursor) = when (expressionItem) {
+            is MathFunction, is UserFunction -> Pair("$expression(", ")")
+            else -> Pair(expression, "")
+        }
+
         replaceRange(
             activeCalculationData.value.autocompleteResult.contextRange,
-            autocompleteItem.typeBeforeCursor,
-            autocompleteItem.typeAfterCursor
+            beforeCursor,
+            afterCursor
         )
     }
 }

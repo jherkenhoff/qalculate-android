@@ -59,11 +59,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.jherkenhoff.qalculate.model.CalculatorAction
-import com.jherkenhoff.qalculate.model.CalcKey
-import com.jherkenhoff.qalculate.model.KeyLibrary
-import com.jherkenhoff.qalculate.model.KeyRole
-import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.domain.model.CalculatorAction
+import com.jherkenhoff.qalculate.domain.model.CalcKey
+import com.jherkenhoff.qalculate.domain.model.KeyLibrary
+import com.jherkenhoff.qalculate.domain.model.KeyRole
+import com.jherkenhoff.qalculate.domain.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

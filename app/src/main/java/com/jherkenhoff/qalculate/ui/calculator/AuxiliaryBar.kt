@@ -1,22 +1,12 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
@@ -27,23 +17,14 @@ import androidx.compose.material.icons.automirrored.filled.Input
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Input
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.VerticalAlignBottom
-import androidx.compose.material3.ChipColors
 import androidx.compose.material3.ElevatedSuggestionChip
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,13 +35,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jherkenhoff.qalculate.domain.AutocompleteResult
-import com.jherkenhoff.qalculate.model.AutocompleteItem
-import com.jherkenhoff.qalculate.model.CalculatorAction
-import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.domain.model.CalculatorAction
+import com.jherkenhoff.qalculate.domain.model.ExpressionItem
+import com.jherkenhoff.qalculate.domain.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.common.CalcActionLabelMapper
 
 @Composable
@@ -70,7 +50,7 @@ fun AuxiliaryBar(
     calcActionLabelMapper: CalcActionLabelMapper,
     isCalculationSnapped: Boolean,
     modifier: Modifier = Modifier,
-    onAutocompleteClick: (AutocompleteItem) -> Unit = { },
+    onAutocompleteClick: (ExpressionItem) -> Unit = { },
     onAction: (CalculatorAction) -> Unit = { },
     onAutocompleteDismiss: () -> Unit = { },
     onScrollToActiveCalculationClick: () -> Unit = { },
@@ -81,26 +61,42 @@ fun AuxiliaryBar(
     AnimatedContent(
         autocompleteResult.items.isNotEmpty() && isCalculationSnapped,
         modifier = modifier
-    ) {
-        if (it) {
+    ) { isAutocompleteShown ->
+        if (isAutocompleteShown) {
             Row {
                 LazyRow(
-                    modifier = Modifier.fillMaxHeight().weight(1f)
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
                         .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
                         .drawWithContent {
                             drawContent()
-                            drawRect(brush = Brush.horizontalGradient(0f to Color.White, 1f to Color.Transparent, startX = this.size.width-fadeWidth, endX = this.size.width), blendMode = BlendMode.DstIn)
-                            drawRect(brush = Brush.horizontalGradient(0f to Color.Transparent, 1f to Color.White, startX = 0f, endX = fadeWidth), blendMode = BlendMode.DstIn)
+                            drawRect(
+                                brush = Brush.horizontalGradient(
+                                    0f to Color.White,
+                                    1f to Color.Transparent,
+                                    startX = this.size.width - fadeWidth,
+                                    endX = this.size.width
+                                ), blendMode = BlendMode.DstIn
+                            )
+                            drawRect(
+                                brush = Brush.horizontalGradient(
+                                    0f to Color.Transparent,
+                                    1f to Color.White,
+                                    startX = 0f,
+                                    endX = fadeWidth
+                                ), blendMode = BlendMode.DstIn
+                            )
                         },
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    item{
-                        Spacer(Modifier.width(fadeWidth.toDp()-8.dp))
+                    item {
+                        Spacer(Modifier.width(fadeWidth.toDp() - 8.dp))
                     }
-                    items(autocompleteResult.items) { it ->
+                    items(autocompleteResult.items) { item ->
                         ElevatedSuggestionChip(
-                            label = { Text(it.title) },
-                            onClick = { onAutocompleteClick(it) },
+                            label = { Text(item.names.first().name) },
+                            onClick = { onAutocompleteClick(item) },
                             colors = SuggestionChipDefaults.elevatedSuggestionChipColors()
                                 .copy(
                                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -108,8 +104,8 @@ fun AuxiliaryBar(
                                 )
                         )
                     }
-                    item{
-                        Spacer(Modifier.width(fadeWidth.toDp()-8.dp))
+                    item {
+                        Spacer(Modifier.width(fadeWidth.toDp() - 8.dp))
                     }
                 }
 
@@ -208,17 +204,19 @@ fun AuxiliaryIconButton(
         onClick = onClick,
         color = color,
         shape = RoundedCornerShape(
-                if (roundStart) 50 else 10,
-                if (roundEnd) 50 else 10,
-                if (roundEnd) 50 else 10,
-                if (roundStart) 50 else 10
-            ),
+            if (roundStart) 50 else 10,
+            if (roundEnd) 50 else 10,
+            if (roundEnd) 50 else 10,
+            if (roundStart) 50 else 10
+        ),
         modifier = modifier.widthIn(min = 48.dp)
     ) {
         Icon(
             imageVector,
             contentDescription,
-            modifier = Modifier.padding(8.dp).size(18.dp)
+            modifier = Modifier
+                .padding(8.dp)
+                .size(18.dp)
         )
     }
 }

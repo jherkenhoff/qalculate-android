@@ -7,9 +7,9 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
-import com.jherkenhoff.qalculate.model.CalculatorAction
+import com.jherkenhoff.qalculate.domain.model.CalculatorAction
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorKeyButtonActionLabel
-import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.domain.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.calculator.CalculatorKeyButtonActionLabel.*
 
 class CalcActionLabelMapper (
