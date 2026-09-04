@@ -5,7 +5,6 @@ sealed class MathUnit : ExpressionItem() {
 }
 
 data class BaseUnit(
-    override val id: Int,
     override val names: List<ExpressionItemName>,
     override val description: String,
     override val category: String,
@@ -13,7 +12,6 @@ data class BaseUnit(
 ) : MathUnit()
 
 data class AliasUnit(
-    override val id: Int,
     override val names: List<ExpressionItemName>,
     override val description: String,
     override val category: String,
@@ -22,7 +20,6 @@ data class AliasUnit(
 ) : MathUnit()
 
 data class CompositeUnit(
-    override val id: Int,
     override val names: List<ExpressionItemName>,
     override val description: String,
     override val category: String,

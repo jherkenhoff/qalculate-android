@@ -89,7 +89,6 @@ fun com.jherkenhoff.libqalculate.Variable.toModel(): AbstractMathVariable {
     return when (this) {
 
         is com.jherkenhoff.libqalculate.KnownVariable -> KnownVariable(
-            id = id(),
             names = names(),
             description = description(),
             category = category(),
@@ -97,9 +96,7 @@ fun com.jherkenhoff.libqalculate.Variable.toModel(): AbstractMathVariable {
         )
 
         is com.jherkenhoff.libqalculate.UnknownVariable -> {
-            Log.i("Moin", name())
             UnknownVariable(
-                id = id(),
                 names = names(),
                 description = description(),
                 category = category(),
@@ -108,7 +105,6 @@ fun com.jherkenhoff.libqalculate.Variable.toModel(): AbstractMathVariable {
         }
 
         else -> Variable(
-            id = id(),
             names = names(),
             description = description(),
             category = category(),
