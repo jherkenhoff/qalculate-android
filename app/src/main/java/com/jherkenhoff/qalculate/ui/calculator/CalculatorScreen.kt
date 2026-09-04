@@ -246,6 +246,7 @@ fun CalculatorScreenContent(
                         padding = padding,
                         interceptKeyboard = !keypads[activeKeypadIndex].imeEnabled,
                         userPreferences = userPreferences,
+                        autocompleteResult = internalAutocompleteResult,
                         onUserpreferencesChanged = onUserPreferencesChanged,
                         onActiveCalculationChanged = onActiveCalculationChanged,
                         onActiveCalculationInputChange = onInputFieldValueChange,

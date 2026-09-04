@@ -85,6 +85,7 @@ fun CalculationList(
     activeCalculationData: ActiveCalculationData,
     interceptKeyboard: Boolean,
     userPreferences: UserPreferences,
+    autocompleteResult: AutocompleteResult,
     modifier: Modifier = Modifier,
     padding: Dp = 0.dp,
     onActiveCalculationChanged: (Long) -> Unit = {},
@@ -191,6 +192,7 @@ fun CalculationList(
                                         activeCalculationData.result,
                                         calculation.executionOrderNumber,
                                         interceptKeyboard,
+                                        autocompleteResult = autocompleteResult,
                                         sharedTransitionScope = this@SharedTransitionLayout,
                                         animatedVisibilityScope = this@AnimatedContent,
                                         userPreferences = userPreferences,
@@ -247,6 +249,7 @@ private fun DefaultPreview() {
         ),
         interceptKeyboard = false,
         userPreferences = UserPreferences(),
+        autocompleteResult = AutocompleteResult(),
         onActiveCalculationChanged = { calculationListData = calculationListData.copy(activeCalculationId = it) }
     )
 }

@@ -1,8 +1,10 @@
 package com.jherkenhoff.qalculate.data.mapper
 
-import android.util.Log
+import com.jherkenhoff.libqalculate.AliasUnit_Composite
 import com.jherkenhoff.libqalculate.ExpressionItem
 import com.jherkenhoff.libqalculate.ExpressionName
+import com.jherkenhoff.libqalculate.SWIGTYPE_p_int
+import com.jherkenhoff.libqalculate.Unit
 import com.jherkenhoff.qalculate.domain.model.AliasUnit
 import com.jherkenhoff.qalculate.domain.model.Assumptions
 import com.jherkenhoff.qalculate.domain.model.BaseUnit
@@ -13,6 +15,10 @@ import com.jherkenhoff.qalculate.domain.model.MathFunction
 import com.jherkenhoff.qalculate.domain.model.MathUnit
 import com.jherkenhoff.qalculate.domain.model.UnknownVariable
 import com.jherkenhoff.qalculate.domain.model.AbstractMathVariable
+import com.jherkenhoff.qalculate.domain.model.BinaryPrefix
+import com.jherkenhoff.qalculate.domain.model.DecimalPrefix
+import com.jherkenhoff.qalculate.domain.model.Prefix
+import com.jherkenhoff.qalculate.domain.model.PrefixedUnit
 import com.jherkenhoff.qalculate.domain.model.Variable
 
 fun ExpressionName.toModel() = ExpressionItemName(
@@ -27,10 +33,27 @@ fun ExpressionName.toModel() = ExpressionItemName(
     completionOnly = completion_only,
 )
 
+fun com.jherkenhoff.libqalculate.Prefix.toModel() : Prefix {
+    return when (this) {
+        is com.jherkenhoff.libqalculate.BinaryPrefix -> BinaryPrefix(
+            names = names(),
+            exponent = exponent()
+        )
+        is com.jherkenhoff.libqalculate.DecimalPrefix -> DecimalPrefix(
+            names = names(),
+            exponent = exponent()
+        )
+        else -> error("Unexpected Prefix child class: ${this::class.qualifiedName}")
+    }
+}
+
+fun com.jherkenhoff.libqalculate.Prefix.names() =
+    (1L..countNames()).map { i -> getName(i).toModel() }
+
 fun ExpressionItem.names() =
     (1L..countNames()).map { i -> getName(i).toModel() }
 
-fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
+fun Unit.toModel(): MathUnit {
     return when (this) {
         is com.jherkenhoff.libqalculate.AliasUnit -> AliasUnit(
             title = title(),
@@ -38,16 +61,26 @@ fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
             description = description(),
             category = category(),
             system = system(),
-            baseUnit = baseUnit().toModel()
+            exponent = baseExponent(),
+            parentUnit = firstBaseUnit().toModel()
         )
 
-        is com.jherkenhoff.libqalculate.CompositeUnit -> CompositeUnit(
-            title = title(),
-            names = names(),
-            description = description(),
-            category = category(),
-            system = system()
-        )
+        is com.jherkenhoff.libqalculate.CompositeUnit -> {
+            CompositeUnit(
+                title = title(),
+                names = names(),
+                description = description(),
+                category = category(),
+                system = system(),
+                childUnits = (1..countUnits()).map { i ->
+                    val nativeChildUnit = get(i)
+                    PrefixedUnit(
+                        prefix = (nativeChildUnit as AliasUnit_Composite).prefix().toModel(),
+                        unit = nativeChildUnit.toModel(),
+                    )
+                }
+            )
+        }
 
         else -> BaseUnit(
             title = title(),
