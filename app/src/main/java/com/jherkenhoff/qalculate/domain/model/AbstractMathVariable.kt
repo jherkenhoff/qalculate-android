@@ -4,14 +4,12 @@ sealed class AbstractMathVariable : ExpressionItem() {
 }
 
 data class Variable(
-    override val id: Int,
     override val names: List<ExpressionItemName>,
     override val description: String,
     override val category: String,
 ) : AbstractMathVariable()
 
 data class KnownVariable(
-    override val id: Int,
     override val names: List<ExpressionItemName>,
     override val description: String,
     override val category: String,
@@ -19,7 +17,6 @@ data class KnownVariable(
 ) : AbstractMathVariable()
 
 data class UnknownVariable(
-    override val id: Int,
     override val names: List<ExpressionItemName>,
     override val description: String,
     override val category: String,
