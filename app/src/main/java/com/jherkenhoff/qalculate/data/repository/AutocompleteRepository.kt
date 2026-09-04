@@ -1,5 +1,6 @@
 package com.jherkenhoff.qalculate.data.repository
 
+import android.util.Log
 import com.jherkenhoff.qalculate.domain.model.ExpressionItem
 import com.jherkenhoff.qalculate.domain.model.MathFunction
 import com.jherkenhoff.qalculate.domain.model.MutableTrie
@@ -55,6 +56,16 @@ class AutocompleteRepository @Inject constructor(
                     caseSensitiveTrie.insert(it.name, function)
                 } else {
                     caseInsensitiveTrie.insert(it.name, function)
+                }
+            }
+        }
+
+        variables.forEach { variable ->
+            variable.names.forEach {
+                if (it.caseSensitive) {
+                    caseSensitiveTrie.insert(it.name, variable)
+                } else {
+                    caseInsensitiveTrie.insert(it.name, variable)
                 }
             }
         }
