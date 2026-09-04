@@ -17,10 +17,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -34,14 +36,22 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -54,6 +64,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.InterceptPlatformTextInput
@@ -70,6 +81,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jherkenhoff.qalculate.R
+import com.jherkenhoff.qalculate.domain.AutocompleteResult
 import com.jherkenhoff.qalculate.domain.model.CalculatorAction
 import com.jherkenhoff.qalculate.domain.model.UserPreferences
 import com.jherkenhoff.qalculate.ui.PreviewData
@@ -102,6 +114,8 @@ fun Modifier.onLongPress(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReorderableCollectionItemScope.ActiveCalculationListItem(
     id: Long,
@@ -113,6 +127,7 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     userPreferences: UserPreferences,
+    autocompleteResult : AutocompleteResult,
     unknownVariables: List<String>,
     modifier: Modifier = Modifier,
     onInputChange: (TextFieldValue) -> Unit = {},
@@ -124,122 +139,166 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
     var menuOpen by remember { mutableStateOf(false) }
 
     val clipboardManager = LocalClipboardManager.current
+    val autocompleteTooltipState = rememberTooltipState(isPersistent = true)
+
+    LaunchedEffect(autocompleteResult) {
+        if (autocompleteResult.items.isEmpty())
+            autocompleteTooltipState.dismiss()
+        else
+            autocompleteTooltipState.show()
+    }
 
     with(sharedTransitionScope) {
 
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            shape = RoundedCornerShape(largeCornerRadius),
-            modifier = modifier.fillMaxWidth().clickable { onClick() }.sharedElement(
-                rememberSharedContentState("container"),
-                animatedVisibilityScope,
-            )
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(40.dp)
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                TooltipAnchorPosition.Above,
+                0.dp
+            ),
+            onDismissRequest = {},
+            tooltip = {
+                RichTooltip(
+                    modifier = Modifier.heightIn(max = 200.dp)
                 ) {
-                    Text(
-                        executionOrderNumber?.toString() ?: "•",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.align(Alignment.TopCenter).padding(6.dp)
-                            .sharedElement(
-                                rememberSharedContentState("number"),
-                                animatedVisibilityScope
+                    LazyColumn(
+                    ) {
+                        items(autocompleteResult.items) { item ->
+                            ListItem(
+                                headlineContent = {
+                                    Text(item.title)
+                                },
+                                supportingContent = {
+                                    Text(item.names.filter { !it.plural }.map { it.name }.joinToString(", "))
+//                                    Text(item.names.firstOrNull { it.abbreviation }?.name
+//                                        ?: item.names.firstOrNull { it.reference }?.name
+//                                        ?: item.names.firstOrNull()?.name
+//                                        ?: ""
+//                                    )
+                                },
+                                trailingContent = {
+                                    val leafCategory = item.category.split("/").first()
+                                    Text("($leafCategory)")
+                                },
+                                colors = ListItemDefaults.colors().copy(containerColor = Color.Transparent)
                             )
-                    )
-                    Icon(
-                        Icons.Default.DragIndicator,
-                        null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.align(Alignment.Center).draggableHandle(
-                            onDragStopped = onDragStopped
-                        )
-                    )
-
+                        }
+                    }
                 }
-                VerticalDivider(Modifier.fillMaxHeight().padding(vertical = 8.dp))
+            },
+            state = autocompleteTooltipState
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(largeCornerRadius),
+                modifier = modifier.fillMaxWidth().clickable { onClick() }.sharedElement(
+                    rememberSharedContentState("container"),
+                    animatedVisibilityScope,
+                )
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(40.dp)
+                    ) {
+                        Text(
+                            executionOrderNumber?.toString() ?: "•",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.align(Alignment.TopCenter).padding(6.dp)
+                                .sharedElement(
+                                    rememberSharedContentState("number"),
+                                    animatedVisibilityScope
+                                )
+                        )
+                        Icon(
+                            Icons.Default.DragIndicator,
+                            null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.align(Alignment.Center).draggableHandle(
+                                onDragStopped = onDragStopped
+                            )
+                        )
+                    }
+                    VerticalDivider(Modifier.fillMaxHeight().padding(vertical = 8.dp))
 
-                Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
-                    AnimatedVisibility(unknownVariables.isNotEmpty()) {
+                    Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+                        AnimatedVisibility(unknownVariables.isNotEmpty()) {
+                            Row(
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Unknowns:", style = MaterialTheme.typography.labelSmall)
+                                unknownVariables.forEach {
+                                    Chip(it, highlight = true)
+                                }
+                            }
+                        }
                         Row(
-                            horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Unknowns:", style = MaterialTheme.typography.labelSmall)
-                            unknownVariables.forEach {
-                                Chip(it, highlight = true)
-                            }
-                        }
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        InputField(
-                            value = input,
-                            onValueChange = onInputChange,
-                            interceptKeyboard = interceptKeyboard,
-                            onSubmit = {},
-                            modifier = Modifier.weight(1f)
-                        )
-                        Box(Modifier.width(40.dp)) {
-                            IconButton(onClick = { menuOpen = true }) {
-                                Icon(
-                                    Icons.Outlined.MoreVert,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            Menu(
-                                menuOpen,
-                                id,
-                                onDismissRequest = { menuOpen = false },
-                                onAction = onAction
+                            InputField(
+                                value = input,
+                                onValueChange = onInputChange,
+                                interceptKeyboard = interceptKeyboard,
+                                onSubmit = {},
+                                modifier = Modifier.weight(1f)
                             )
-                        }
-                    }
-                    HorizontalDivider()
-                    Text(
-                        mathExpressionFormatter(parsed),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(Modifier.height(6.dp))
-
-                    AutoSizeText(
-                        text = mathExpressionFormatter(result),
-                        alignment = Alignment.CenterEnd,
-                        style = MaterialTheme.typography.displayMedium,
-                        minTextSize = 14.sp,
-                        maxTextSize = 40.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp, horizontal = 8.dp)
-                            .size(40.dp)
-                            .sharedElement(
-                                rememberSharedContentState("result"),
-                                animatedVisibilityScope
-                            ).onLongPress({
-                                clipboardManager.setText(
-                                    AnnotatedString(mathExpressionPlainText(result))
+                            Box(Modifier.width(40.dp)) {
+                                IconButton(onClick = { menuOpen = true }) {
+                                    Icon(
+                                        Icons.Outlined.MoreVert,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Menu(
+                                    menuOpen,
+                                    id,
+                                    onDismissRequest = { menuOpen = false },
+                                    onAction = onAction
                                 )
-                            })
-                    )
-                }
+                            }
+                        }
+                        HorizontalDivider()
+                        Text(
+                            mathExpressionFormatter(parsed),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.height(6.dp))
 
+                        AutoSizeText(
+                            text = mathExpressionFormatter(result),
+                            alignment = Alignment.CenterEnd,
+                            style = MaterialTheme.typography.displayMedium,
+                            minTextSize = 14.sp,
+                            maxTextSize = 40.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp, horizontal = 8.dp)
+                                .size(40.dp)
+                                .sharedElement(
+                                    rememberSharedContentState("result"),
+                                    animatedVisibilityScope
+                                ).onLongPress({
+                                    clipboardManager.setText(
+                                        AnnotatedString(mathExpressionPlainText(result))
+                                    )
+                                })
+                        )
+                    }
+
+                }
             }
         }
-
     }
 }
 
@@ -515,6 +574,7 @@ private fun ActivePreview() {
                             "2",
                             1,
                             false,
+                            autocompleteResult = AutocompleteResult(),
                             unknownVariables = listOf("x"),
                             userPreferences = UserPreferences.Default,
                             sharedTransitionScope = this@SharedTransitionLayout,

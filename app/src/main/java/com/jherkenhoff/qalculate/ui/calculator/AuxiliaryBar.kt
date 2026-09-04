@@ -94,14 +94,9 @@ fun AuxiliaryBar(
                         Spacer(Modifier.width(fadeWidth.toDp() - 8.dp))
                     }
                     items(autocompleteResult.items) { item ->
-                        ElevatedSuggestionChip(
-                            label = { Text(item.names.first().name) },
-                            onClick = { onAutocompleteClick(item) },
-                            colors = SuggestionChipDefaults.elevatedSuggestionChipColors()
-                                .copy(
-                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                )
+                        CompletionCard(
+                            item,
+                            onClick = { onAutocompleteClick(item) }
                         )
                     }
                     item {

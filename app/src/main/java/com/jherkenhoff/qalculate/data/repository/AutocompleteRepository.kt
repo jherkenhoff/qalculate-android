@@ -81,6 +81,6 @@ class AutocompleteRepository @Inject constructor(
         val caseInsensitiveMatches = _tries.value.caseInsensitiveTrie.search(key.lowercase())
 
         val combinedMatches = (caseSensitiveMatches + caseInsensitiveMatches).sortedBy { it.matchDepth }
-        return combinedMatches.map { it.value }
+        return combinedMatches.map { it.value }.distinct()
     }
 }
