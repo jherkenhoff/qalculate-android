@@ -1,10 +1,10 @@
 package com.jherkenhoff.qalculate.data.mapper
 
+import android.util.Log
 import com.jherkenhoff.libqalculate.AliasUnit_Composite
 import com.jherkenhoff.libqalculate.ExpressionItem
 import com.jherkenhoff.libqalculate.ExpressionName
-import com.jherkenhoff.libqalculate.SWIGTYPE_p_int
-import com.jherkenhoff.libqalculate.Unit
+import com.jherkenhoff.libqalculate.UnitSubtype
 import com.jherkenhoff.qalculate.domain.model.AliasUnit
 import com.jherkenhoff.qalculate.domain.model.Assumptions
 import com.jherkenhoff.qalculate.domain.model.BaseUnit
@@ -53,19 +53,24 @@ fun com.jherkenhoff.libqalculate.Prefix.names() =
 fun ExpressionItem.names() =
     (1L..countNames()).map { i -> getName(i).toModel() }
 
-fun Unit.toModel(): MathUnit {
-    return when (this) {
-        is com.jherkenhoff.libqalculate.AliasUnit -> AliasUnit(
-            title = title(),
-            names = names(),
-            description = description(),
-            category = category(),
-            system = system(),
-            exponent = baseExponent(),
-            parentUnit = firstBaseUnit().toModel()
-        )
+fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
 
-        is com.jherkenhoff.libqalculate.CompositeUnit -> {
+    return when (subtype()) {
+        UnitSubtype.SUBTYPE_ALIAS_UNIT.swigValue() -> {
+            val aliasUnit = this as com.jherkenhoff.libqalculate.AliasUnit
+            AliasUnit(
+                title = title(),
+                names = names(),
+                description = description(),
+                category = category(),
+                system = system(),
+                exponent = baseExponent(),
+                parentUnit = aliasUnit.firstBaseUnit().toModel()
+            )
+        }
+
+        UnitSubtype.SUBTYPE_COMPOSITE_UNIT.swigValue() -> {
+            this as com.jherkenhoff.libqalculate.CompositeUnit
             CompositeUnit(
                 title = title(),
                 names = names(),
@@ -82,13 +87,17 @@ fun Unit.toModel(): MathUnit {
             )
         }
 
-        else -> BaseUnit(
-            title = title(),
-            names = names(),
-            description = description(),
-            category = category(),
-            system = system()
-        )
+        UnitSubtype.SUBTYPE_BASE_UNIT.swigValue() -> {
+            BaseUnit(
+                title = title(),
+                names = names(),
+                description = description(),
+                category = category(),
+                system = system()
+            )
+        }
+
+        else -> error("Unexpected subtype: ${subtype()}")
     }
 }
 

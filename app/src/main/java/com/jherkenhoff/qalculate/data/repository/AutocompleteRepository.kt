@@ -6,6 +6,7 @@ import com.jherkenhoff.qalculate.domain.model.MathFunction
 import com.jherkenhoff.qalculate.domain.model.MutableTrie
 import com.jherkenhoff.qalculate.domain.model.Trie
 import com.jherkenhoff.qalculate.domain.model.AbstractMathVariable
+import com.jherkenhoff.qalculate.domain.model.CompositeUnit
 import com.jherkenhoff.qalculate.domain.model.MathUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,6 +42,11 @@ class AutocompleteRepository @Inject constructor(
         val caseInsensitiveTrie = MutableTrie<ExpressionItem>()
 
         units.forEach { unit ->
+
+            if (unit is CompositeUnit) {
+                Log.i("Moin", unit.childUnits.toString())
+            }
+
             unit.names.forEach {
                 if (it.caseSensitive) {
                     caseSensitiveTrie.insert(it.name, unit)
