@@ -35,6 +35,19 @@ Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/com.jherkenhoff.qalculate/)
 [<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/jherkenhoff/qalculate-android/releases/latest)
 
+<details>
+<summary>APK verification</summary>
+
+
+> Package ID: `com.jherkenhoff.qalculate`
+> 
+> SHA-256 Hash of Signing Certificate: `35:6F:99:80:E2:C8:2D:41:9F:4A:53:27:C6:F2:CD:D1:50:A3:D1:70:A2:00:3C:7D:3E:38:AB:1B:75:B2:D3:31`
+>
+> The signature is valid for the APKs published on Github as well as F-Droid, thanks to reproducible builds. This means the APK built by F-Droid is bit-for-bit identical to the one built from the source code you're seeing here, allowing independent verification by a third party you may trust more than the developer.
+
+</details>
+
+
 > [!WARNING]
 > This project supports an open and independent Android ecosystem and will not participate in Google's efforts to further lock-down Android. As a result, this app may not install on many devices starting September 2026. More information: https://keepandroidopen.org/
 
