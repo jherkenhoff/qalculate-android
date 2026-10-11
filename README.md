@@ -33,8 +33,7 @@ Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> 
 # Download
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/com.jherkenhoff.qalculate/)
-
-Or download the latest APK from the [Releases Section](https://github.com/jherkenhoff/qalculate-android/releases/latest).
+[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/jherkenhoff/qalculate-android/releases/latest)
 
 > [!WARNING]
 > This project supports an open and independent Android ecosystem and will not participate in Google's efforts to further lock-down Android. As a result, this app may not install on many devices starting September 2026. More information: https://keepandroidopen.org/
