@@ -1,16 +1,24 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -114,6 +122,7 @@ fun Modifier.shrinkHeightAbsolute(shrinkPx: Int): Modifier = this.then(
     }
 )
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
     ExperimentalSharedTransitionApi::class, ExperimentalLayoutApi::class
 )
@@ -152,6 +161,12 @@ fun CalculatorScreenContent(
 
     val calculationListState = rememberCalculationListState()
 
+    val keypadBottomExtraPadding by animateDpAsState(if (WindowInsets.isImeVisible)
+            6.dp
+        else
+            0.dp
+    )
+
     val calcActionLabelMapper = remember(userPreferences) { CalcActionLabelMapper(userPreferences) }
 
     LaunchedEffect(activeCalculationData.id) {
@@ -180,7 +195,7 @@ fun CalculatorScreenContent(
                 )
             )
         }
-    ) { innerPadding ->
+    ) {
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -265,14 +280,12 @@ fun CalculatorScreenContent(
                             keypads[activeKeypadIndex].sections,
                             calcActionLabelMapper,
                             onKeyAction = onAction,
-                            modifier = Modifier.padding(top = 6.dp)
+                            modifier = Modifier.padding(
+                                top = 6.dp,
+                                bottom = WindowInsets.safeContent.getBottom(localDensity).toDp() + keypadBottomExtraPadding
+                            )
                         )
                     }
-                    Spacer(
-                        Modifier.height(
-                            innerPadding.calculateBottomPadding() + WindowInsets.ime.getBottom(LocalDensity.current).toDp() + 6.dp
-                        )
-                    )
                 }
             }
         }
