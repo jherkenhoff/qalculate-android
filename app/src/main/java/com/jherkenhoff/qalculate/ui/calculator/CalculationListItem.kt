@@ -379,7 +379,7 @@ private fun InputField(
                     capitalization = KeyboardCapitalization.None,
                     autoCorrectEnabled = false,
                     imeAction = ImeAction.Send,
-                    keyboardType = KeyboardType.Password
+                    keyboardType = KeyboardType.Text
                 ),
                 keyboardActions = KeyboardActions { onSubmit() },
                 cursorBrush = SolidColor(LocalContentColor.current),
