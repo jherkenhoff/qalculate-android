@@ -34,6 +34,7 @@ Android UI of the almighty <a href="https://qalculate.github.io">Qalculate!</a> 
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/com.jherkenhoff.qalculate/)
 [<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/jherkenhoff/qalculate-android/releases/latest)
+[<img src="readme/badge_obtainium.png" alt="Get it on Obtainium" height="80">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.jherkenhoff.qalculate%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fjherkenhoff%2Fqalculate-android%22%2C%22author%22%3A%22jherkenhoff%22%2C%22name%22%3A%22Qalculate!%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22allowedSigningCertHashes%5C%22%3A%5C%2235%3A6F%3A99%3A80%3AE2%3AC8%3A2D%3A41%3A9F%3A4A%3A53%3A27%3AC6%3AF2%3ACD%3AD1%3A50%3AA3%3AD1%3A70%3AA2%3A00%3A3C%3A7D%3A3E%3A38%3AAB%3A1B%3A75%3AB2%3AD3%3A31%5C%22%2C%5C%22appName%5C%22%3A%5C%22Qalculate!%5C%22%2C%5C%22appAuthor%5C%22%3A%5C%22jherkenhoff%5C%22%2C%5C%22about%5C%22%3A%5C%22A%20powerful%20and%20versatile%20multi-purpose%20calculator%20for%20the%20Android%20platform%5C%22%7D%22%7D)
 
 <details>
 <summary>APK verification</summary>
