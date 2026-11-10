@@ -255,7 +255,7 @@ class CalculatorViewModel @Inject constructor(
     fun submitActiveCalculation() {
         val currentId = activeCalculationData.value.id ?: return
 
-        calculatorRepository.setAnsExpression(mathExpressionPlainText(activeCalculationData.value.input.text))
+        calculatorRepository.setAnsExpression(mathExpressionPlainText(activeCalculationData.value.result))
 
         // Append a new, blank calculation at the end if the currently submitted calculation was the last
         if (currentId == persistentCalculationList.value.last().id) {
