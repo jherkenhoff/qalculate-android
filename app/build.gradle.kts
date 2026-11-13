@@ -134,11 +134,12 @@ dependencies {
     implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.iconsExtended)
-    implementation(libs.qalculate)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.reorderable)
+    //implementation(libs.qalculate)
+    implementation(files("../../libqalculate-android/lib/build/outputs/aar/lib-debug.aar"))
 
     ksp(libs.hilt.compiler)
     ksp(libs.androidx.room.compiler)

@@ -23,9 +23,10 @@ data class AliasUnit(
     val parentUnit: MathUnit
 ) : MathUnit()
 
-data class PrefixedUnit(
-    val prefix: Prefix,
-    val unit: MathUnit
+data class ChildUnit(
+    val unit: MathUnit,
+    val prefix: Prefix?,
+    val exponent: Int?
 )
 
 data class CompositeUnit(
@@ -34,5 +35,5 @@ data class CompositeUnit(
     override val description: String,
     override val category: String,
     override val system: String,
-    val childUnits: List<PrefixedUnit>
+    val childUnits: List<ChildUnit>
 ) : MathUnit()

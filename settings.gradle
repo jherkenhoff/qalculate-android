@@ -14,3 +14,10 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Qalculate!"
 include ':app'
+
+//includeBuild("../libqalculate-android") {
+//    dependencySubstitution {
+//        substitute(module("com.jherkenhoff:libqalculate"))
+//                .using(project(":lib"))
+//    }
+//}

@@ -4,6 +4,7 @@ import android.util.Log
 import com.jherkenhoff.libqalculate.AliasUnit_Composite
 import com.jherkenhoff.libqalculate.ExpressionItem
 import com.jherkenhoff.libqalculate.ExpressionName
+import com.jherkenhoff.libqalculate.Unit
 import com.jherkenhoff.libqalculate.UnitSubtype
 import com.jherkenhoff.qalculate.domain.model.AliasUnit
 import com.jherkenhoff.qalculate.domain.model.Assumptions
@@ -16,9 +17,10 @@ import com.jherkenhoff.qalculate.domain.model.MathUnit
 import com.jherkenhoff.qalculate.domain.model.UnknownVariable
 import com.jherkenhoff.qalculate.domain.model.AbstractMathVariable
 import com.jherkenhoff.qalculate.domain.model.BinaryPrefix
+import com.jherkenhoff.qalculate.domain.model.ChildUnit
 import com.jherkenhoff.qalculate.domain.model.DecimalPrefix
+import com.jherkenhoff.qalculate.domain.model.NumberPrefix
 import com.jherkenhoff.qalculate.domain.model.Prefix
-import com.jherkenhoff.qalculate.domain.model.PrefixedUnit
 import com.jherkenhoff.qalculate.domain.model.Variable
 
 fun ExpressionName.toModel() = ExpressionItemName(
@@ -43,6 +45,9 @@ fun com.jherkenhoff.libqalculate.Prefix.toModel() : Prefix {
             names = names(),
             exponent = exponent()
         )
+        is com.jherkenhoff.libqalculate.NumberPrefix -> NumberPrefix(
+            names = names()
+        )
         else -> error("Unexpected Prefix child class: ${this::class.qualifiedName}")
     }
 }
@@ -55,9 +60,9 @@ fun ExpressionItem.names() =
 
 fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
 
-    return when (subtype()) {
-        UnitSubtype.SUBTYPE_ALIAS_UNIT.swigValue() -> {
-            val aliasUnit = this as com.jherkenhoff.libqalculate.AliasUnit
+    return when (this) {
+
+        is com.jherkenhoff.libqalculate.AliasUnit -> {
             AliasUnit(
                 title = title(),
                 names = names(),
@@ -65,12 +70,11 @@ fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
                 category = category(),
                 system = system(),
                 exponent = baseExponent(),
-                parentUnit = aliasUnit.firstBaseUnit().toModel()
+                parentUnit = firstBaseUnit().toModel()
             )
         }
 
-        UnitSubtype.SUBTYPE_COMPOSITE_UNIT.swigValue() -> {
-            this as com.jherkenhoff.libqalculate.CompositeUnit
+        is com.jherkenhoff.libqalculate.CompositeUnit -> {
             CompositeUnit(
                 title = title(),
                 names = names(),
@@ -78,16 +82,19 @@ fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
                 category = category(),
                 system = system(),
                 childUnits = (1..countUnits()).map { i ->
-                    val nativeChildUnit = get(i)
-                    PrefixedUnit(
-                        prefix = (nativeChildUnit as AliasUnit_Composite).prefix().toModel(),
+                    val nativeChildUnit = getUnit(i)
+                    val prefix : com.jherkenhoff.libqalculate.Prefix? = getPrefix(i)
+                    val exponent = getExponent(i)
+                    ChildUnit(
+                        prefix = prefix?.toModel(),
                         unit = nativeChildUnit.toModel(),
+                        exponent = exponent
                     )
                 }
             )
         }
 
-        UnitSubtype.SUBTYPE_BASE_UNIT.swigValue() -> {
+        else -> {
             BaseUnit(
                 title = title(),
                 names = names(),
@@ -96,8 +103,6 @@ fun com.jherkenhoff.libqalculate.Unit.toModel(): MathUnit {
                 system = system()
             )
         }
-
-        else -> error("Unexpected subtype: ${subtype()}")
     }
 }
 
@@ -144,7 +149,7 @@ fun com.jherkenhoff.libqalculate.Variable.toModel(): AbstractMathVariable {
                 names = names(),
                 description = description(),
                 category = category(),
-                assumptions = assumptions().toModel(),
+                assumptions = assumptions()?.toModel(),
             )
         }
 

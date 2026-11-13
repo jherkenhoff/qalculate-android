@@ -23,5 +23,5 @@ data class UnknownVariable(
     override val names: List<ExpressionItemName>,
     override val description: String,
     override val category: String,
-    val assumptions: Assumptions
+    val assumptions: Assumptions?
 ) : AbstractMathVariable()
