@@ -17,7 +17,7 @@ activityCompose = "1.10.1"
 composeBom = "2026.05.01"
 ksp = "2.3.4"
 reorderable = "3.1.0"
-qalculate = "5.8.2-2"
+qalculate = "5.13.1-1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
